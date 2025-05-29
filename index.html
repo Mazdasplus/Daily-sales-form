@@ -274,7 +274,7 @@
 
             <div class="text-center mt-6 flex justify-center space-x-4">
                 <button type="submit" class="btn-primary">Submit Daily Report</button>
-                <button type="button" onclick="copyPageAsImage()" class="btn-primary bg-gray-600 hover:bg-gray-700">Copy Page as Image</button>
+                <button type="button" onclick="savePageAsImage()" class="btn-primary bg-gray-600 hover:bg-gray-700">Save Page as Image</button>
             </div>
 
             <div class="totals-section">
@@ -311,10 +311,20 @@
         // Function to set the current date
         function setCurrentDate() {
             const today = new Date();
+            // Format as YYYY-MM-DD for the input[type="date"] field
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
             const dd = String(today.getDate()).padStart(2, '0');
             document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Function to get the date in MMDDYY format for filename
+        function getFormattedDateForFilename() {
+            const today = new Date();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const yy = String(today.getFullYear()).slice(-2); // Get last two digits of the year
+            return `${mm}${dd}${yy}`;
         }
 
         // Function to update the daily goal based on prior day's total
@@ -553,9 +563,9 @@
             }
         }
 
-        // Function to copy the page as an image to clipboard
-        async function copyPageAsImage() {
-            showMessageBox('Copying Image...', 'Please wait while the page is captured and copied.');
+        // Function to save the page as an image
+        async function savePageAsImage() {
+            showMessageBox('Saving Image...', 'Please wait while the page is captured and prepared for download.');
             try {
                 const formContainer = document.querySelector('.container'); // Target the main form container
                 const originalOverflow = document.body.style.overflow;
@@ -574,27 +584,29 @@
                             logging: false // Disable logging to console
                         });
 
-                        canvas.toBlob(async (blob) => {
-                            try {
-                                const item = new ClipboardItem({ 'image/png': blob });
-                                await navigator.clipboard.write([item]);
-                                showMessageBox('Success!', 'The page image has been copied to your clipboard.');
-                            } catch (err) {
-                                console.error('Failed to copy image to clipboard:', err);
-                                showMessageBox('Error', 'Failed to copy image to clipboard. Your browser might require special permissions or not support this feature directly. Try right-clicking the form and selecting "Save image as..." if available.');
-                            } finally {
-                                document.body.style.overflow = originalOverflow; // Restore original overflow
-                            }
-                        }, 'image/png');
+                        const image = canvas.toDataURL('image/png');
+                        const a = document.createElement('a');
+                        const filenameDate = getFormattedDateForFilename(); // Get date in MMDDYY format
+                        const filename = `mplussales_${filenameDate}.png`;
+
+                        a.href = image;
+                        a.download = filename;
+                        document.body.appendChild(a); // Append to body to make it clickable
+                        a.click(); // Programmatically click the link to trigger download
+                        document.body.removeChild(a); // Remove the link after clicking
+
+                        showMessageBox('Success!', `The image "${filename}" has been downloaded.`);
 
                     } catch (error) {
                         console.error('Error generating canvas from page:', error);
                         showMessageBox('Error', 'Failed to capture page image. Please try again.');
+                    } finally {
+                        document.body.style.overflow = originalOverflow; // Restore original overflow
                     }
                 }, 100); // Small delay to ensure rendering is complete
 
             } catch (error) {
-                console.error('Error in copyPageAsImage function:', error);
+                console.error('Error in savePageAsImage function:', error);
                 showMessageBox('Error', 'An unexpected error occurred during image capture.');
             }
         }
