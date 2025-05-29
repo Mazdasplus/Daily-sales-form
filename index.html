@@ -100,7 +100,7 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
-        <form id="salesForm" class="space-y-8">
+        <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
             <div class="space-y-4">
                 <h2 class="text-2xl font-semibold text-gray-700 section-title">Sales Metrics</h2>
 
@@ -424,12 +424,14 @@
             document.getElementById('messageBox').classList.add('hidden');
         }
 
-        // Handle form submission
+        // Handle form submission (now relies on Formspree's action attribute)
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent default form submission
+            // NOTE: event.preventDefault() is REMOVED here because Formspree needs the default browser submission
+            // to send the data. Your custom JavaScript will still collect formData,
+            // but Formspree captures form fields directly from the HTML.
 
-            // Gather form data
-            const formData = {
+            // The following console.log is for your own debugging/viewing purposes in the browser console.
+            const formDataCollectedByJS = {
                 dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
                 priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
                 carSales: [],
@@ -450,7 +452,7 @@
                 const sold = parseFloat(carSoldSales[index].value) || 0;
                 const appointment = carAppointmentScheduled[index].value;
                 if (roNum || discovered > 0 || sold > 0 || appointment) {
-                    formData.carSales.push({
+                    formDataCollectedByJS.carSales.push({
                         repairOrderNumber: roNum,
                         discoveredSales: discovered,
                         soldSales: sold,
@@ -469,7 +471,7 @@
                 const phone = customerPhones[index].value;
                 const booked = bookedAppointments[index].value;
                 if (name || phone || booked) {
-                    formData.calls.push({
+                    formDataCollectedByJS.calls.push({
                         customerName: name,
                         customerPhone: phone,
                         bookedAppointment: booked
@@ -492,7 +494,7 @@
                 const otherReasonDetails = lostOtherReasons[index].value;
 
                 if (name || phone || cost > 0 || reason) {
-                    formData.lostOpportunities.push({
+                    formDataCollectedByJS.lostOpportunities.push({
                         customerName: name,
                         customerPhone: phone,
                         lostCost: cost,
@@ -502,45 +504,16 @@
                 }
             });
 
-            console.log('Form Data Submitted:', formData);
-            showMessageBox('Report Submitted!', 'Your daily sales report has been successfully recorded. Check the console for details.');
+            console.log('Form Data (as collected by JS):', formDataCollectedByJS); // This will still show in your browser console
 
-            // If you want to send this data to an external service (like Formspree for emails),
-            // you would typically use a fetch() request here.
-            // Example for Formspree (replace YOUR_FORMSPREE_ENDPOINT with your actual endpoint):
-            /*
-            try {
-                const response = await fetch('YOUR_FORMSPREE_ENDPOINT', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-                if (response.ok) {
-                    showMessageBox('Report Submitted!', 'Your daily sales report has been successfully sent via email!');
-                } else {
-                    const errorData = await response.json();
-                    showMessageBox('Error', `Failed to send report: ${errorData.error || 'Unknown error'}`);
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-                showMessageBox('Error', `Network error: Could not send report. ${error.message}`);
-            }
-            */
+            // Show a temporary message while the browser redirects to Formspree's success page (or reloads)
+            showMessageBox('Submitting Report...', 'Please wait while your data is sent via email.');
 
-            // Optionally, clear the form after submission
-            // this.reset();
-            // callEntryCount = 1;
-            // carEntryCount = 1;
-            // lostOpportunityEntryCount = 1;
-            // document.getElementById('callEntries').innerHTML = `...`; // Reset initial call entry
-            // document.getElementById('carSalesEntries').innerHTML = `...`; // Reset initial car entry
-            // document.getElementById('lostOpportunityEntries').innerHTML = `...`; // Reset initial lost opportunity entry
-            // updateRemoveButtonsVisibility('callEntries');
-            // updateRemoveButtonsVisibility('carSalesEntries');
-            // updateRemoveButtonsVisibility('lostOpportunityEntries');
+            // Formspree handles the actual submission via the HTML 'action' attribute.
+            // The browser will now submit the form data and typically redirect to Formspree's thank you page.
+            // If you want to prevent redirection and handle success/error messages purely within your JS,
+            // you'd need to use fetch() as shown in the commented-out example in the previous code.
+            // For now, the default form submission (redirect) is enabled.
         });
     </script>
 </body>
