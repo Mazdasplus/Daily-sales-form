@@ -107,7 +107,7 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -150" class="w-full rounded-md" step="0.01" oninput="updateRemainingGoal()">
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateRemainingGoal()">
                     </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
@@ -136,7 +136,7 @@
                                 <input type="number" id="carSoldSales_1" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                             </div>
                             <div class="form-col">
-                                <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Appointment Scheduled?</label>
+                                <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
                                 <select id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="w-full rounded-md">
                                     <option value="">Select</option>
                                     <option value="yes">Yes</option>
@@ -248,8 +248,10 @@
                 totalSoldSales += parseFloat(input.value) || 0;
             });
 
-            // Calculate remaining goal: (Daily Goal + Prior Day Total) - Total Sold Sales
-            const remainingGoal = (dailyGoal + priorDayTotal) - totalSoldSales;
+            // Adjusted calculation: (Daily Goal - Prior Day Total) - Total Sold Sales
+            // If Prior Day Total is negative (e.g., -200), subtracting it makes it positive (5200 - (-200) = 5400)
+            // If Prior Day Total is positive (e.g., 100), subtracting it reduces the goal (5200 - 100 = 5100)
+            const remainingGoal = (dailyGoal - priorDayTotal) - totalSoldSales;
             document.getElementById('remainingDailyGoal').innerText = remainingGoal.toFixed(2);
         }
 
@@ -310,7 +312,7 @@
                     <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                 </div>
                 <div class="form-col">
-                    <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Appointment Scheduled?</label>
+                    <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
                     <select id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="w-full rounded-md">
                         <option value="">Select</option>
                         <option value="yes">Yes</option>
@@ -354,7 +356,7 @@
                 </div>
                 <div class="form-col">
                     <label for="lostReason_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
-                    <select id="lostReason_${lostOpportunityEntryCount}" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${lostOpportunityEntryCount})">
+                    <select id="lostReason_${lostOpportunityEntryCount}" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1)">
                         <option value="">Select Reason</option>
                         <option value="Cost">Cost</option>
                         <option value="Appointment Availability">Appointment Availability</option>
