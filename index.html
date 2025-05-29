@@ -83,20 +83,61 @@
                 flex: 1;
             }
         }
+        /* Generic goal display styles - colors handled by JS */
         .goal-display {
             font-size: 1.25rem; /* text-xl */
             font-weight: 600; /* font-semibold */
-            color: #1f2937; /* text-gray-900 */
             margin-top: 1rem;
             padding: 0.75rem 1rem;
-            background-color: #e0f2fe; /* bg-blue-50 */
-            border-left: 4px solid #3b82f6; /* border-blue-500 */
             border-radius: 0.375rem; /* rounded-md */
+            border-left: 4px solid; /* Border color handled by JS */
+        }
+        .totals-section {
+            background-color: #f0f9ff; /* Light blue background for totals */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #bfdbfe; /* Light blue border */
+            margin-top: 2rem;
+        }
+        .totals-section p {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500;
+            color: #1e3a8a; /* Darker blue text */
+            margin-bottom: 0.5rem;
+        }
+        .totals-section p span {
+            font-weight: 700; /* bold */
+            color: #000; /* Black for values */
+        }
+        /* Generic highlighted goal styles - colors handled by JS */
+        .highlighted-goal {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-top: 1rem;
+            border: 2px solid; /* Border color handled by JS */
+        }
+
+        /* Classes for dynamic color changes */
+        .goal-met {
+            color: #16a34a; /* green-700 */
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+        }
+        .goal-not-met {
+            color: #dc2626; /* red-700 */
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="text-center mb-8">
+            <img src="IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+        </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
@@ -115,8 +156,8 @@
                     </div>
                 </div>
 
-                <div class="goal-display">
-                    Remaining Daily Goal: $<span id="remainingDailyGoal">0.00</span>
+                <div class="goal-display" id="remainingDailyGoalTop">
+                    Remaining Daily Goal: $<span id="remainingDailyGoalValueTop">0.00</span>
                 </div>
 
                 <div class="space-y-4 pt-4 border-t border-gray-200 mt-6">
@@ -129,11 +170,11 @@
                             </div>
                             <div class="form-col">
                                 <label for="carDiscoveredSales_1" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
-                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                             </div>
                             <div class="form-col">
                                 <label for="carSoldSales_1" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
-                                <input type="number" id="carSoldSales_1" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                                <input type="number" id="carSoldSales_1" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal(); updateRunningTotals()">
                             </div>
                             <div class="form-col">
                                 <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
@@ -172,33 +213,13 @@
                                 <option value="no">No</option>
                             </select>
                         </div>
-                        <div class="w-full sm:w-auto">
-                            <button type="button" onclick="removeCallEntry(this)" class="btn-remove hidden">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" onclick="addCallEntry()" class="btn-primary text-sm mt-4">Add Another Call</button>
-            </div>
-
-            <div class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-700 section-title">Lost Opportunity / Reason</h2>
-                <div id="lostOpportunityEntries" class="space-y-4">
-                    <div class="form-row items-end">
                         <div class="form-col">
-                            <label for="lostCustomerName_1" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
-                            <input type="text" id="lostCustomerName_1" name="lostCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
+                            <label for="callLostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                            <input type="number" id="callLostCost_1" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                         </div>
                         <div class="form-col">
-                            <label for="lostCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
-                            <input type="text" id="lostCustomerPhone_1" name="lostCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
-                        </div>
-                        <div class="form-col">
-                            <label for="lostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
-                            <input type="number" id="lostCost_1" name="lostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
-                        </div>
-                        <div class="form-col">
-                            <label for="lostReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
-                            <select id="lostReason_1" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1)">
+                            <label for="callReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                            <select id="callReason_1" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1, 'call')">
                                 <option value="">Select Reason</option>
                                 <option value="Cost">Cost</option>
                                 <option value="Appointment Availability">Appointment Availability</option>
@@ -206,19 +227,29 @@
                             </select>
                         </div>
                         <div class="w-full sm:w-auto">
-                            <button type="button" onclick="removeLostOpportunityEntry(this)" class="btn-remove hidden">Remove</button>
+                            <button type="button" onclick="removeCallEntry(this)" class="btn-remove hidden">Remove</button>
                         </div>
-                        <div class="form-col w-full" id="otherReasonContainer_1" style="display:none;">
-                            <label for="lostOtherReason_1" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
-                            <textarea id="lostOtherReason_1" name="lostOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
+                        <div class="form-col w-full" id="callOtherReasonContainer_1" style="display:none;">
+                            <label for="callOtherReason_1" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
+                            <textarea id="callOtherReason_1" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="addLostOpportunityEntry()" class="btn-primary text-sm mt-4">Add Lost Opportunity</button>
+                <button type="button" onclick="addCallEntry()" class="btn-primary text-sm mt-4">Add Another Call</button>
             </div>
 
             <div class="text-center">
                 <button type="submit" class="btn-primary">Submit Daily Report</button>
+            </div>
+
+            <div class="totals-section">
+                <h2 class="text-2xl font-semibold text-gray-700 section-title">Daily Totals</h2>
+                <p>Total Discovered Sales: $<span id="totalDiscoveredSales">0.00</span></p>
+                <p>Total Sold Sales: $<span id="totalSoldSales">0.00</span></p>
+                <p>Close Ratio: <span id="closeRatio">0.00%</span></p>
+                <div class="highlighted-goal" id="remainingDailyGoalBottom">
+                    Remaining Daily Goal: $<span id="remainingDailyGoalValueBottom">0.00</span>
+                </div>
             </div>
         </form>
 
@@ -234,26 +265,63 @@
     <script>
         let callEntryCount = 1;
         let carEntryCount = 1;
-        let lostOpportunityEntryCount = 1;
 
-        // Function to update the Remaining Daily Goal display
+        // Function to update the Remaining Daily Goal display and its color
         function updateRemainingGoal() {
             const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
-            // Allow priorDayTotal to be negative
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
-            let totalSoldSales = 0;
+            let currentDaySoldSales = 0;
 
             // Sum up all 'Sold Sales' from car entries
             document.querySelectorAll('input[name="carSoldSales[]"]').forEach(input => {
-                totalSoldSales += parseFloat(input.value) || 0;
+                currentDaySoldSales += parseFloat(input.value) || 0;
             });
 
-            // Adjusted calculation: (Daily Goal - Prior Day Total) - Total Sold Sales
-            // If Prior Day Total is negative (e.g., -200), subtracting it makes it positive (5200 - (-200) = 5400)
-            // If Prior Day Total is positive (e.g., 100), subtracting it reduces the goal (5200 - 100 = 5100)
-            const remainingGoal = (dailyGoal - priorDayTotal) - totalSoldSales;
-            document.getElementById('remainingDailyGoal').innerText = remainingGoal.toFixed(2);
+            // Adjusted calculation: (Daily Goal - Prior Day Total) - Current Day Sold Sales
+            const remainingGoal = (dailyGoal - priorDayTotal) - currentDaySoldSales;
+
+            const remainingGoalValueTop = document.getElementById('remainingDailyGoalValueTop');
+            const remainingGoalValueBottom = document.getElementById('remainingDailyGoalValueBottom');
+            const remainingGoalContainerTop = document.getElementById('remainingDailyGoalTop');
+            const remainingGoalContainerBottom = document.getElementById('remainingDailyGoalBottom');
+
+            remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
+            remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
+
+            // Apply color based on remainingGoal
+            if (remainingGoal <= 0) {
+                remainingGoalContainerTop.classList.remove('goal-not-met');
+                remainingGoalContainerTop.classList.add('goal-met');
+                remainingGoalContainerBottom.classList.remove('goal-not-met');
+                remainingGoalContainerBottom.classList.add('goal-met');
+            } else {
+                remainingGoalContainerTop.classList.remove('goal-met');
+                remainingGoalContainerTop.classList.add('goal-not-met');
+                remainingGoalContainerBottom.classList.remove('goal-met');
+                remainingGoalContainerBottom.classList.add('goal-not-met');
+            }
         }
+
+        // Function to update the running totals (Discovered, Sold, Close Ratio)
+        function updateRunningTotals() {
+            let totalDiscovered = 0;
+            let totalSold = 0;
+
+            document.querySelectorAll('input[name="carDiscoveredSales[]"]').forEach(input => {
+                totalDiscovered += parseFloat(input.value) || 0;
+            });
+
+            document.querySelectorAll('input[name="carSoldSales[]"]').forEach(input => {
+                totalSold += parseFloat(input.value) || 0;
+            });
+
+            const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
+
+            document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
+            document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
+            document.getElementById('closeRatio').innerText = closeRatio.toFixed(2) + '%';
+        }
+
 
         // Function to add a new call entry row
         function addCallEntry() {
@@ -278,8 +346,25 @@
                         <option value="no">No</option>
                     </select>
                 </div>
+                <div class="form-col">
+                    <label for="callLostCost_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                    <input type="number" id="callLostCost_${callEntryCount}" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
+                </div>
+                <div class="form-col">
+                    <label for="callReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                    <select id="callReason_${callEntryCount}" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${callEntryCount}, 'call')">
+                        <option value="">Select Reason</option>
+                        <option value="Cost">Cost</option>
+                        <option value="Appointment Availability">Appointment Availability</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
                 <div class="w-full sm:w-auto">
                     <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
+                </div>
+                <div class="form-col w-full" id="callOtherReasonContainer_${callEntryCount}" style="display:none;">
+                    <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
+                    <textarea id="callOtherReason_${callEntryCount}" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                 </div>
             `;
             callEntriesDiv.appendChild(newEntry);
@@ -305,11 +390,11 @@
                 </div>
                 <div class="form-col">
                     <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
-                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                 </div>
                 <div class="form-col">
                     <label for="carSoldSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
-                    <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                    <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal(); updateRunningTotals()">
                 </div>
                 <div class="form-col">
                     <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
@@ -326,6 +411,7 @@
             carSalesEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('carSalesEntries');
             updateRemainingGoal(); // Update goal when a new car entry is added
+            updateRunningTotals(); // Update totals when a new car entry is added
         }
 
         // Function to remove a car sales entry row
@@ -333,62 +419,17 @@
             button.closest('.form-row').remove();
             updateRemoveButtonsVisibility('carSalesEntries');
             updateRemainingGoal(); // Update goal when a car entry is removed
-        }
-
-        // Function to add a new lost opportunity entry row
-        function addLostOpportunityEntry() {
-            lostOpportunityEntryCount++;
-            const lostOpportunityEntriesDiv = document.getElementById('lostOpportunityEntries');
-            const newEntry = document.createElement('div');
-            newEntry.className = 'form-row items-end';
-            newEntry.innerHTML = `
-                <div class="form-col">
-                    <label for="lostCustomerName_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
-                    <input type="text" id="lostCustomerName_${lostOpportunityEntryCount}" name="lostCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
-                </div>
-                <div class="form-col">
-                    <label for="lostCustomerPhone_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
-                    <input type="text" id="lostCustomerPhone_${lostOpportunityEntryCount}" name="lostCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
-                </div>
-                <div class="form-col">
-                    <label for="lostCost_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
-                    <input type="number" id="lostCost_${lostOpportunityEntryCount}" name="lostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
-                </div>
-                <div class="form-col">
-                    <label for="lostReason_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
-                    <select id="lostReason_${lostOpportunityEntryCount}" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1)">
-                        <option value="">Select Reason</option>
-                        <option value="Cost">Cost</option>
-                        <option value="Appointment Availability">Appointment Availability</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="w-full sm:w-auto">
-                    <button type="button" onclick="removeLostOpportunityEntry(this)" class="btn-remove">Remove</button>
-                </div>
-                <div class="form-col w-full" id="otherReasonContainer_${lostOpportunityEntryCount}" style="display:none;">
-                    <label for="lostOtherReason_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
-                    <textarea id="lostOtherReason_${lostOpportunityEntryCount}" name="lostOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
-                </div>
-            `;
-            lostOpportunityEntriesDiv.appendChild(newEntry);
-            updateRemoveButtonsVisibility('lostOpportunityEntries');
-        }
-
-        // Function to remove a lost opportunity entry row
-        function removeLostOpportunityEntry(button) {
-            button.closest('.form-row').remove();
-            updateRemoveButtonsVisibility('lostOpportunityEntries');
+            updateRunningTotals(); // Update totals when a car entry is removed
         }
 
         // Function to toggle visibility of the "Other Reason Details" textarea
-        function toggleOtherReason(selectElement, index) {
-            const otherReasonContainer = document.getElementById(`otherReasonContainer_${index}`);
+        function toggleOtherReason(selectElement, index, type) {
+            const otherReasonContainer = document.getElementById(`${type}OtherReasonContainer_${index}`);
             if (selectElement.value === 'Other') {
                 otherReasonContainer.style.display = 'block';
             } else {
                 otherReasonContainer.style.display = 'none';
-                document.getElementById(`lostOtherReason_${index}`).value = ''; // Clear content when hidden
+                document.getElementById(`${type}OtherReason_${index}`).value = ''; // Clear content when hidden
             }
         }
 
@@ -409,8 +450,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateRemoveButtonsVisibility('callEntries');
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemoveButtonsVisibility('lostOpportunityEntries');
             updateRemainingGoal(); // Calculate initial goal on load
+            updateRunningTotals(); // Calculate initial totals on load
         });
 
 
@@ -437,8 +478,7 @@
                 dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
                 priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
                 carSales: [],
-                calls: [],
-                lostOpportunities: [],
+                calls: [], // Calls now include lost cost and reason
                 submissionDate: new Date().toISOString(),
             };
 
@@ -463,45 +503,31 @@
                 }
             });
 
-            // Get all call entries
+            // Get all call entries (now including lost opportunity details)
             const customerNames = document.querySelectorAll('input[name="callCustomerName[]"]');
             const customerPhones = document.querySelectorAll('input[name="callCustomerPhone[]"]');
             const bookedAppointments = document.querySelectorAll('select[name="callBookedAppointment[]"]');
+            const callLostCosts = document.querySelectorAll('input[name="callLostCost[]"]');
+            const callReasons = document.querySelectorAll('select[name="callReason[]"]');
+            const callOtherReasons = document.querySelectorAll('textarea[name="callOtherReason[]"]');
+
 
             customerNames.forEach((input, index) => {
                 const name = input.value;
                 const phone = customerPhones[index].value;
                 const booked = bookedAppointments[index].value;
-                if (name || phone || booked) {
+                const lostCost = parseFloat(callLostCosts[index].value) || 0;
+                const reason = callReasons[index].value;
+                const otherReasonDetails = callOtherReasons[index].value;
+
+                if (name || phone || booked || lostCost > 0 || reason) {
                     formDataCollectedByJS.calls.push({
                         customerName: name,
                         customerPhone: phone,
-                        bookedAppointment: booked
-                    });
-                }
-            });
-
-            // Get all lost opportunity entries
-            const lostCustomerNames = document.querySelectorAll('input[name="lostCustomerName[]"]');
-            const lostCustomerPhones = document.querySelectorAll('input[name="lostCustomerPhone[]"]');
-            const lostCosts = document.querySelectorAll('input[name="lostCost[]"]');
-            const lostReasons = document.querySelectorAll('select[name="lostReason[]"]');
-            const lostOtherReasons = document.querySelectorAll('textarea[name="lostOtherReason[]"]');
-
-            lostCustomerNames.forEach((input, index) => {
-                const name = input.value;
-                const phone = lostCustomerPhones[index].value;
-                const cost = parseFloat(lostCosts[index].value) || 0;
-                const reason = lostReasons[index].value;
-                const otherReasonDetails = lostOtherReasons[index].value;
-
-                if (name || phone || cost > 0 || reason) {
-                    formDataCollectedByJS.lostOpportunities.push({
-                        customerName: name,
-                        customerPhone: phone,
-                        lostCost: cost,
-                        reason: reason,
-                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : ''
+                        bookedAppointment: booked,
+                        lostCost: lostCost, // Added to calls
+                        reason: reason,     // Added to calls
+                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : '' // Added to calls
                     });
                 }
             });
