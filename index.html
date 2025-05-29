@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Sales Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for better form visibility */
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            width: 100%;
+            max-width: 960px; /* max-w-3xl */
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select { /* Added select to styling */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.625rem 1rem; /* py-2.5 px-4 */
+            width: 100%;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus { /* Added select to styling */
+            border-color: #3b82f6; /* ring-blue-500 */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* ring-blue-500/25 */
+        }
+        .section-title {
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn-primary {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: #ffffff; /* text-white */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* bg-blue-600 */
+        }
+        .btn-remove { /* Style for remove buttons */
+            background-color: #ef4444; /* bg-red-500 */
+            color: #ffffff; /* text-white */
+            padding: 0.5rem 0.75rem; /* p-2 */
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 500; /* font-medium */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-remove:hover {
+            background-color: #dc2626; /* bg-red-600 */
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem; /* space-x-4 and space-y-4 for stacking */
+        }
+        .form-col {
+            flex: 1;
+            min-width: 180px; /* Adjusted min-width for more columns in car sales */
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .form-row > div {
+                flex: 1;
+            }
+        }
+        .goal-display {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #1f2937; /* text-gray-900 */
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background-color: #e0f2fe; /* bg-blue-50 */
+            border-left: 4px solid #3b82f6; /* border-blue-500 */
+            border-radius: 0.375rem; /* rounded-md */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
+        <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
+
+        <form id="salesForm" class="space-y-8">
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold text-gray-700 section-title">Sales Metrics</h2>
+
+                <div class="form-row mb-4">
+                    <div class="form-col">
+                        <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -150" class="w-full rounded-md" step="0.01" oninput="updateRemainingGoal()">
+                    </div>
+                    <div class="form-col">
+                        <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
+                        <input type="number" id="dailyGoal" name="dailyGoal" value="5200" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                    </div>
+                </div>
+
+                <div class="goal-display">
+                    Remaining Daily Goal: $<span id="remainingDailyGoal">0.00</span>
+                </div>
+
+                <div class="space-y-4 pt-4 border-t border-gray-200 mt-6">
+                    <h3 class="text-xl font-semibold text-gray-700">Individual Car Sales</h3>
+                    <div id="carSalesEntries" class="space-y-4">
+                        <div class="form-row items-end">
+                            <div class="form-col">
+                                <label for="carRepairOrderNumber_1" class="block text-gray-700 text-sm font-medium mb-1">Repair Order #</label>
+                                <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                            </div>
+                            <div class="form-col">
+                                <label for="carDiscoveredSales_1" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
+                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                            </div>
+                            <div class="form-col">
+                                <label for="carSoldSales_1" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
+                                <input type="number" id="carSoldSales_1" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                            </div>
+                            <div class="form-col">
+                                <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Appointment Scheduled?</label>
+                                <select id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="w-full rounded-md">
+                                    <option value="">Select</option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                            <div class="w-full sm:w-auto">
+                                <button type="button" onclick="removeCarEntry(this)" class="btn-remove hidden">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addCarEntry()" class="btn-primary text-sm mt-4">Add Another Car</button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold text-gray-700 section-title">New Customer Outreach</h2>
+                <div id="callEntries" class="space-y-4">
+                    <div class="form-row items-end">
+                        <div class="form-col">
+                            <label for="callCustomerName_1" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                            <input type="text" id="callCustomerName_1" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
+                        </div>
+                        <div class="form-col">
+                            <label for="callCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                            <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                        </div>
+                        <div class="form-col">
+                            <label for="callBookedAppointment_1" class="block text-gray-700 text-sm font-medium mb-1">Booked Appointment?</label>
+                            <select id="callBookedAppointment_1" name="callBookedAppointment[]" class="w-full rounded-md">
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <button type="button" onclick="removeCallEntry(this)" class="btn-remove hidden">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addCallEntry()" class="btn-primary text-sm mt-4">Add Another Call</button>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-2xl font-semibold text-gray-700 section-title">Lost Opportunity / Reason</h2>
+                <div id="lostOpportunityEntries" class="space-y-4">
+                    <div class="form-row items-end">
+                        <div class="form-col">
+                            <label for="lostCustomerName_1" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                            <input type="text" id="lostCustomerName_1" name="lostCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
+                        </div>
+                        <div class="form-col">
+                            <label for="lostCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                            <input type="text" id="lostCustomerPhone_1" name="lostCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                        </div>
+                        <div class="form-col">
+                            <label for="lostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                            <input type="number" id="lostCost_1" name="lostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
+                        </div>
+                        <div class="form-col">
+                            <label for="lostReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                            <select id="lostReason_1" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1)">
+                                <option value="">Select Reason</option>
+                                <option value="Cost">Cost</option>
+                                <option value="Appointment Availability">Appointment Availability</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <button type="button" onclick="removeLostOpportunityEntry(this)" class="btn-remove hidden">Remove</button>
+                        </div>
+                        <div class="form-col w-full" id="otherReasonContainer_1" style="display:none;">
+                            <label for="lostOtherReason_1" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
+                            <textarea id="lostOtherReason_1" name="lostOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addLostOpportunityEntry()" class="btn-primary text-sm mt-4">Add Lost Opportunity</button>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn-primary">Submit Daily Report</button>
+            </div>
+        </form>
+
+        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4" id="messageBoxTitle"></h3>
+                <p class="text-gray-700 mb-6" id="messageBoxContent"></p>
+                <button onclick="closeMessageBox()" class="btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let callEntryCount = 1;
+        let carEntryCount = 1;
+        let lostOpportunityEntryCount = 1;
+
+        // Function to update the Remaining Daily Goal display
+        function updateRemainingGoal() {
+            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
+            // Allow priorDayTotal to be negative
+            const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
+            let totalSoldSales = 0;
+
+            // Sum up all 'Sold Sales' from car entries
+            document.querySelectorAll('input[name="carSoldSales[]"]').forEach(input => {
+                totalSoldSales += parseFloat(input.value) || 0;
+            });
+
+            // Calculate remaining goal: (Daily Goal + Prior Day Total) - Total Sold Sales
+            const remainingGoal = (dailyGoal + priorDayTotal) - totalSoldSales;
+            document.getElementById('remainingDailyGoal').innerText = remainingGoal.toFixed(2);
+        }
+
+        // Function to add a new call entry row
+        function addCallEntry() {
+            callEntryCount++;
+            const callEntriesDiv = document.getElementById('callEntries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'form-row items-end';
+            newEntry.innerHTML = `
+                <div class="form-col">
+                    <label for="callCustomerName_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                    <input type="text" id="callCustomerName_${callEntryCount}" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                    <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="callBookedAppointment_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Booked Appointment?</label>
+                    <select id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="w-full rounded-md">
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
+                </div>
+            `;
+            callEntriesDiv.appendChild(newEntry);
+            updateRemoveButtonsVisibility('callEntries');
+        }
+
+        // Function to remove a call entry row
+        function removeCallEntry(button) {
+            button.closest('.form-row').remove();
+            updateRemoveButtonsVisibility('callEntries');
+        }
+
+        // Function to add a new car sales entry row
+        function addCarEntry() {
+            carEntryCount++;
+            const carSalesEntriesDiv = document.getElementById('carSalesEntries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'form-row items-end';
+            newEntry.innerHTML = `
+                <div class="form-col">
+                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Repair Order #</label>
+                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                </div>
+                <div class="form-col">
+                    <label for="carSoldSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
+                    <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                </div>
+                <div class="form-col">
+                    <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Appointment Scheduled?</label>
+                    <select id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="w-full rounded-md">
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <button type="button" onclick="removeCarEntry(this)" class="btn-remove">Remove</button>
+                </div>
+            `;
+            carSalesEntriesDiv.appendChild(newEntry);
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRemainingGoal(); // Update goal when a new car entry is added
+        }
+
+        // Function to remove a car sales entry row
+        function removeCarEntry(button) {
+            button.closest('.form-row').remove();
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRemainingGoal(); // Update goal when a car entry is removed
+        }
+
+        // Function to add a new lost opportunity entry row
+        function addLostOpportunityEntry() {
+            lostOpportunityEntryCount++;
+            const lostOpportunityEntriesDiv = document.getElementById('lostOpportunityEntries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'form-row items-end';
+            newEntry.innerHTML = `
+                <div class="form-col">
+                    <label for="lostCustomerName_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                    <input type="text" id="lostCustomerName_${lostOpportunityEntryCount}" name="lostCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="lostCustomerPhone_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                    <input type="text" id="lostCustomerPhone_${lostOpportunityEntryCount}" name="lostCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="lostCost_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                    <input type="number" id="lostCost_${lostOpportunityEntryCount}" name="lostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
+                </div>
+                <div class="form-col">
+                    <label for="lostReason_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                    <select id="lostReason_${lostOpportunityEntryCount}" name="lostReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${lostOpportunityEntryCount})">
+                        <option value="">Select Reason</option>
+                        <option value="Cost">Cost</option>
+                        <option value="Appointment Availability">Appointment Availability</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <button type="button" onclick="removeLostOpportunityEntry(this)" class="btn-remove">Remove</button>
+                </div>
+                <div class="form-col w-full" id="otherReasonContainer_${lostOpportunityEntryCount}" style="display:none;">
+                    <label for="lostOtherReason_${lostOpportunityEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
+                    <textarea id="lostOtherReason_${lostOpportunityEntryCount}" name="lostOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
+                </div>
+            `;
+            lostOpportunityEntriesDiv.appendChild(newEntry);
+            updateRemoveButtonsVisibility('lostOpportunityEntries');
+        }
+
+        // Function to remove a lost opportunity entry row
+        function removeLostOpportunityEntry(button) {
+            button.closest('.form-row').remove();
+            updateRemoveButtonsVisibility('lostOpportunityEntries');
+        }
+
+        // Function to toggle visibility of the "Other Reason Details" textarea
+        function toggleOtherReason(selectElement, index) {
+            const otherReasonContainer = document.getElementById(`otherReasonContainer_${index}`);
+            if (selectElement.value === 'Other') {
+                otherReasonContainer.style.display = 'block';
+            } else {
+                otherReasonContainer.style.display = 'none';
+                document.getElementById(`lostOtherReason_${index}`).value = ''; // Clear content when hidden
+            }
+        }
+
+        // Function to update visibility of remove buttons for a given container
+        function updateRemoveButtonsVisibility(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return; // Exit if container not found
+
+            const removeButtons = container.querySelectorAll('.form-row .btn-remove');
+            if (removeButtons.length <= 1) {
+                removeButtons.forEach(btn => btn.classList.add('hidden'));
+            } else {
+                removeButtons.forEach(btn => btn.classList.remove('hidden'));
+            }
+        }
+
+        // Initial calls to set button visibility and calculate goal on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRemoveButtonsVisibility('callEntries');
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRemoveButtonsVisibility('lostOpportunityEntries');
+            updateRemainingGoal(); // Calculate initial goal on load
+        });
+
+
+        // Function to show a custom message box
+        function showMessageBox(title, message) {
+            document.getElementById('messageBoxTitle').innerText = title;
+            document.getElementById('messageBoxContent').innerText = message;
+            document.getElementById('messageBox').classList.remove('hidden');
+        }
+
+        // Function to close the custom message box
+        function closeMessageBox() {
+            document.getElementById('messageBox').classList.add('hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('salesForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Gather form data
+            const formData = {
+                dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
+                priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
+                carSales: [],
+                calls: [],
+                lostOpportunities: [],
+                submissionDate: new Date().toISOString(),
+            };
+
+            // Get all car sales entries
+            const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
+            const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
+            const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
+            const carAppointmentScheduled = document.querySelectorAll('select[name="carAppointmentScheduled[]"]');
+
+            carRepairOrderNumbers.forEach((input, index) => {
+                const roNum = input.value;
+                const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
+                const sold = parseFloat(carSoldSales[index].value) || 0;
+                const appointment = carAppointmentScheduled[index].value;
+                if (roNum || discovered > 0 || sold > 0 || appointment) {
+                    formData.carSales.push({
+                        repairOrderNumber: roNum,
+                        discoveredSales: discovered,
+                        soldSales: sold,
+                        appointmentScheduled: appointment
+                    });
+                }
+            });
+
+            // Get all call entries
+            const customerNames = document.querySelectorAll('input[name="callCustomerName[]"]');
+            const customerPhones = document.querySelectorAll('input[name="callCustomerPhone[]"]');
+            const bookedAppointments = document.querySelectorAll('select[name="callBookedAppointment[]"]');
+
+            customerNames.forEach((input, index) => {
+                const name = input.value;
+                const phone = customerPhones[index].value;
+                const booked = bookedAppointments[index].value;
+                if (name || phone || booked) {
+                    formData.calls.push({
+                        customerName: name,
+                        customerPhone: phone,
+                        bookedAppointment: booked
+                    });
+                }
+            });
+
+            // Get all lost opportunity entries
+            const lostCustomerNames = document.querySelectorAll('input[name="lostCustomerName[]"]');
+            const lostCustomerPhones = document.querySelectorAll('input[name="lostCustomerPhone[]"]');
+            const lostCosts = document.querySelectorAll('input[name="lostCost[]"]');
+            const lostReasons = document.querySelectorAll('select[name="lostReason[]"]');
+            const lostOtherReasons = document.querySelectorAll('textarea[name="lostOtherReason[]"]');
+
+            lostCustomerNames.forEach((input, index) => {
+                const name = input.value;
+                const phone = lostCustomerPhones[index].value;
+                const cost = parseFloat(lostCosts[index].value) || 0;
+                const reason = lostReasons[index].value;
+                const otherReasonDetails = lostOtherReasons[index].value;
+
+                if (name || phone || cost > 0 || reason) {
+                    formData.lostOpportunities.push({
+                        customerName: name,
+                        customerPhone: phone,
+                        lostCost: cost,
+                        reason: reason,
+                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : ''
+                    });
+                }
+            });
+
+            console.log('Form Data Submitted:', formData);
+            showMessageBox('Report Submitted!', 'Your daily sales report has been successfully recorded. Check the console for details.');
+
+            // If you want to send this data to an external service (like Formspree for emails),
+            // you would typically use a fetch() request here.
+            // Example for Formspree (replace YOUR_FORMSPREE_ENDPOINT with your actual endpoint):
+            /*
+            try {
+                const response = await fetch('YOUR_FORMSPREE_ENDPOINT', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                if (response.ok) {
+                    showMessageBox('Report Submitted!', 'Your daily sales report has been successfully sent via email!');
+                } else {
+                    const errorData = await response.json();
+                    showMessageBox('Error', `Failed to send report: ${errorData.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showMessageBox('Error', `Network error: Could not send report. ${error.message}`);
+            }
+            */
+
+            // Optionally, clear the form after submission
+            // this.reset();
+            // callEntryCount = 1;
+            // carEntryCount = 1;
+            // lostOpportunityEntryCount = 1;
+            // document.getElementById('callEntries').innerHTML = `...`; // Reset initial call entry
+            // document.getElementById('carSalesEntries').innerHTML = `...`; // Reset initial car entry
+            // document.getElementById('lostOpportunityEntries').innerHTML = `...`; // Reset initial lost opportunity entry
+            // updateRemoveButtonsVisibility('callEntries');
+            // updateRemoveButtonsVisibility('carSalesEntries');
+            // updateRemoveButtonsVisibility('lostOpportunityEntries');
+        });
+    </script>
+</body>
+</html>
