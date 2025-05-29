@@ -32,7 +32,7 @@
             border-radius: 0.375rem; /* rounded-md */
             padding: 0.625rem 1rem; /* py-2.5 px-4 */
             width: 100%;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, background-color 0.15s ease-in-out;
         }
         input[type="text"]:focus,
         input[type="number"]:focus,
@@ -120,7 +120,7 @@
             border: 2px solid; /* Border color handled by JS */
         }
 
-        /* Classes for dynamic color changes */
+        /* Classes for dynamic color changes for Remaining Goal */
         .goal-met {
             color: #16a34a; /* green-700 */
             background-color: #dcfce7; /* green-100 */
@@ -130,6 +130,18 @@
             color: #dc2626; /* red-700 */
             background-color: #fee2e2; /* red-100 */
             border-color: #ef4444; /* red-500 */
+        }
+
+        /* Classes for dynamic color changes for individual Close Ratio inputs */
+        input.conversion-met {
+            color: #16a34a; /* green-700 */
+            border-color: #22c55e; /* green-500 */
+            background-color: #dcfce7; /* green-100 */
+        }
+        input.conversion-not-met {
+            color: #dc2626; /* red-700 */
+            border-color: #ef4444; /* red-500 */
+            background-color: #fee2e2; /* red-100 */
         }
     </style>
 </head>
@@ -148,11 +160,11 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateRemainingGoal()">
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
                     </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
-                        <input type="number" id="dailyGoal" name="dailyGoal" value="5200" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
+                        <input type="number" id="dailyGoal" name="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                     </div>
                 </div>
 
@@ -165,8 +177,12 @@
                     <div id="carSalesEntries" class="space-y-4">
                         <div class="form-row items-end">
                             <div class="form-col">
-                                <label for="carRepairOrderNumber_1" class="block text-gray-700 text-sm font-medium mb-1">Repair Order #</label>
+                                <label for="carRepairOrderNumber_1" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
                                 <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                            </div>
+                            <div class="form-col">
+                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
+                                <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
                                 <label for="carDiscoveredSales_1" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
@@ -175,6 +191,10 @@
                             <div class="form-col">
                                 <label for="carSoldSales_1" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
                                 <input type="number" id="carSoldSales_1" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal(); updateRunningTotals()">
+                            </div>
+                            <div class="form-col">
+                                <label for="carIndividualCloseRatio_1" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
+                                <input type="text" id="carIndividualCloseRatio_1" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                             </div>
                             <div class="form-col">
                                 <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
@@ -265,11 +285,26 @@
     <script>
         let callEntryCount = 1;
         let carEntryCount = 1;
+        const baseDailyGoal = 5200; // Define the base daily goal here
+
+        // Function to update the daily goal based on prior day's total
+        function updateDailyGoalBasedOnPriorDay() {
+            const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
+            const dailyGoalInput = document.getElementById('dailyGoal');
+
+            // Calculate the adjusted daily goal
+            const adjustedDailyGoal = baseDailyGoal - priorDayTotal;
+
+            // Update the daily goal input field
+            dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
+
+            // Also update the remaining goal display as it depends on the dailyGoal
+            updateRemainingGoal();
+        }
 
         // Function to update the Remaining Daily Goal display and its color
         function updateRemainingGoal() {
-            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
-            const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
+            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0; // Now reads the adjusted daily goal
             let currentDaySoldSales = 0;
 
             // Sum up all 'Sold Sales' from car entries
@@ -277,8 +312,8 @@
                 currentDaySoldSales += parseFloat(input.value) || 0;
             });
 
-            // Adjusted calculation: (Daily Goal - Prior Day Total) - Current Day Sold Sales
-            const remainingGoal = (dailyGoal - priorDayTotal) - currentDaySoldSales;
+            // Adjusted calculation: (Daily Goal - Current Day Sold Sales)
+            const remainingGoal = dailyGoal - currentDaySoldSales;
 
             const remainingGoalValueTop = document.getElementById('remainingDailyGoalValueTop');
             const remainingGoalValueBottom = document.getElementById('remainingDailyGoalValueBottom');
@@ -302,17 +337,39 @@
             }
         }
 
-        // Function to update the running totals (Discovered, Sold, Close Ratio)
+        // Function to update the running totals (Discovered, Sold, Close Ratio) and individual sold field colors
         function updateRunningTotals() {
             let totalDiscovered = 0;
             let totalSold = 0;
 
-            document.querySelectorAll('input[name="carDiscoveredSales[]"]').forEach(input => {
-                totalDiscovered += parseFloat(input.value) || 0;
-            });
+            const discoveredInputs = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
+            const soldInputs = document.querySelectorAll('input[name="carSoldSales[]"]');
+            const individualCloseRatioInputs = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
 
-            document.querySelectorAll('input[name="carSoldSales[]"]').forEach(input => {
-                totalSold += parseFloat(input.value) || 0;
+
+            discoveredInputs.forEach((discoveredInput, index) => {
+                const discovered = parseFloat(discoveredInput.value) || 0;
+                const soldInput = soldInputs[index];
+                const sold = parseFloat(soldInput.value) || 0;
+                const individualCloseRatioInput = individualCloseRatioInputs[index];
+
+                totalDiscovered += discovered;
+                totalSold += sold;
+
+                // Calculate and update individual close ratio
+                let individualConversionRate = 0;
+                if (discovered > 0) {
+                    individualConversionRate = (sold / discovered) * 100;
+                }
+                individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
+
+                // Apply color to individual close ratio input
+                individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met'); // Clear existing classes
+                if (individualConversionRate >= 50) {
+                    individualCloseRatioInput.classList.add('conversion-met');
+                } else {
+                    individualCloseRatioInput.classList.add('conversion-not-met');
+                }
             });
 
             const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
@@ -320,6 +377,9 @@
             document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
             document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
             document.getElementById('closeRatio').innerText = closeRatio.toFixed(2) + '%';
+
+            // Ensure remaining goal is also updated when totals change
+            updateRemainingGoal();
         }
 
 
@@ -385,8 +445,12 @@
             newEntry.className = 'form-row items-end';
             newEntry.innerHTML = `
                 <div class="form-col">
-                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Repair Order #</label>
+                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
                     <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
+                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
                     <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
@@ -395,6 +459,10 @@
                 <div class="form-col">
                     <label for="carSoldSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
                     <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal(); updateRunningTotals()">
+                </div>
+                <div class="form-col">
+                    <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
+                    <input type="text" id="carIndividualCloseRatio_${carEntryCount}" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                 </div>
                 <div class="form-col">
                     <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
@@ -450,7 +518,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateRemoveButtonsVisibility('callEntries');
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal(); // Calculate initial goal on load
+            updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
             updateRunningTotals(); // Calculate initial totals on load
         });
 
@@ -484,20 +552,26 @@
 
             // Get all car sales entries
             const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
+            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]'); // Get last name inputs
             const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
             const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
+            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]'); // Get individual close ratio inputs
             const carAppointmentScheduled = document.querySelectorAll('select[name="carAppointmentScheduled[]"]');
 
             carRepairOrderNumbers.forEach((input, index) => {
                 const roNum = input.value;
+                const lastName = carLastNames[index].value; // Get last name value
                 const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
                 const sold = parseFloat(carSoldSales[index].value) || 0;
+                const individualCloseRatio = carIndividualCloseRatios[index].value; // Get individual close ratio value
                 const appointment = carAppointmentScheduled[index].value;
-                if (roNum || discovered > 0 || sold > 0 || appointment) {
+                if (roNum || lastName || discovered > 0 || sold > 0 || appointment) {
                     formDataCollectedByJS.carSales.push({
                         repairOrderNumber: roNum,
+                        lastName: lastName, // Add last name to collected data
                         discoveredSales: discovered,
                         soldSales: sold,
+                        individualCloseRatio: individualCloseRatio, // Add individual close ratio to collected data
                         appointmentScheduled: appointment
                     });
                 }
