@@ -329,11 +329,10 @@
         // Function to set the current date
         function setCurrentDate() {
             const today = new Date();
-            // Format as YYYY-MM-DD for the input[type="date"] field
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-            const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('reportDate').value = `${year}-${month}-${day}`;
         }
 
         // Function to get the date in MMDDYY format for filename
@@ -350,27 +349,20 @@
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
             const dailyGoalInput = document.getElementById('dailyGoal');
 
-            // Calculate the adjusted daily goal
             const adjustedDailyGoal = baseDailyGoal - priorDayTotal;
-
-            // Update the daily goal input field
             dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
-
-            // Also update the remaining goal display as it depends on the dailyGoal
             updateRemainingGoal();
         }
 
         // Function to update the Remaining Daily Goal display and its color
         function updateRemainingGoal() {
-            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0; // Now reads the adjusted daily goal
+            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
             let currentDaySoldSales = 0;
 
-            // Sum up all 'Sold Sales' from car entries
             document.querySelectorAll('input[name="carSoldSales[]"]').forEach(input => {
                 currentDaySoldSales += parseFloat(input.value) || 0;
             });
 
-            // Adjusted calculation: (Daily Goal - Current Day Sold Sales)
             const remainingGoal = dailyGoal - currentDaySoldSales;
 
             const remainingGoalValueTop = document.getElementById('remainingDailyGoalValueTop');
@@ -380,12 +372,8 @@
 
             remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
             remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
-
-            // Update hidden input for Formspree
             document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
 
-
-            // Apply color based on remainingGoal
             if (remainingGoal <= 0) {
                 remainingGoalContainerTop.classList.remove('goal-not-met');
                 remainingGoalContainerTop.classList.add('goal-met');
@@ -406,11 +394,9 @@
             const numberOfCars = document.querySelectorAll('#carSalesEntries .form-row').length;
             const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
 
-
             const discoveredInputs = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
             const soldInputs = document.querySelectorAll('input[name="carSoldSales[]"]');
             const individualCloseRatioInputs = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
-
 
             discoveredInputs.forEach((discoveredInput, index) => {
                 const discovered = parseFloat(discoveredInput.value) || 0;
@@ -421,15 +407,13 @@
                 totalDiscovered += discovered;
                 totalSold += sold;
 
-                // Calculate and update individual close ratio
                 let individualConversionRate = 0;
                 if (discovered > 0) {
                     individualConversionRate = (sold / discovered) * 100;
                 }
                 individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
 
-                // Apply color to individual close ratio input
-                individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met'); // Clear existing classes
+                individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
                 if (individualConversionRate >= 50) {
                     individualCloseRatioInput.classList.add('conversion-met');
                 } else {
@@ -450,8 +434,6 @@
             document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
             document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
 
-
-            // Update hidden inputs for Formspree
             document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
             document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
             document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
@@ -460,13 +442,9 @@
             document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
             document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
 
-
-            // Ensure remaining goal is also updated when totals change
             updateRemainingGoal();
         }
 
-
-        // Function to add a new call entry row
         function addCallEntry() {
             callEntryCount++;
             const callEntriesDiv = document.getElementById('callEntries');
@@ -522,31 +500,79 @@
             `;
             callEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('callEntries');
-            updateRunningTotals(); // Update totals when a new call entry is added
+            updateRunningTotals();
         }
 
-        // Function to remove a call entry row
         function removeCallEntry(button) {
             button.closest('.form-row').remove();
             updateRemoveButtonsVisibility('callEntries');
-            updateRunningTotals(); // Update totals when a call entry is removed
+            updateRunningTotals();
         }
 
-        // Function to toggle visibility of the "Other Reason Details" textarea
+        function addCarEntry() {
+            carEntryCount++;
+            const carSalesEntriesDiv = document.getElementById('carSalesEntries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'form-row items-end';
+            newEntry.innerHTML = `
+                <div class="form-col">
+                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
+                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
+                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                </div>
+                <div class="form-col">
+                    <label for="carSoldSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
+                    <input type="number" id="carSoldSales_${carEntryCount}" name="carSoldSales[]" placeholder="e.g., 350" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal(); updateRunningTotals()">
+                </div>
+                <div class="form-col">
+                    <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
+                    <input type="text" id="carIndividualCloseRatio_${carEntryCount}" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
+                </div>
+                <div class="form-col">
+                    <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
+                    <select id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="w-full rounded-md">
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-auto">
+                    <button type="button" onclick="removeCarEntry(this)" class="btn-remove">Remove</button>
+                </div>
+            `;
+            carSalesEntriesDiv.appendChild(newEntry);
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRemainingGoal();
+            updateRunningTotals();
+        }
+
+        function removeCarEntry(button) {
+            button.closest('.form-row').remove();
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRemainingGoal();
+            updateRunningTotals();
+        }
+
         function toggleOtherReason(selectElement, index, type) {
             const otherReasonContainer = document.getElementById(`${type}OtherReasonContainer_${index}`);
             if (selectElement.value === 'Other') {
                 otherReasonContainer.style.display = 'block';
             } else {
                 otherReasonContainer.style.display = 'none';
-                document.getElementById(`${type}OtherReason_${index}`).value = ''; // Clear content when hidden
+                document.getElementById(`${type}OtherReason_${index}`).value = '';
             }
         }
 
-        // Function to update visibility of remove buttons for a given container
         function updateRemoveButtonsVisibility(containerId) {
             const container = document.getElementById(containerId);
-            if (!container) return; // Exit if container not found
+            if (!container) return;
 
             const removeButtons = container.querySelectorAll('.form-row .btn-remove');
             if (removeButtons.length <= 1) {
@@ -556,45 +582,42 @@
             }
         }
 
-        // Function to save the page as an image
         async function savePageAsImage() {
             showMessageBox('Saving Image...', 'Please wait while the page is captured and prepared for download.');
             try {
-                const formContainer = document.querySelector('.container'); // Target the main form container
-                const messageBox = document.getElementById('messageBox'); // Get the message box element
+                const formContainer = document.querySelector('.container');
+                const messageBox = document.getElementById('messageBox');
 
-                // Temporarily hide the message box if it's visible
                 const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
                 if (wasMessageBoxVisible) {
                     messageBox.classList.add('hidden');
                 }
 
                 const originalOverflow = document.body.style.overflow;
-                document.body.style.overflow = 'auto'; // Temporarily allow overflow for full capture
+                document.body.style.overflow = 'auto';
 
-                // Use a timeout to ensure all dynamic updates are rendered before capture
                 setTimeout(async () => {
                     try {
                         const canvas = await html2canvas(formContainer, {
-                            scale: 2, // Increase scale for better resolution
-                            useCORS: true, // Enable CORS if you have external images (like logo)
-                            windowWidth: formContainer.scrollWidth, // Capture full width
-                            windowHeight: formContainer.scrollHeight, // Capture full height
-                            scrollX: -window.scrollX, // Adjust for current scroll position
+                            scale: 2,
+                            useCORS: true,
+                            windowWidth: formContainer.scrollWidth,
+                            windowHeight: formContainer.scrollHeight,
+                            scrollX: -window.scrollX,
                             scrollY: -window.scrollY,
-                            logging: false // Disable logging to console
+                            logging: false
                         });
 
                         const image = canvas.toDataURL('image/png');
                         const a = document.createElement('a');
-                        const filenameDate = getFormattedDateForFilename(); // Get date in MMDDYY format
+                        const filenameDate = getFormattedDateForFilename();
                         const filename = `mplussales_${filenameDate}.png`;
 
                         a.href = image;
                         a.download = filename;
-                        document.body.appendChild(a); // Append to body to make it clickable
-                        a.click(); // Programmatically click the link to trigger download
-                        document.body.removeChild(a); // Remove the link after clicking
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
 
                         showMessageBox('Success!', `The image "${filename}" has been downloaded.`);
 
@@ -602,30 +625,18 @@
                         console.error('Error generating canvas from page:', error);
                         showMessageBox('Error', 'Failed to capture page image. Please try again.');
                     } finally {
-                        document.body.style.overflow = originalOverflow; // Restore original overflow
-                        // Restore message box visibility if it was visible
+                        document.body.style.overflow = originalOverflow;
                         if (wasMessageBoxVisible) {
                             messageBox.classList.remove('hidden');
                         }
                     }
-                }, 100); // Small delay to ensure rendering is complete
+                }, 100);
 
             } catch (error) {
                 console.error('Error in savePageAsImage function:', error);
                 showMessageBox('Error', 'An unexpected error occurred during image capture.');
             }
         }
-
-
-        // Initial calls to set button visibility and calculate goal on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            setCurrentDate(); // Set the current date on load
-            updateRemoveButtonsVisibility('callEntries');
-            updateRemoveButtonsVisibility('carSalesEntries');
-            updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
-            updateRunningTotals(); // Calculate initial totals on load
-        });
-
 
         // Function to show a custom message box
         function showMessageBox(title, message) {
@@ -641,84 +652,19 @@
 
         // Handle form submission (now relies on Formspree's action attribute)
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            const formDataCollectedByJS = {
-                reportDate: document.getElementById('reportDate').value, // Include date
-                serviceAdvisorName: document.getElementById('serviceAdvisorName').value, // Include advisor name
-                dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
-                priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
-                carSales: [],
-                calls: [], // Calls now include lost cost and reason
-                submissionDate: new Date().toISOString(),
-                finalTotalDiscoveredSales: document.getElementById('hiddenTotalDiscoveredSales').value,
-                finalTotalSoldSales: document.getElementById('hiddenTotalSoldSales').value,
-                finalCloseRatio: document.getElementById('hiddenCloseRatio').value,
-                finalRemainingDailyGoal: document.getElementById('hiddenRemainingDailyGoal').value,
-                finalTotalCars: document.getElementById('hiddenTotalCars').value,
-                finalAverageDiscoveredSales: document.getElementById('hiddenAverageDiscoveredSales').value,
-                finalAverageSoldSales: document.getElementById('hiddenAverageSoldSales').value,
-                finalTotalCustomerCalls: document.getElementById('hiddenTotalCustomerCalls').value
-            };
+            // Formspree will automatically collect all named inputs.
+            // We just need to ensure calculated hidden fields are updated.
+            updateRunningTotals(); // Ensure all totals are up-to-date before submission
+        });
 
-            // Get all car sales entries
-            const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
-            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]');
-            const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
-            const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
-            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
-            const carAppointmentScheduled = document.querySelectorAll('select[name="carAppointmentScheduled[]"]');
-
-            carRepairOrderNumbers.forEach((input, index) => {
-                const roNum = input.value;
-                const lastName = carLastNames[index].value;
-                const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
-                const sold = parseFloat(carSoldSales[index].value) || 0;
-                const individualCloseRatio = carIndividualCloseRatios[index].value;
-                const appointment = carAppointmentScheduled[index].value;
-                if (roNum || lastName || discovered > 0 || sold > 0 || appointment) {
-                    formDataCollectedByJS.carSales.push({
-                        repairOrderNumber: roNum,
-                        lastName: lastName,
-                        discoveredSales: discovered,
-                        soldSales: sold,
-                        individualCloseRatio: individualCloseRatio,
-                        appointmentScheduled: appointment
-                    });
-                }
-            });
-
-            // Get all call entries (now including lost opportunity details)
-            const customerNames = document.querySelectorAll('input[name="callCustomerName[]"]');
-            const customerPhones = document.querySelectorAll('input[name="callCustomerPhone[]"]');
-            const bookedAppointments = document.querySelectorAll('select[name="callBookedAppointment[]"]');
-            const callLostCosts = document.querySelectorAll('input[name="callLostCost[]"]');
-            const callReasons = document.querySelectorAll('select[name="callReason[]"]');
-            const callOtherReasons = document.querySelectorAll('textarea[name="callOtherReason[]"]');
-            const callSources = document.querySelectorAll('select[name="callSource[]"]'); // Get source inputs
-
-
-            customerNames.forEach((input, index) => {
-                const name = input.value;
-                const phone = customerPhones[index].value;
-                const booked = bookedAppointments[index].value;
-                const lostCost = parseFloat(callLostCosts[index].value) || 0;
-                const reason = callReasons[index].value;
-                const otherReasonDetails = callOtherReasons[index].value;
-                const source = callSources[index].value; // Get source value
-
-                if (name || phone || booked || lostCost > 0 || reason || source) {
-                    formDataCollectedByJS.calls.push({
-                        customerName: name,
-                        customerPhone: phone,
-                        bookedAppointment: booked,
-                        lostCost: lostCost,
-                        reason: reason,
-                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : '',
-                        source: source // Add source to collected data
-                    });
-                }
-            });
-
-            console.log('Form Data (as collected by JS):', formDataCollectedByJS); // This will still show in your browser console
+        // Initial calls to set button visibility and calculate goal on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setCurrentDate();
+            updateRemoveButtonsVisibility('callEntries');
+            updateRemoveButtonsVisibility('carSalesEntries');
+            // No prior day total fetching from backend, so just initialize
+            updateDailyGoalBasedOnPriorDay();
+            updateRunningTotals();
         });
     </script>
 </body>
