@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Sales Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Custom styles for Inter font and general body styling */
         body {
@@ -27,7 +28,8 @@
         input[type="text"],
         input[type="number"],
         textarea,
-        select { /* Added select to styling */
+        select,
+        input[type="date"] { /* Added input[type="date"] to styling */
             border: 1px solid #d1d5db; /* border-gray-300 */
             border-radius: 0.375rem; /* rounded-md */
             padding: 0.625rem 1rem; /* py-2.5 px-4 */
@@ -37,7 +39,8 @@
         input[type="text"]:focus,
         input[type="number"]:focus,
         textarea:focus,
-        select:focus { /* Added select to styling */
+        select:focus,
+        input[type="date"]:focus { /* Added input[type="date"] to styling */
             border-color: #3b82f6; /* ring-blue-500 */
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* ring-blue-500/25 */
@@ -154,6 +157,17 @@
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
+            <div class="form-row mb-4">
+                <div class="form-col">
+                    <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
+                    <input type="date" id="reportDate" name="reportDate" class="w-full rounded-md">
+                </div>
+                <div class="form-col">
+                    <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
+                    <input type="text" id="serviceAdvisorName" name="serviceAdvisorName" placeholder="Your Name" class="w-full rounded-md">
+                </div>
+            </div>
+
             <div class="space-y-4">
                 <h2 class="text-2xl font-semibold text-gray-700 section-title">Sales Metrics</h2>
 
@@ -258,8 +272,9 @@
                 <button type="button" onclick="addCallEntry()" class="btn-primary text-sm mt-4">Add Another Call</button>
             </div>
 
-            <div class="text-center">
+            <div class="text-center mt-6 flex justify-center space-x-4">
                 <button type="submit" class="btn-primary">Submit Daily Report</button>
+                <button type="button" onclick="copyPageAsImage()" class="btn-primary bg-gray-600 hover:bg-gray-700">Copy Page as Image</button>
             </div>
 
             <div class="totals-section">
@@ -271,6 +286,12 @@
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueBottom">0.00</span>
                 </div>
             </div>
+
+            <input type="hidden" id="hiddenTotalDiscoveredSales" name="Total Discovered Sales">
+            <input type="hidden" id="hiddenTotalSoldSales" name="Total Sold Sales">
+            <input type="hidden" id="hiddenCloseRatio" name="Close Ratio">
+            <input type="hidden" id="hiddenRemainingDailyGoal" name="Remaining Daily Goal">
+
         </form>
 
         <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
@@ -286,6 +307,15 @@
         let callEntryCount = 1;
         let carEntryCount = 1;
         const baseDailyGoal = 5200; // Define the base daily goal here
+
+        // Function to set the current date
+        function setCurrentDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('reportDate').value = `${yyyy}-${mm}-${dd}`;
+        }
 
         // Function to update the daily goal based on prior day's total
         function updateDailyGoalBasedOnPriorDay() {
@@ -322,6 +352,10 @@
 
             remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
             remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
+
+            // Update hidden input for Formspree
+            document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
+
 
             // Apply color based on remainingGoal
             if (remainingGoal <= 0) {
@@ -377,6 +411,11 @@
             document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
             document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
             document.getElementById('closeRatio').innerText = closeRatio.toFixed(2) + '%';
+
+            // Update hidden inputs for Formspree
+            document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
+            document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
+            document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
 
             // Ensure remaining goal is also updated when totals change
             updateRemainingGoal();
@@ -514,8 +553,56 @@
             }
         }
 
+        // Function to copy the page as an image to clipboard
+        async function copyPageAsImage() {
+            showMessageBox('Copying Image...', 'Please wait while the page is captured and copied.');
+            try {
+                const formContainer = document.querySelector('.container'); // Target the main form container
+                const originalOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'auto'; // Temporarily allow overflow for full capture
+
+                // Use a timeout to ensure all dynamic updates are rendered before capture
+                setTimeout(async () => {
+                    try {
+                        const canvas = await html2canvas(formContainer, {
+                            scale: 2, // Increase scale for better resolution
+                            useCORS: true, // Enable CORS if you have external images (like logo)
+                            windowWidth: formContainer.scrollWidth, // Capture full width
+                            windowHeight: formContainer.scrollHeight, // Capture full height
+                            scrollX: -window.scrollX, // Adjust for current scroll position
+                            scrollY: -window.scrollY,
+                            logging: false // Disable logging to console
+                        });
+
+                        canvas.toBlob(async (blob) => {
+                            try {
+                                const item = new ClipboardItem({ 'image/png': blob });
+                                await navigator.clipboard.write([item]);
+                                showMessageBox('Success!', 'The page image has been copied to your clipboard.');
+                            } catch (err) {
+                                console.error('Failed to copy image to clipboard:', err);
+                                showMessageBox('Error', 'Failed to copy image to clipboard. Your browser might require special permissions or not support this feature directly. Try right-clicking the form and selecting "Save image as..." if available.');
+                            } finally {
+                                document.body.style.overflow = originalOverflow; // Restore original overflow
+                            }
+                        }, 'image/png');
+
+                    } catch (error) {
+                        console.error('Error generating canvas from page:', error);
+                        showMessageBox('Error', 'Failed to capture page image. Please try again.');
+                    }
+                }, 100); // Small delay to ensure rendering is complete
+
+            } catch (error) {
+                console.error('Error in copyPageAsImage function:', error);
+                showMessageBox('Error', 'An unexpected error occurred during image capture.');
+            }
+        }
+
+
         // Initial calls to set button visibility and calculate goal on page load
         document.addEventListener('DOMContentLoaded', () => {
+            setCurrentDate(); // Set the current date on load
             updateRemoveButtonsVisibility('callEntries');
             updateRemoveButtonsVisibility('carSalesEntries');
             updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
@@ -537,41 +624,42 @@
 
         // Handle form submission (now relies on Formspree's action attribute)
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            // NOTE: event.preventDefault() is REMOVED here because Formspree needs the default browser submission
-            // to send the data. Your custom JavaScript will still collect formData,
-            // but Formspree captures form fields directly from the HTML.
-
-            // The following console.log is for your own debugging/viewing purposes in the browser console.
             const formDataCollectedByJS = {
+                reportDate: document.getElementById('reportDate').value, // Include date
+                serviceAdvisorName: document.getElementById('serviceAdvisorName').value, // Include advisor name
                 dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
                 priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
                 carSales: [],
                 calls: [], // Calls now include lost cost and reason
                 submissionDate: new Date().toISOString(),
+                finalTotalDiscoveredSales: document.getElementById('hiddenTotalDiscoveredSales').value,
+                finalTotalSoldSales: document.getElementById('hiddenTotalSoldSales').value,
+                finalCloseRatio: document.getElementById('hiddenCloseRatio').value,
+                finalRemainingDailyGoal: document.getElementById('hiddenRemainingDailyGoal').value
             };
 
             // Get all car sales entries
             const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
-            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]'); // Get last name inputs
+            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]');
             const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
             const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
-            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]'); // Get individual close ratio inputs
+            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
             const carAppointmentScheduled = document.querySelectorAll('select[name="carAppointmentScheduled[]"]');
 
             carRepairOrderNumbers.forEach((input, index) => {
                 const roNum = input.value;
-                const lastName = carLastNames[index].value; // Get last name value
+                const lastName = carLastNames[index].value;
                 const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
                 const sold = parseFloat(carSoldSales[index].value) || 0;
-                const individualCloseRatio = carIndividualCloseRatios[index].value; // Get individual close ratio value
+                const individualCloseRatio = carIndividualCloseRatios[index].value;
                 const appointment = carAppointmentScheduled[index].value;
                 if (roNum || lastName || discovered > 0 || sold > 0 || appointment) {
                     formDataCollectedByJS.carSales.push({
                         repairOrderNumber: roNum,
-                        lastName: lastName, // Add last name to collected data
+                        lastName: lastName,
                         discoveredSales: discovered,
                         soldSales: sold,
-                        individualCloseRatio: individualCloseRatio, // Add individual close ratio to collected data
+                        individualCloseRatio: individualCloseRatio,
                         appointmentScheduled: appointment
                     });
                 }
@@ -599,23 +687,14 @@
                         customerName: name,
                         customerPhone: phone,
                         bookedAppointment: booked,
-                        lostCost: lostCost, // Added to calls
-                        reason: reason,     // Added to calls
-                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : '' // Added to calls
+                        lostCost: lostCost,
+                        reason: reason,
+                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : ''
                     });
                 }
             });
 
             console.log('Form Data (as collected by JS):', formDataCollectedByJS); // This will still show in your browser console
-
-            // Show a temporary message while the browser redirects to Formspree's success page (or reloads)
-            showMessageBox('Submitting Report...', 'Please wait while your data is sent via email.');
-
-            // Formspree handles the actual submission via the HTML 'action' attribute.
-            // The browser will now submit the form data and typically redirect to Formspree's thank you page.
-            // If you want to prevent redirection and handle success/error messages purely within your JS,
-            // you'd need to use fetch() as shown in the commented-out example in the previous code.
-            // For now, the default form submission (redirect) is enabled.
         });
     </script>
 </body>
