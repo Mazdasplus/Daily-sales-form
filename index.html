@@ -239,21 +239,17 @@
                         </div>
                         <div class="form-col">
                             <label for="callCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
-                            <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                            <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                         </div>
-                        <div class="form-col">
-                            <label for="callBookedAppointment_1" class="block text-gray-700 text-sm font-medium mb-1">Booked Appointment?</label>
-                            <select id="callBookedAppointment_1" name="callBookedAppointment[]" class="w-full rounded-md">
-                                <option value="">Select</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </select>
+                        <div class="form-col flex items-center pt-6">
+                            <input type="checkbox" id="callBookedAppointment_1" name="callBookedAppointment[]" class="mr-2" onchange="toggleLostOpportunityFields(this, 1)">
+                            <label for="callBookedAppointment_1" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
                         </div>
-                        <div class="form-col">
+                        <div class="form-col" id="callLostCostContainer_1">
                             <label for="callLostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                             <input type="number" id="callLostCost_1" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                         </div>
-                        <div class="form-col">
+                        <div class="form-col" id="callReasonContainer_1">
                             <label for="callReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
                             <select id="callReason_1" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1, 'call')">
                                 <option value="">Select Reason</option>
@@ -482,21 +478,17 @@
                 </div>
                 <div class="form-col">
                     <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
-                    <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="e.g., (555) 123-4567" class="w-full rounded-md">
+                    <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                 </div>
-                <div class="form-col">
-                    <label for="callBookedAppointment_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Booked Appointment?</label>
-                    <select id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="w-full rounded-md">
-                        <option value="">Select</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
+                <div class="form-col flex items-center pt-6">
+                    <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleLostOpportunityFields(this, ${callEntryCount})">
+                    <label for="callBookedAppointment_${callEntryCount}" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
                 </div>
-                <div class="form-col">
+                <div class="form-col" id="callLostCostContainer_${callEntryCount}">
                     <label for="callLostCost_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                     <input type="number" id="callLostCost_${callEntryCount}" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                 </div>
-                <div class="form-col">
+                <div class="form-col" id="callReasonContainer_${callEntryCount}">
                     <label for="callReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
                     <select id="callReason_${callEntryCount}" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${callEntryCount}, 'call')">
                         <option value="">Select Reason</option>
@@ -674,6 +666,53 @@
             document.getElementById('messageBox').classList.add('hidden');
         }
 
+        // Phone number formatting function
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, ''); // Remove all non-digits
+            let formattedValue = '';
+
+            if (value.length > 0) {
+                formattedValue += '(' + value.substring(0, 3);
+            }
+            if (value.length >= 4) {
+                formattedValue += ') ' + value.substring(3, 6);
+            }
+            if (value.length >= 7) {
+                formattedValue += '-' + value.substring(6, 10);
+            }
+            input.value = formattedValue;
+        }
+
+        // Function to toggle lost opportunity fields based on "Booked Appointment?" checkbox
+        function toggleLostOpportunityFields(checkbox, index) {
+            const parentRow = checkbox.closest('.form-row');
+            const lostCostContainer = parentRow.querySelector(`#callLostCostContainer_${index}`);
+            const reasonContainer = parentRow.querySelector(`#callReasonContainer_${index}`);
+            const otherReasonContainer = parentRow.querySelector(`#callOtherReasonContainer_${index}`);
+
+            if (checkbox.checked) {
+                // If booked, hide and clear values
+                if (lostCostContainer) lostCostContainer.style.display = 'none';
+                if (reasonContainer) reasonContainer.style.display = 'none';
+                if (otherReasonContainer) otherReasonContainer.style.display = 'none';
+
+                // Clear values to prevent sending stale data
+                if (parentRow.querySelector(`#callLostCost_${index}`)) parentRow.querySelector(`#callLostCost_${index}`).value = '';
+                if (parentRow.querySelector(`#callReason_${index}`)) parentRow.querySelector(`#callReason_${index}`).value = '';
+                if (parentRow.querySelector(`#callOtherReason_${index}`)) parentRow.querySelector(`#callOtherReason_${index}`).value = '';
+
+            } else {
+                // If not booked, show fields
+                if (lostCostContainer) lostCostContainer.style.display = 'block';
+                if (reasonContainer) reasonContainer.style.display = 'block';
+                // Only show other reason if 'Other' is selected
+                if (parentRow.querySelector(`#callReason_${index}`) && parentRow.querySelector(`#callReason_${index}`).value === 'Other') {
+                    if (otherReasonContainer) otherReasonContainer.style.display = 'block';
+                }
+            }
+        }
+
+
         // Handle form submission (now relies on Formspree's action attribute)
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
             // Formspree will automatically collect all named inputs.
@@ -688,6 +727,14 @@
             updateRemoveButtonsVisibility('carSalesEntries');
             updateDailyGoalBasedOnPriorDay();
             updateRunningTotals(); // Call updateRunningTotals to set initial values
+
+            // Initialize visibility for existing call entries (if any)
+            document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
+                const checkbox = row.querySelector(`#callBookedAppointment_${index + 1}`);
+                if (checkbox) {
+                    toggleLostOpportunityFields(checkbox, index + 1);
+                }
+            });
         });
     </script>
 </body>
