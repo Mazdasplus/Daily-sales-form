@@ -350,13 +350,18 @@
             return `${mm}${dd}${yy}`;
         }
 
-        // Function to update the daily goal based on prior day's total
+        // Function to update the daily goal based on prior day's total (now as carry-over)
         function updateDailyGoalBasedOnPriorDay() {
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
             const dailyGoalInput = document.getElementById('dailyGoal');
 
-            const adjustedDailyGoal = baseDailyGoal - priorDayTotal;
+            // Calculate the adjusted daily goal by ADDING the priorDayTotal
+            const adjustedDailyGoal = baseDailyGoal + priorDayTotal;
+
+            // Update the daily goal input field
             dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
+
+            // Also update the remaining goal display as it depends on the dailyGoal
             updateRemainingGoal();
         }
 
