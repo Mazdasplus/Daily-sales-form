@@ -164,7 +164,10 @@
                 </div>
                 <div class="form-col">
                     <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
-                    <input type="text" id="serviceAdvisorName" name="serviceAdvisorName" placeholder="Your Name" class="w-full rounded-md">
+                    <select id="serviceAdvisorName" name="serviceAdvisorName" class="w-full rounded-md">
+                        <option value="Beto Calderon">Beto Calderon</option>
+                        <option value="Scott Carvalho">Scott Carvalho</option>
+                    </select>
                 </div>
             </div>
 
@@ -210,13 +213,12 @@
                                 <label for="carIndividualCloseRatio_1" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
                                 <input type="text" id="carIndividualCloseRatio_1" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                             </div>
-                            <div class="form-col">
-                                <label for="carAppointmentScheduled_1" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
-                                <select id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="w-full rounded-md">
-                                    <option value="">Select</option>
-                                    <option value="yes">Yes</option>
-                                    <option value="no">No</option>
-                                </select>
+                            <div class="form-col flex items-center pt-6">
+                                <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
+                                <label for="carAppointmentScheduled_1" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
+                            </div>
+                             <div class="form-col flex items-center pt-6"> <input type="checkbox" id="carInsuranceClaim_1" name="carInsuranceClaim[]" class="mr-2">
+                                <label for="carInsuranceClaim_1" class="text-gray-700 text-sm font-medium">Insurance Claim</label>
                             </div>
                             <div class="w-full sm:w-auto">
                                 <button type="button" onclick="removeCarEntry(this)" class="btn-remove hidden">Remove</button>
@@ -296,6 +298,8 @@
                 <p>Average Discovered Sales: $<span id="averageDiscoveredSales">0.00</span></p>
                 <p>Average Sale: $<span id="averageSoldSales">0.00</span></p>
                 <p>New Customer Calls: <span id="totalCustomerCalls">0</span></p>
+                <p>Total Insurance Claims Jobs: <span id="totalInsuranceClaims">0</span></p>
+                <p>Insurance Percentage of Sales: <span id="percentageOfInsuranceClaims">0.00%</span></p>
                 <div class="highlighted-goal" id="remainingDailyGoalBottom">
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueBottom">0.00</span>
                 </div>
@@ -309,6 +313,8 @@
             <input type="hidden" id="hiddenAverageDiscoveredSales" name="Average Discovered Sales">
             <input type="hidden" id="hiddenAverageSoldSales" name="Average Sale">
             <input type="hidden" id="hiddenTotalCustomerCalls" name="New Customer Calls">
+            <input type="hidden" id="hiddenTotalInsuranceClaims" name="Total Insurance Claims Jobs">
+            <input type="hidden" id="hiddenPercentageOfInsuranceClaims" name="Insurance Percentage of Sales">
 
         </form>
 
@@ -387,25 +393,34 @@
             }
         }
 
-        // Function to update the running totals (Discovered, Sold, Close Ratio) and individual sold field colors
+        // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims)
         function updateRunningTotals() {
             let totalDiscovered = 0;
             let totalSold = 0;
             const numberOfCars = document.querySelectorAll('#carSalesEntries .form-row').length;
             const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
+            let totalInsuranceClaims = 0; // New counter for insurance claims
 
             const discoveredInputs = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
             const soldInputs = document.querySelectorAll('input[name="carSoldSales[]"]');
             const individualCloseRatioInputs = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
+            const insuranceClaimCheckboxes = document.querySelectorAll('input[name="carInsuranceClaim[]"]'); // Get all checkboxes
+            const appointmentCheckboxes = document.querySelectorAll('input[name="carAppointmentScheduled[]"]'); // Get all appointment checkboxes
+
 
             discoveredInputs.forEach((discoveredInput, index) => {
                 const discovered = parseFloat(discoveredInput.value) || 0;
                 const soldInput = soldInputs[index];
                 const sold = parseFloat(soldInput.value) || 0;
                 const individualCloseRatioInput = individualCloseRatioInputs[index];
+                const isInsuranceClaim = insuranceClaimCheckboxes[index] ? insuranceClaimCheckboxes[index].checked : false; // Check if checkbox is checked
 
                 totalDiscovered += discovered;
                 totalSold += sold;
+
+                if (isInsuranceClaim) {
+                    totalInsuranceClaims++; // Increment if insurance claim is checked
+                }
 
                 let individualConversionRate = 0;
                 if (discovered > 0) {
@@ -424,7 +439,7 @@
             const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
             const averageDiscoveredSales = numberOfCars > 0 ? (totalDiscovered / numberOfCars) : 0;
             const averageSoldSales = numberOfCars > 0 ? (totalSold / numberOfCars) : 0;
-
+            const percentageOfInsuranceClaims = numberOfCars > 0 ? (totalInsuranceClaims / numberOfCars * 100) : 0; // Calculate percentage
 
             document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
             document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
@@ -433,6 +448,8 @@
             document.getElementById('averageDiscoveredSales').innerText = averageDiscoveredSales.toFixed(2);
             document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
             document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
+            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims; // Update display
+            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update display
 
             document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
             document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
@@ -441,6 +458,9 @@
             document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
             document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
             document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
+            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims; // Update hidden input
+            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update hidden input
+
 
             updateRemainingGoal();
         }
@@ -535,13 +555,12 @@
                     <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
                     <input type="text" id="carIndividualCloseRatio_${carEntryCount}" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                 </div>
-                <div class="form-col">
-                    <label for="carAppointmentScheduled_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Future Appointment Scheduled?</label>
-                    <select id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="w-full rounded-md">
-                        <option value="">Select</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
+                <div class="form-col flex items-center pt-6">
+                    <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
+                    <label for="carAppointmentScheduled_${carEntryCount}" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
+                </div>
+                 <div class="form-col flex items-center pt-6"> <input type="checkbox" id="carInsuranceClaim_${carEntryCount}" name="carInsuranceClaim[]" class="mr-2" onchange="updateRunningTotals()">
+                    <label for="carInsuranceClaim_${carEntryCount}" class="text-gray-700 text-sm font-medium">Insurance Claim</label>
                 </div>
                 <div class="w-full sm:w-auto">
                     <button type="button" onclick="removeCarEntry(this)" class="btn-remove">Remove</button>
@@ -550,7 +569,7 @@
             carSalesEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('carSalesEntries');
             updateRemainingGoal();
-            updateRunningTotals();
+            updateRunningTotals(); // Call updateRunningTotals to ensure new checkbox is counted
         }
 
         function removeCarEntry(button) {
@@ -662,9 +681,8 @@
             setCurrentDate();
             updateRemoveButtonsVisibility('callEntries');
             updateRemoveButtonsVisibility('carSalesEntries');
-            // No prior day total fetching from backend, so just initialize
             updateDailyGoalBasedOnPriorDay();
-            updateRunningTotals();
+            updateRunningTotals(); // Call updateRunningTotals to set initial values
         });
     </script>
 </body>
