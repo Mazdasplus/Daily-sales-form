@@ -6,6 +6,7 @@
     <title>Daily Sales Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Custom styles for Inter font and general body styling */
         body {
@@ -151,12 +152,14 @@
 <body>
     <div class="container">
         <div class="text-center mb-8">
-            <img src="IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+            <img src="https://placehold.co/200xauto/f3f4f6/1f2937?text=Mazda's+Plus+Logo" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
+            <input type="hidden" id="pdfData" name="pdfData">
+
             <div class="form-row mb-4">
                 <div class="form-col">
                     <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
@@ -177,7 +180,7 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="text" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
                     </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
@@ -198,7 +201,7 @@
                                 <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
-                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</labeL>
+                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
                                 <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
@@ -217,8 +220,19 @@
                                 <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
                                 <label for="carAppointmentScheduled_1" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
                             </div>
-                             <div class="form-col flex items-center pt-6"> <input type="checkbox" id="carInsuranceClaim_1" name="carInsuranceClaim[]" class="mr-2">
+                            <div class="form-col flex items-center pt-6">
+                                <input type="checkbox" id="carInsuranceClaim_1" name="carInsuranceClaim[]" class="mr-2" onchange="toggleInsuranceFields(this.closest('.form-row'))">
                                 <label for="carInsuranceClaim_1" class="text-gray-700 text-sm font-medium">Insurance Claim</label>
+                            </div>
+                            <div class="form-row w-full" id="insurancePayCustomerPayGroup_1" style="display:none;">
+                                <div class="form-col">
+                                    <label for="carInsuranceSold_1" class="block text-gray-700 text-sm font-medium mb-1">Insurance Sold ($)</label>
+                                    <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="e.g., 200" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(this.closest('.form-row')); updateRunningTotals()">
+                                </div>
+                                <div class="form-col">
+                                    <label for="carCustomerPaySold_1" class="block text-gray-700 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
+                                    <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="e.g., 150" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(this.closest('.form-row')); updateRunningTotals()">
+                                </div>
                             </div>
                             <div class="w-full sm:w-auto">
                                 <button type="button" onclick="removeCarEntry(this)" class="btn-remove hidden">Remove</button>
@@ -241,15 +255,19 @@
                             <label for="callCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
                             <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                         </div>
-                        <div class="form-col flex items-center pt-6">
-                            <input type="checkbox" id="callBookedAppointment_1" name="callBookedAppointment[]" class="mr-2" onchange="toggleLostOpportunityFields(this, 1)">
+                        <div class="form-col flex items-center">
+                            <input type="checkbox" id="callBookedAppointment_1" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
                             <label for="callBookedAppointment_1" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
                         </div>
-                        <div class="form-col" id="callLostCostContainer_1">
+                        <div class="form-col flex items-center">
+                            <input type="checkbox" id="callLostLead_1" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
+                            <label for="callLostLead_1" class="text-gray-700 text-sm font-medium">Lost Lead?</label>
+                        </div>
+                        <div class="form-col" id="callLostCostContainer_1" style="display:none;">
                             <label for="callLostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                             <input type="number" id="callLostCost_1" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                         </div>
-                        <div class="form-col" id="callReasonContainer_1">
+                        <div class="form-col" id="callReasonContainer_1" style="display:none;">
                             <label for="callReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
                             <select id="callReason_1" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1, 'call')">
                                 <option value="">Select Reason</option>
@@ -258,7 +276,7 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="form-col">
+                        <div class="form-col" id="callSourceContainer_1" style="display:none;">
                             <label for="callSource_1" class="block text-gray-700 text-sm font-medium mb-1">Source</label>
                             <select id="callSource_1" name="callSource[]" class="w-full rounded-md">
                                 <option value="">Select Source</option>
@@ -314,7 +332,7 @@
 
         </form>
 
-        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
+        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-content-center p-4 hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4" id="messageBoxTitle"></h3>
                 <p class="text-gray-700 mb-6" id="messageBoxContent"></p>
@@ -394,39 +412,41 @@
             }
         }
 
-        // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims)
-        function updateRunningTotals() {
-            let totalDiscovered = 0;
-            let totalSold = 0;
-            const numberOfCars = document.querySelectorAll('#carSalesEntries .form-row').length;
-            const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
-            let totalInsuranceClaims = 0; // New counter for insurance claims
+        // Function to calculate totals for a single car row
+        function updateCarRowTotals(rowElement) { // Changed to accept rowElement
+            const discoveredInput = rowElement.querySelector('input[name="carDiscoveredSales[]"]');
+            const soldInput = rowElement.querySelector('input[name="carSoldSales[]"]');
+            const insuranceClaimCheckbox = rowElement.querySelector('input[name="carInsuranceClaim[]"]');
+            const insuranceSoldInput = rowElement.querySelector('input[name="carInsuranceSold[]"]');
+            const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
+            const individualCloseRatioInput = rowElement.querySelector('input[name="carIndividualCloseRatio[]"]');
 
-            const discoveredInputs = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
-            const soldInputs = document.querySelectorAll('input[name="carSoldSales[]"]');
-            const individualCloseRatioInputs = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]');
-            const insuranceClaimCheckboxes = document.querySelectorAll('input[name="carInsuranceClaim[]"]'); // Get all checkboxes
-            const appointmentCheckboxes = document.querySelectorAll('input[name="carAppointmentScheduled[]"]'); // Get all appointment checkboxes
+            // Add null checks for safety using optional chaining
+            const discovered = parseFloat(discoveredInput?.value || '0');
+            let sold = 0;
 
-
-            discoveredInputs.forEach((discoveredInput, index) => {
-                const discovered = parseFloat(discoveredInput.value) || 0;
-                const soldInput = soldInputs[index];
-                const sold = parseFloat(soldInput.value) || 0;
-                const individualCloseRatioInput = individualCloseRatioInputs[index];
-                const isInsuranceClaim = insuranceClaimCheckboxes[index] ? insuranceClaimCheckboxes[index].checked : false; // Check if checkbox is checked
-
-                totalDiscovered += discovered;
-                totalSold += sold;
-
-                if (isInsuranceClaim) {
-                    totalInsuranceClaims++; // Increment if insurance claim is checked
+            // If insurance claim is checked, sum insurance and customer pay
+            if (insuranceClaimCheckbox?.checked) { // Use optional chaining
+                const insuranceSold = parseFloat(insuranceSoldInput?.value || '0'); // Use optional chaining
+                const customerPaySold = parseFloat(customerPaySoldInput?.value || '0'); // Use optional chaining
+                sold = insuranceSold + customerPaySold;
+                if (soldInput) {
+                    soldInput.value = sold.toFixed(2); // Update the main sold field
+                    soldInput.setAttribute('readonly', true); // Make it read-only
                 }
-
-                let individualConversionRate = 0;
-                if (discovered > 0) {
-                    individualConversionRate = (sold / discovered) * 100;
+            } else {
+                // Otherwise, use the manually entered sold value
+                sold = parseFloat(soldInput?.value || '0'); // Use optional chaining
+                if (soldInput) {
+                    soldInput.removeAttribute('readonly'); // Make it editable
                 }
+            }
+
+            let individualConversionRate = 0;
+            if (discovered > 0) {
+                individualConversionRate = (sold / discovered) * 100;
+            }
+            if (individualCloseRatioInput) {
                 individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
 
                 individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
@@ -434,6 +454,44 @@
                     individualCloseRatioInput.classList.add('conversion-met');
                 } else {
                     individualCloseRatioInput.classList.add('conversion-not-met');
+                }
+            }
+        }
+
+        // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims)
+        function updateRunningTotals() {
+            let totalDiscovered = 0;
+            let totalSold = 0;
+            let numberOfCars = 0; // Initialize here, increment only for valid rows
+            const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
+            let totalInsuranceClaims = 0; // New counter for insurance claims
+
+            document.querySelectorAll('#carSalesEntries .form-row').forEach((row) => {
+                const discoveredInput = row.querySelector('input[name="carDiscoveredSales[]"]');
+                const soldInput = row.querySelector('input[name="carSoldSales[]"]');
+                const insuranceClaimCheckbox = row.querySelector('input[name="carInsuranceClaim[]"]');
+                const individualCloseRatioInput = row.querySelector('input[name="carIndividualCloseRatio[]"]');
+
+                // Ensure all critical inputs for a car row are present before proceeding
+                if (!discoveredInput || !soldInput || !individualCloseRatioInput) {
+                    console.warn('Skipping malformed or incomplete car entry row (missing critical inputs):', row);
+                    return; // Skip to the next iteration
+                }
+
+                numberOfCars++;
+
+                // Call updateCarRowTotals for this specific row to ensure its 'sold' value is correct
+                updateCarRowTotals(row);
+
+                // Now safely read the values
+                const discovered = parseFloat(discoveredInput.value || '0');
+                const sold = parseFloat(soldInput.value || '0');
+
+                totalDiscovered += discovered;
+                totalSold += sold;
+
+                if (insuranceClaimCheckbox?.checked) { // Use optional chaining
+                    totalInsuranceClaims++;
                 }
             });
 
@@ -466,6 +524,31 @@
             updateRemainingGoal();
         }
 
+        // Function to toggle visibility of insurance sold fields
+        function toggleInsuranceFields(rowElement) { // Changed to accept rowElement
+            const insuranceClaimCheckbox = rowElement.querySelector('input[name="carInsuranceClaim[]"]');
+            const insurancePayCustomerPayGroup = rowElement.querySelector('[id^="insurancePayCustomerPayGroup_"]'); // Select by ID prefix
+            const soldInput = rowElement.querySelector('input[name="carSoldSales[]"]');
+
+            if (insuranceClaimCheckbox && insurancePayCustomerPayGroup && soldInput) {
+                if (insuranceClaimCheckbox.checked) {
+                    insurancePayCustomerPayGroup.style.display = 'flex'; // Use 'flex' to make them side-by-side
+                    soldInput.setAttribute('readonly', true); // Make sold field read-only
+                } else {
+                    insurancePayCustomerPayGroup.style.display = 'none';
+                    soldInput.removeAttribute('readonly'); // Make sold field editable
+                    // Clear values when hidden
+                    const insuranceSoldInput = rowElement.querySelector('input[name="carInsuranceSold[]"]');
+                    const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
+                    if (insuranceSoldInput) insuranceSoldInput.value = '';
+                    if (customerPaySoldInput) customerPaySoldInput.value = '';
+                }
+                updateCarRowTotals(rowElement); // Recalculate sold for this row
+                // Removed: updateRunningTotals(); // This is now called by updateCarRowTotals
+            }
+        }
+
+
         function addCallEntry() {
             callEntryCount++;
             const callEntriesDiv = document.getElementById('callEntries');
@@ -480,15 +563,19 @@
                     <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
                     <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                 </div>
-                <div class="form-col flex items-center pt-6">
-                    <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleLostOpportunityFields(this, ${callEntryCount})">
+                <div class="form-col flex items-center">
+                    <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
                     <label for="callBookedAppointment_${callEntryCount}" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
                 </div>
-                <div class="form-col" id="callLostCostContainer_${callEntryCount}">
+                <div class="form-col flex items-center">
+                    <input type="checkbox" id="callLostLead_${callEntryCount}" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
+                    <label for="callLostLead_${callEntryCount}" class="text-gray-700 text-sm font-medium">Lost Lead?</label>
+                </div>
+                <div class="form-col" id="callLostCostContainer_${callEntryCount}" style="display:none;">
                     <label for="callLostCost_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                     <input type="number" id="callLostCost_${callEntryCount}" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                 </div>
-                <div class="form-col" id="callReasonContainer_${callEntryCount}">
+                <div class="form-col" id="callReasonContainer_${callEntryCount}" style="display:none;">
                     <label for="callReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
                     <select id="callReason_${callEntryCount}" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${callEntryCount}, 'call')">
                         <option value="">Select Reason</option>
@@ -497,7 +584,7 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <div class="form-col">
+                <div class="form-col" id="callSourceContainer_${callEntryCount}" style="display:none;">
                     <label for="callSource_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Source</label>
                     <select id="callSource_${callEntryCount}" name="callSource[]" class="w-full rounded-md">
                         <option value="">Select Source</option>
@@ -518,6 +605,8 @@
             callEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('callEntries');
             updateRunningTotals();
+            // Initialize visibility for the newly added row
+            toggleCallFieldsVisibility(callEntryCount);
         }
 
         function removeCallEntry(button) {
@@ -556,8 +645,19 @@
                     <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
                     <label for="carAppointmentScheduled_${carEntryCount}" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
                 </div>
-                 <div class="form-col flex items-center pt-6"> <input type="checkbox" id="carInsuranceClaim_${carEntryCount}" name="carInsuranceClaim[]" class="mr-2" onchange="updateRunningTotals()">
+                <div class="form-col flex items-center pt-6">
+                    <input type="checkbox" id="carInsuranceClaim_${carEntryCount}" name="carInsuranceClaim[]" class="mr-2" onchange="toggleInsuranceFields(this.closest('.form-row'))">
                     <label for="carInsuranceClaim_${carEntryCount}" class="text-gray-700 text-sm font-medium">Insurance Claim</label>
+                </div>
+                <div class="form-row w-full" id="insurancePayCustomerPayGroup_${carEntryCount}" style="display:none;">
+                    <div class="form-col">
+                        <label for="carInsuranceSold_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Insurance Sold ($)</label>
+                        <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="e.g., 200" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(this.closest('.form-row')); updateRunningTotals()">
+                    </div>
+                    <div class="form-col">
+                        <label for="carCustomerPaySold_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
+                        <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="e.g., 150" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(this.closest('.form-row')); updateRunningTotals()">
+                    </div>
                 </div>
                 <div class="w-full sm:w-auto">
                     <button type="button" onclick="removeCarEntry(this)" class="btn-remove">Remove</button>
@@ -565,30 +665,105 @@
             `;
             carSalesEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal();
-            updateRunningTotals(); // Call updateRunningTotals to ensure new checkbox is counted
+            updateRemainingGoal(); // Update goal when a new car entry is added
+            updateRunningTotals(); // Update totals when a new car entry is added
+            toggleInsuranceFields(newEntry); // Initialize visibility for new entry by passing the new row
         }
 
         function removeCarEntry(button) {
             button.closest('.form-row').remove();
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal();
-            updateRunningTotals();
+            updateRemainingGoal(); // Update goal when a car entry is removed
+            updateRunningTotals(); // Update totals when a car entry is removed
         }
 
+        // Function to toggle visibility of the "Other Reason Details" textarea
         function toggleOtherReason(selectElement, index, type) {
             const otherReasonContainer = document.getElementById(`${type}OtherReasonContainer_${index}`);
             if (selectElement.value === 'Other') {
                 otherReasonContainer.style.display = 'block';
             } else {
                 otherReasonContainer.style.display = 'none';
-                document.getElementById(`${type}OtherReason_${index}`).value = '';
+                document.getElementById(`${type}OtherReason_${index}`).value = ''; // Clear content when hidden
             }
         }
 
+        // Consolidated function to toggle visibility of fields in 'New Customer Leads' section
+        function toggleCallFieldsVisibility(index) {
+            const bookedCheckbox = document.getElementById(`callBookedAppointment_${index}`);
+            const lostLeadCheckbox = document.getElementById(`callLostLead_${index}`);
+
+            const lostCostContainer = document.getElementById(`callLostCostContainer_${index}`);
+            const reasonContainer = document.getElementById(`callReasonContainer_${index}`);
+            const sourceContainer = document.getElementById(`callSourceContainer_${index}`);
+            const otherReasonContainer = document.getElementById(`callOtherReasonContainer_${index}`); // Get other reason container
+
+            // Handle Lost Lead fields
+            if (lostLeadCheckbox && lostCostContainer && reasonContainer) {
+                if (lostLeadCheckbox.checked) {
+                    lostCostContainer.style.display = 'block';
+                    reasonContainer.style.display = 'block';
+                    // Add w-full to force them to a new line and align
+                    lostCostContainer.classList.add('w-full');
+                    reasonContainer.classList.add('w-full');
+
+                    // Re-check other reason visibility if 'Other' was selected
+                    const reasonSelect = document.getElementById(`callReason_${index}`);
+                    if (reasonSelect && reasonSelect.value === 'Other') {
+                        if (otherReasonContainer) otherReasonContainer.style.display = 'block';
+                    }
+                    // If lost lead is checked, uncheck booked appointment and hide source
+                    if (bookedCheckbox && bookedCheckbox.checked) {
+                        bookedCheckbox.checked = false;
+                        if (sourceContainer) sourceContainer.style.display = 'none';
+                        if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
+                        sourceContainer.classList.remove('w-full');
+                    }
+                } else {
+                    lostCostContainer.style.display = 'none';
+                    reasonContainer.style.display = 'none';
+                    if (otherReasonContainer) otherReasonContainer.style.display = 'none'; // Ensure other reason is also hidden
+                    lostCostContainer.classList.remove('w-full');
+                    reasonContainer.classList.remove('w-full');
+
+                    // Clear values when hidden
+                    if (document.getElementById(`callLostCost_${index}`)) document.getElementById(`callLostCost_${index}`).value = '';
+                    if (document.getElementById(`callReason_${index}`)) document.getElementById(`callReason_${index}`).value = '';
+                    if (document.getElementById(`callOtherReason_${index}`)) document.getElementById(`callOtherReason_${index}`).value = '';
+                }
+            }
+
+            // Handle Booked Appointment fields (specifically Source)
+            if (bookedCheckbox && sourceContainer) {
+                if (bookedCheckbox.checked) {
+                    sourceContainer.style.display = 'block';
+                    sourceContainer.classList.add('w-full'); // Add w-full to force it to a new line and align
+
+                    // If booked appointment is checked, uncheck lost lead and hide lost cost/reason
+                    if (lostLeadCheckbox && lostLeadCheckbox.checked) {
+                        lostLeadCheckbox.checked = false;
+                        if (lostCostContainer) lostCostContainer.style.display = 'none';
+                        if (reasonContainer) reasonContainer.style.display = 'none';
+                        if (otherReasonContainer) otherReasonContainer.style.display = 'none';
+                        if (document.getElementById(`callLostCost_${index}`)) document.getElementById(`callLostCost_${index}`).value = '';
+                        if (document.getElementById(`callReason_${index}`)) document.getElementById(`callReason_${index}`).value = '';
+                        if (document.getElementById(`callOtherReason_${index}`)) document.getElementById(`callOtherReason_${index}`).value = '';
+                        lostCostContainer.classList.remove('w-full');
+                        reasonContainer.classList.remove('w-full');
+                    }
+                } else {
+                    sourceContainer.style.display = 'none';
+                    sourceContainer.classList.remove('w-full'); // Remove w-full when hidden
+                    // Clear value when hidden
+                    if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
+                }
+            }
+        }
+
+
         function updateRemoveButtonsVisibility(containerId) {
             const container = document.getElementById(containerId);
-            if (!container) return;
+            if (!container) return; // Exit if container not found
 
             const removeButtons = container.querySelectorAll('.form-row .btn-remove');
             if (removeButtons.length <= 1) {
@@ -598,61 +773,85 @@
             }
         }
 
-        async function savePageAsImage() {
-            showMessageBox('Saving Image...', 'Please wait while the page is captured and prepared for download.');
-            try {
-                const formContainer = document.querySelector('.container');
-                const messageBox = document.getElementById('messageBox');
+        // Function to generate PDF and submit the form
+        async function generatePdfAndSubmit() {
+            showMessageBox('Generating PDF...', 'Please wait while the form is converted to PDF.');
 
-                const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
-                if (wasMessageBoxVisible) {
-                    messageBox.classList.add('hidden');
-                }
+            const formContainer = document.querySelector('.container'); // Target the main form container
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'auto'; // Temporarily allow overflow for full capture
 
-                const originalOverflow = document.body.style.overflow;
-                document.body.style.overflow = 'auto';
+            // Use a timeout to ensure all dynamic updates are rendered before capture
+            setTimeout(async () => {
+                try {
+                    const canvas = await html2canvas(formContainer, {
+                        scale: 2, // Increase scale for better resolution
+                        useCORS: true, // Enable CORS if you have external images (like logo)
+                        windowWidth: formContainer.scrollWidth, // Capture full width
+                        windowHeight: formContainer.scrollHeight, // Capture full height
+                        scrollX: -window.scrollX, // Adjust for current scroll position
+                        scrollY: -window.scrollY,
+                    });
 
-                setTimeout(async () => {
-                    try {
-                        const canvas = await html2canvas(formContainer, {
-                            scale: 2,
-                            useCORS: true,
-                            windowWidth: formContainer.scrollWidth,
-                            windowHeight: formContainer.scrollHeight,
-                            scrollX: -window.scrollX,
-                            scrollY: -window.scrollY,
-                            logging: false
-                        });
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
 
-                        const image = canvas.toDataURL('image/png');
-                        const a = document.createElement('a');
-                        const filenameDate = getFormattedDateForFilename();
-                        const filename = `mplussales_${filenameDate}.png`;
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
 
-                        a.href = image;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
 
-                        showMessageBox('Success!', `The image "${filename}" has been downloaded.`);
-
-                    } catch (error) {
-                        console.error('Error generating canvas from page:', error);
-                        showMessageBox('Error', 'Failed to capture page image. Please try again.');
-                    } finally {
-                        document.body.style.overflow = originalOverflow;
-                        if (wasMessageBoxVisible) {
-                            messageBox.classList.remove('hidden');
-                        }
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
                     }
-                }, 100);
 
-            } catch (error) {
-                console.error('Error in savePageAsImage function:', error);
-                showMessageBox('Error', 'An unexpected error occurred during image capture.');
-            }
+                    // Get the PDF as a Data URL (base64)
+                    const pdfData = pdf.output('datauristring');
+
+                    // Set the hidden input field's value
+                    document.getElementById('pdfData').value = pdfData;
+
+                    // Submit the form programmatically
+                    document.getElementById('salesForm').submit();
+
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    showMessageBox('Error', 'Failed to generate PDF. Please try again.');
+                } finally {
+                    document.body.style.overflow = originalOverflow; // Restore original overflow
+                }
+            }, 100); // Small delay to ensure rendering is complete
         }
+
+
+        // Initial calls to set button visibility and calculate goal on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setCurrentDate(); // Set the current date when the page loads
+            updateRemoveButtonsVisibility('callEntries');
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
+            updateRunningTotals(); // Calculate initial totals on load
+
+            // Initialize visibility for existing call entries (if any)
+            document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
+                // Ensure correct index for toggleCallFieldsVisibility
+                toggleCallFieldsVisibility(index + 1);
+            });
+
+            // Initialize visibility for existing car entries (if any)
+            document.querySelectorAll('#carSalesEntries .form-row').forEach((row) => {
+                toggleInsuranceFields(row); // Initialize visibility for insurance fields by passing the row
+            });
+        });
+
 
         // Function to show a custom message box
         function showMessageBox(title, message) {
@@ -683,58 +882,97 @@
             input.value = formattedValue;
         }
 
-        // Function to toggle lost opportunity fields based on "Booked Appointment?" checkbox
-        function toggleLostOpportunityFields(checkbox, index) {
-            const parentRow = checkbox.closest('.form-row');
-            const lostCostContainer = parentRow.querySelector(`#callLostCostContainer_${index}`);
-            const reasonContainer = parentRow.querySelector(`#callReasonContainer_${index}`);
-            const otherReasonContainer = parentRow.querySelector(`#callOtherReasonContainer_${index}`);
-
-            if (checkbox.checked) {
-                // If booked, hide and clear values
-                if (lostCostContainer) lostCostContainer.style.display = 'none';
-                if (reasonContainer) reasonContainer.style.display = 'none';
-                if (otherReasonContainer) otherReasonContainer.style.display = 'none';
-
-                // Clear values to prevent sending stale data
-                if (parentRow.querySelector(`#callLostCost_${index}`)) parentRow.querySelector(`#callLostCost_${index}`).value = '';
-                if (parentRow.querySelector(`#callReason_${index}`)) parentRow.querySelector(`#callReason_${index}`).value = '';
-                if (parentRow.querySelector(`#callOtherReason_${index}`)) parentRow.querySelector(`#callOtherReason_${index}`).value = '';
-
-            } else {
-                // If not booked, show fields
-                if (lostCostContainer) lostCostContainer.style.display = 'block';
-                if (reasonContainer) reasonContainer.style.display = 'block';
-                // Only show other reason if 'Other' is selected
-                if (parentRow.querySelector(`#callReason_${index}`) && parentRow.querySelector(`#callReason_${index}`).value === 'Other') {
-                    if (otherReasonContainer) otherReasonContainer.style.display = 'block';
-                }
-            }
-        }
-
-
         // Handle form submission (now relies on Formspree's action attribute)
+        // The submit event listener is now mainly for logging, as submission is triggered by generatePdfAndSubmit()
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            // Formspree will automatically collect all named inputs.
-            // We just need to ensure calculated hidden fields are updated.
-            updateRunningTotals(); // Ensure all totals are up-to-date before submission
-        });
+            // This event listener will fire when the form is submitted, either normally or programmatically.
+            // Formspree handles the actual submission via the HTML 'action' attribute.
+            // The browser will now submit the form data and typically redirect to Formspree's thank you page.
 
-        // Initial calls to set button visibility and calculate goal on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            setCurrentDate();
-            updateRemoveButtonsVisibility('callEntries');
-            updateRemoveButtonsVisibility('carSalesEntries');
-            updateDailyGoalBasedOnPriorDay();
-            updateRunningTotals(); // Call updateRunningTotals to set initial values
+            const formDataCollectedByJS = {
+                dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
+                priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
+                carSales: [],
+                calls: [], // Calls now include lost cost and reason
+                submissionDate: new Date().toISOString(),
+                pdfData: document.getElementById('pdfData').value // Include PDF data
+            };
 
-            // Initialize visibility for existing call entries (if any)
-            document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
-                const checkbox = row.querySelector(`#callBookedAppointment_${index + 1}`);
-                if (checkbox) {
-                    toggleLostOpportunityFields(checkbox, index + 1);
+            // Get all car sales entries
+            const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
+            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]'); // Get last name inputs
+            const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
+            const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
+            const carInsuranceSold = document.querySelectorAll('input[name="carInsuranceSold[]"]'); // New
+            const carCustomerPaySold = document.querySelectorAll('input[name="carCustomerPaySold[]"]'); // New
+            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]'); // Get individual close ratio inputs
+            const carAppointmentScheduled = document.querySelectorAll('input[name="carAppointmentScheduled[]"]'); // Changed to input for checkbox
+            const carInsuranceClaims = document.querySelectorAll('input[name="carInsuranceClaim[]"]');
+
+
+            carRepairOrderNumbers.forEach((input, index) => {
+                const roNum = input.value;
+                const lastName = carLastNames[index].value; // Get last name value
+                const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
+                const sold = parseFloat(carSoldSales[index].value) || 0;
+                const insuranceSold = parseFloat(carInsuranceSold[index]?.value || '0') || 0; // New: Added optional chaining
+                const customerPaySold = parseFloat(carCustomerPaySold[index]?.value || '0') || 0; // New: Added optional chaining
+                const individualCloseRatio = carIndividualCloseRatios[index].value; // Get individual close ratio value
+                const appointment = carAppointmentScheduled[index].checked; // Get checked status for checkbox
+                const insuranceClaim = carInsuranceClaims[index].checked; // Get insurance claim status
+                if (roNum || lastName || discovered > 0 || sold > 0 || appointment || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
+                    formDataCollectedByJS.carSales.push({
+                        repairOrderNumber: roNum,
+                        lastName: lastName, // Add last name to collected data
+                        discoveredSales: discovered,
+                        soldSales: sold,
+                        insuranceSold: insuranceSold, // New
+                        customerPaySold: customerPaySold, // New
+                        individualCloseRatio: individualCloseRatio, // Add individual close ratio to collected data
+                        appointmentScheduled: appointment,
+                        insuranceClaim: insuranceClaim // Add insurance claim status
+                    });
                 }
             });
+
+            // Get all call entries (now including lost opportunity details)
+            const customerNames = document.querySelectorAll('input[name="callCustomerName[]"]');
+            const customerPhones = document.querySelectorAll('input[name="callCustomerPhone[]"]');
+            const bookedAppointments = document.querySelectorAll('input[name="callBookedAppointment[]"]'); // Changed to input as it's a checkbox now
+            const lostLeads = document.querySelectorAll('input[name="callLostLead[]"]'); // New: Lost Lead checkbox
+            const callLostCosts = document.querySelectorAll('input[name="callLostCost[]"]');
+            const callReasons = document.querySelectorAll('select[name="callReason[]"]');
+            const callOtherReasons = document.querySelectorAll('textarea[name="callOtherReason[]"]');
+            const callSources = document.querySelectorAll('select[name="callSource[]"]');
+
+
+            customerNames.forEach((input, index) => {
+                const name = input.value;
+                const phone = customerPhones[index].value;
+                const booked = bookedAppointments[index].checked; // Get checked status for checkbox
+                const lost = lostLeads[index].checked; // Get checked status for Lost Lead checkbox
+                const lostCost = parseFloat(callLostCosts[index].value) || 0;
+                const reason = callReasons[index].value;
+                const otherReasonDetails = callOtherReasons[index].value;
+                const source = callSources[index].value;
+
+                if (name || phone || booked || lost || lostCost > 0 || reason || source) {
+                    formDataCollectedByJS.calls.push({
+                        customerName: name,
+                        customerPhone: phone,
+                        bookedAppointment: booked,
+                        lostLead: lost, // Added to calls
+                        lostCost: lostCost, // Added to calls
+                        reason: reason,     // Added to calls
+                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : '', // Added to calls
+                        source: source // Added to calls
+                    });
+                }
+            });
+
+            console.log('Form Data (as collected by JS):', formDataCollectedByJS); // This will still show in your browser console
+
+            // No need to show message box here, as it's handled by generatePdfAndSubmit()
         });
     </script>
 </body>
