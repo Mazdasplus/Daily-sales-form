@@ -159,16 +159,13 @@
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
             <input type="hidden" id="pdfData" name="pdfData">
-
-            <div class="form-row mb-4">
+            <input type="hidden" id="formDataJson" name="formDataJson"> <div class="form-row mb-4">
                 <div class="form-col">
                     <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
-                    <input type="date" id="reportDate" name="reportDate" class="w-full rounded-md">
-                </div>
+                    <input type="date" id="reportDate" class="w-full rounded-md"> </div>
                 <div class="form-col">
                     <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
-                    <select id="serviceAdvisorName" name="serviceAdvisorName" class="w-full rounded-md">
-                        <option value="Beto Calderon">Beto Calderon</option>
+                    <select id="serviceAdvisorName" class="w-full rounded-md"> <option value="Beto Calderon">Beto Calderon</option>
                         <option value="Scott Carvalho">Scott Carvalho</option>
                     </select>
                 </div>
@@ -180,12 +177,10 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
-                    </div>
+                        <input type="number" id="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()"> </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
-                        <input type="number" id="dailyGoal" name="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
-                    </div>
+                        <input type="number" id="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()"> </div>
                 </div>
 
                 <div class="goal-display" id="remainingDailyGoalTop">
@@ -319,18 +314,7 @@
                 </div>
             </div>
 
-            <input type="hidden" id="hiddenTotalDiscoveredSales" name="Total Discovered Sales">
-            <input type="hidden" id="hiddenTotalSoldSales" name="Total Sold Sales">
-            <input type="hidden" id="hiddenCloseRatio" name="Close Ratio">
-            <input type="hidden" id="hiddenRemainingDailyGoal" name="Remaining Daily Goal">
-            <input type="hidden" id="hiddenTotalCars" name="Total Cars">
-            <input type="hidden" id="hiddenAverageDiscoveredSales" name="Average Discovered Sales">
-            <input type="hidden" id="hiddenAverageSoldSales" name="Average Sale">
-            <input type="hidden" id="hiddenTotalCustomerCalls" name="New Customer Calls">
-            <input type="hidden" id="hiddenTotalInsuranceClaims" name="Total Insurance Claims Jobs">
-            <input type="hidden" id="hiddenPercentageOfInsuranceClaims" name="Insurance Percentage of Sales">
-
-        </form>
+            </form>
 
         <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-content-center p-4 hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
@@ -397,7 +381,7 @@
 
             remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
             remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
-            document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
+            // document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2); // No longer needed as part of formDataJson
 
             if (remainingGoal <= 0) {
                 remainingGoalContainerTop.classList.remove('goal-not-met');
@@ -510,15 +494,16 @@
             document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims; // Update display
             document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update display
 
-            document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
-            document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
-            document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
-            document.getElementById('hiddenTotalCars').value = numberOfCars;
-            document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
-            document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
-            document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
-            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims; // Update hidden input
-            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update hidden input
+            // These are no longer hidden inputs for Formspree, but can be used for internal display
+            // document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
+            // document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
+            // document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
+            // document.getElementById('hiddenTotalCars').value = numberOfCars;
+            // document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
+            // document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
+            // document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
+            // document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
+            // document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
 
 
             updateRemainingGoal();
@@ -883,96 +868,88 @@
         }
 
         // Handle form submission (now relies on Formspree's action attribute)
-        // The submit event listener is now mainly for logging, as submission is triggered by generatePdfAndSubmit()
         document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            // This event listener will fire when the form is submitted, either normally or programmatically.
-            // Formspree handles the actual submission via the HTML 'action' attribute.
-            // The browser will now submit the form data and typically redirect to Formspree's thank you page.
-
-            const formDataCollectedByJS = {
+            // Collect all data into a structured object
+            const formDataCollected = {
+                reportDate: document.getElementById('reportDate').value,
+                serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
                 dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
                 priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
                 carSales: [],
-                calls: [], // Calls now include lost cost and reason
-                submissionDate: new Date().toISOString(),
-                pdfData: document.getElementById('pdfData').value // Include PDF data
+                customerLeads: [], // Renamed from 'calls' for clarity
+                totals: {
+                    totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
+                    totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
+                    closeRatio: document.getElementById('closeRatio').innerText,
+                    totalCars: parseInt(document.getElementById('totalCars').innerText) || 0,
+                    averageDiscoveredSales: parseFloat(document.getElementById('averageDiscoveredSales').innerText) || 0,
+                    averageSoldSales: parseFloat(document.getElementById('averageSoldSales').innerText) || 0,
+                    newCustomerCalls: parseInt(document.getElementById('totalCustomerCalls').innerText) || 0,
+                    totalInsuranceClaims: parseInt(document.getElementById('totalInsuranceClaims').innerText) || 0,
+                    percentageOfInsuranceClaims: document.getElementById('percentageOfInsuranceClaims').innerText,
+                    remainingDailyGoal: parseFloat(document.getElementById('remainingDailyGoalValueBottom').innerText) || 0,
+                }
             };
 
-            // Get all car sales entries
-            const carRepairOrderNumbers = document.querySelectorAll('input[name="carRepairOrderNumber[]"]');
-            const carLastNames = document.querySelectorAll('input[name="carLastName[]"]'); // Get last name inputs
-            const carDiscoveredSales = document.querySelectorAll('input[name="carDiscoveredSales[]"]');
-            const carSoldSales = document.querySelectorAll('input[name="carSoldSales[]"]');
-            const carInsuranceSold = document.querySelectorAll('input[name="carInsuranceSold[]"]'); // New
-            const carCustomerPaySold = document.querySelectorAll('input[name="carCustomerPaySold[]"]'); // New
-            const carIndividualCloseRatios = document.querySelectorAll('input[name="carIndividualCloseRatio[]"]'); // Get individual close ratio inputs
-            const carAppointmentScheduled = document.querySelectorAll('input[name="carAppointmentScheduled[]"]'); // Changed to input for checkbox
-            const carInsuranceClaims = document.querySelectorAll('input[name="carInsuranceClaim[]"]');
+            // Collect car sales data
+            document.querySelectorAll('#carSalesEntries .form-row').forEach(row => {
+                const roNum = row.querySelector('input[name="carRepairOrderNumber[]"]')?.value || '';
+                const lastName = row.querySelector('input[name="carLastName[]"]')?.value || '';
+                const discovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value || '0');
+                const sold = parseFloat(row.querySelector('input[name="carSoldSales[]"]')?.value || '0');
+                const individualCloseRatio = row.querySelector('input[name="carIndividualCloseRatio[]"]')?.value || '';
+                const appointmentScheduled = row.querySelector('input[name="carAppointmentScheduled[]"]')?.checked || false;
+                const insuranceClaim = row.querySelector('input[name="carInsuranceClaim[]"]')?.checked || false;
+                const insuranceSold = parseFloat(row.querySelector('input[name="carInsuranceSold[]"]')?.value || '0');
+                const customerPaySold = parseFloat(row.querySelector('input[name="carCustomerPaySold[]"]')?.value || '0');
 
-
-            carRepairOrderNumbers.forEach((input, index) => {
-                const roNum = input.value;
-                const lastName = carLastNames[index].value; // Get last name value
-                const discovered = parseFloat(carDiscoveredSales[index].value) || 0;
-                const sold = parseFloat(carSoldSales[index].value) || 0;
-                const insuranceSold = parseFloat(carInsuranceSold[index]?.value || '0') || 0; // New: Added optional chaining
-                const customerPaySold = parseFloat(carCustomerPaySold[index]?.value || '0') || 0; // New: Added optional chaining
-                const individualCloseRatio = carIndividualCloseRatios[index].value; // Get individual close ratio value
-                const appointment = carAppointmentScheduled[index].checked; // Get checked status for checkbox
-                const insuranceClaim = carInsuranceClaims[index].checked; // Get insurance claim status
-                if (roNum || lastName || discovered > 0 || sold > 0 || appointment || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
-                    formDataCollectedByJS.carSales.push({
+                if (roNum || lastName || discovered > 0 || sold > 0 || appointmentScheduled || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
+                    formDataCollected.carSales.push({
                         repairOrderNumber: roNum,
-                        lastName: lastName, // Add last name to collected data
+                        lastName: lastName,
                         discoveredSales: discovered,
                         soldSales: sold,
-                        insuranceSold: insuranceSold, // New
-                        customerPaySold: customerPaySold, // New
-                        individualCloseRatio: individualCloseRatio, // Add individual close ratio to collected data
-                        appointmentScheduled: appointment,
-                        insuranceClaim: insuranceClaim // Add insurance claim status
+                        individualCloseRatio: individualCloseRatio,
+                        appointmentScheduled: appointmentScheduled,
+                        insuranceClaim: insuranceClaim,
+                        insuranceSold: insuranceSold,
+                        customerPaySold: customerPaySold
                     });
                 }
             });
 
-            // Get all call entries (now including lost opportunity details)
-            const customerNames = document.querySelectorAll('input[name="callCustomerName[]"]');
-            const customerPhones = document.querySelectorAll('input[name="callCustomerPhone[]"]');
-            const bookedAppointments = document.querySelectorAll('input[name="callBookedAppointment[]"]'); // Changed to input as it's a checkbox now
-            const lostLeads = document.querySelectorAll('input[name="callLostLead[]"]'); // New: Lost Lead checkbox
-            const callLostCosts = document.querySelectorAll('input[name="callLostCost[]"]');
-            const callReasons = document.querySelectorAll('select[name="callReason[]"]');
-            const callOtherReasons = document.querySelectorAll('textarea[name="callOtherReason[]"]');
-            const callSources = document.querySelectorAll('select[name="callSource[]"]');
+            // Collect customer leads data
+            document.querySelectorAll('#callEntries .form-row').forEach(row => {
+                const customerName = row.querySelector('input[name="callCustomerName[]"]')?.value || '';
+                const customerPhone = row.querySelector('input[name="callCustomerPhone[]"]')?.value || '';
+                const bookedAppointment = row.querySelector('input[name="callBookedAppointment[]"]')?.checked || false;
+                const lostLead = row.querySelector('input[name="callLostLead[]"]')?.checked || false;
+                const lostCost = parseFloat(row.querySelector('input[name="callLostCost[]"]')?.value || '0');
+                const reason = row.querySelector('select[name="callReason[]"]')?.value || '';
+                const otherReasonDetails = row.querySelector('textarea[name="callOtherReason[]"]')?.value || '';
+                const source = row.querySelector('select[name="callSource[]"]')?.value || '';
 
-
-            customerNames.forEach((input, index) => {
-                const name = input.value;
-                const phone = customerPhones[index].value;
-                const booked = bookedAppointments[index].checked; // Get checked status for checkbox
-                const lost = lostLeads[index].checked; // Get checked status for Lost Lead checkbox
-                const lostCost = parseFloat(callLostCosts[index].value) || 0;
-                const reason = callReasons[index].value;
-                const otherReasonDetails = callOtherReasons[index].value;
-                const source = callSources[index].value;
-
-                if (name || phone || booked || lost || lostCost > 0 || reason || source) {
-                    formDataCollectedByJS.calls.push({
-                        customerName: name,
-                        customerPhone: phone,
-                        bookedAppointment: booked,
-                        lostLead: lost, // Added to calls
-                        lostCost: lostCost, // Added to calls
-                        reason: reason,     // Added to calls
-                        otherReasonDetails: reason === 'Other' ? otherReasonDetails : '', // Added to calls
-                        source: source // Added to calls
+                if (customerName || customerPhone || bookedAppointment || lostLead || lostCost > 0 || reason || source) {
+                    formDataCollected.customerLeads.push({
+                        customerName: customerName,
+                        customerPhone: customerPhone,
+                        bookedAppointment: bookedAppointment,
+                        lostLead: lostLead,
+                        lostCost: lostCost,
+                        reason: reason,
+                        otherReasonDetails: (reason === 'Other' && otherReasonDetails) ? otherReasonDetails : '',
+                        source: source
                     });
                 }
             });
 
-            console.log('Form Data (as collected by JS):', formDataCollectedByJS); // This will still show in your browser console
+            // Set the JSON string to the hidden input
+            document.getElementById('formDataJson').value = JSON.stringify(formDataCollected, null, 2);
 
-            // No need to show message box here, as it's handled by generatePdfAndSubmit()
+            // For Formspree, it's best to let the form submit naturally after populating the hidden JSON field.
+            // If you were using a custom backend, you would preventDefault and send a fetch request.
+            // event.preventDefault(); // Uncomment this if you want to handle submission via fetch API
+            console.log('Form Data for Formspree:', formDataCollected);
         });
     </script>
 </body>
