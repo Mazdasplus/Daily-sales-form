@@ -152,20 +152,26 @@
 <body>
     <div class="container">
         <div class="text-center mb-8">
-            <img src="https://placehold.co/200xauto/f3f4f6/1f2937?text=Mazda's+Plus+Logo" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+            <!-- IMPORTANT: Replace the src below with the actual public URL of your logo. -->
+            <!-- Example: <img src="https://yourwebsite.com/images/IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;"> -->
+            <img src="https://placehold.co/200xauto/f3f4f6/1f2937?text=Your+Logo+Here" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
         </div>
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
             <input type="hidden" id="pdfData" name="pdfData">
-            <input type="hidden" id="formDataJson" name="formDataJson"> <div class="form-row mb-4">
+            <input type="hidden" id="formDataJson" name="formDataJson"> <!-- New hidden input for structured JSON -->
+
+            <div class="form-row mb-4">
                 <div class="form-col">
                     <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
-                    <input type="date" id="reportDate" class="w-full rounded-md"> </div>
+                    <input type="date" id="reportDate" class="w-full rounded-md"> <!-- Removed name attribute -->
+                </div>
                 <div class="form-col">
                     <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
-                    <select id="serviceAdvisorName" class="w-full rounded-md"> <option value="Beto Calderon">Beto Calderon</option>
+                    <select id="serviceAdvisorName" class="w-full rounded-md"> <!-- Removed name attribute -->
+                        <option value="Beto Calderon">Beto Calderon</option>
                         <option value="Scott Carvalho">Scott Carvalho</option>
                     </select>
                 </div>
@@ -177,10 +183,12 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()"> </div>
+                        <input type="number" id="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()"> <!-- Removed name attribute -->
+                    </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
-                        <input type="number" id="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()"> </div>
+                        <input type="number" id="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()"> <!-- Removed name attribute -->
+                    </div>
                 </div>
 
                 <div class="goal-display" id="remainingDailyGoalTop">
@@ -294,7 +302,7 @@
             </div>
 
             <div class="text-center mt-6 flex justify-center space-x-4">
-                <button type="submit" class="btn-primary">Submit Daily Report</button>
+                <button type="submit" class="btn-primary" onclick="generatePdfAndSubmit(event)">Submit Daily Report</button>
                 <button type="button" onclick="savePageAsImage()" class="btn-primary bg-gray-600 hover:bg-gray-700">Save Page as Image</button>
             </div>
 
@@ -314,7 +322,7 @@
                 </div>
             </div>
 
-            </form>
+        </form>
 
         <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-content-center p-4 hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
@@ -381,7 +389,6 @@
 
             remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
             remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
-            // document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2); // No longer needed as part of formDataJson
 
             if (remainingGoal <= 0) {
                 remainingGoalContainerTop.classList.remove('goal-not-met');
@@ -397,7 +404,7 @@
         }
 
         // Function to calculate totals for a single car row
-        function updateCarRowTotals(rowElement) { // Changed to accept rowElement
+        function updateCarRowTotals(rowElement) {
             const discoveredInput = rowElement.querySelector('input[name="carDiscoveredSales[]"]');
             const soldInput = rowElement.querySelector('input[name="carSoldSales[]"]');
             const insuranceClaimCheckbox = rowElement.querySelector('input[name="carInsuranceClaim[]"]');
@@ -405,24 +412,21 @@
             const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
             const individualCloseRatioInput = rowElement.querySelector('input[name="carIndividualCloseRatio[]"]');
 
-            // Add null checks for safety using optional chaining
             const discovered = parseFloat(discoveredInput?.value || '0');
             let sold = 0;
 
-            // If insurance claim is checked, sum insurance and customer pay
-            if (insuranceClaimCheckbox?.checked) { // Use optional chaining
-                const insuranceSold = parseFloat(insuranceSoldInput?.value || '0'); // Use optional chaining
-                const customerPaySold = parseFloat(customerPaySoldInput?.value || '0'); // Use optional chaining
+            if (insuranceClaimCheckbox?.checked) {
+                const insuranceSold = parseFloat(insuranceSoldInput?.value || '0');
+                const customerPaySold = parseFloat(customerPaySoldInput?.value || '0');
                 sold = insuranceSold + customerPaySold;
                 if (soldInput) {
-                    soldInput.value = sold.toFixed(2); // Update the main sold field
-                    soldInput.setAttribute('readonly', true); // Make it read-only
+                    soldInput.value = sold.toFixed(2);
+                    soldInput.setAttribute('readonly', true);
                 }
             } else {
-                // Otherwise, use the manually entered sold value
-                sold = parseFloat(soldInput?.value || '0'); // Use optional chaining
+                sold = parseFloat(soldInput?.value || '0');
                 if (soldInput) {
-                    soldInput.removeAttribute('readonly'); // Make it editable
+                    soldInput.removeAttribute('readonly');
                 }
             }
 
@@ -446,9 +450,9 @@
         function updateRunningTotals() {
             let totalDiscovered = 0;
             let totalSold = 0;
-            let numberOfCars = 0; // Initialize here, increment only for valid rows
+            let numberOfCars = 0;
             const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
-            let totalInsuranceClaims = 0; // New counter for insurance claims
+            let totalInsuranceClaims = 0;
 
             document.querySelectorAll('#carSalesEntries .form-row').forEach((row) => {
                 const discoveredInput = row.querySelector('input[name="carDiscoveredSales[]"]');
@@ -456,25 +460,22 @@
                 const insuranceClaimCheckbox = row.querySelector('input[name="carInsuranceClaim[]"]');
                 const individualCloseRatioInput = row.querySelector('input[name="carIndividualCloseRatio[]"]');
 
-                // Ensure all critical inputs for a car row are present before proceeding
                 if (!discoveredInput || !soldInput || !individualCloseRatioInput) {
                     console.warn('Skipping malformed or incomplete car entry row (missing critical inputs):', row);
-                    return; // Skip to the next iteration
+                    return;
                 }
 
                 numberOfCars++;
 
-                // Call updateCarRowTotals for this specific row to ensure its 'sold' value is correct
                 updateCarRowTotals(row);
 
-                // Now safely read the values
                 const discovered = parseFloat(discoveredInput.value || '0');
                 const sold = parseFloat(soldInput.value || '0');
 
                 totalDiscovered += discovered;
                 totalSold += sold;
 
-                if (insuranceClaimCheckbox?.checked) { // Use optional chaining
+                if (insuranceClaimCheckbox?.checked) {
                     totalInsuranceClaims++;
                 }
             });
@@ -482,7 +483,7 @@
             const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
             const averageDiscoveredSales = numberOfCars > 0 ? (totalDiscovered / numberOfCars) : 0;
             const averageSoldSales = numberOfCars > 0 ? (totalSold / numberOfCars) : 0;
-            const percentageOfInsuranceClaims = numberOfCars > 0 ? (totalInsuranceClaims / numberOfCars * 100) : 0; // Calculate percentage
+            const percentageOfInsuranceClaims = numberOfCars > 0 ? (totalInsuranceClaims / numberOfCars * 100) : 0;
 
             document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
             document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
@@ -491,48 +492,33 @@
             document.getElementById('averageDiscoveredSales').innerText = averageDiscoveredSales.toFixed(2);
             document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
             document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
-            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims; // Update display
-            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update display
-
-            // These are no longer hidden inputs for Formspree, but can be used for internal display
-            // document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
-            // document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
-            // document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
-            // document.getElementById('hiddenTotalCars').value = numberOfCars;
-            // document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
-            // document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
-            // document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
-            // document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
-            // document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
-
+            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims;
+            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%';
 
             updateRemainingGoal();
         }
 
         // Function to toggle visibility of insurance sold fields
-        function toggleInsuranceFields(rowElement) { // Changed to accept rowElement
+        function toggleInsuranceFields(rowElement) {
             const insuranceClaimCheckbox = rowElement.querySelector('input[name="carInsuranceClaim[]"]');
-            const insurancePayCustomerPayGroup = rowElement.querySelector('[id^="insurancePayCustomerPayGroup_"]'); // Select by ID prefix
+            const insurancePayCustomerPayGroup = rowElement.querySelector('[id^="insurancePayCustomerPayGroup_"]');
             const soldInput = rowElement.querySelector('input[name="carSoldSales[]"]');
 
             if (insuranceClaimCheckbox && insurancePayCustomerPayGroup && soldInput) {
                 if (insuranceClaimCheckbox.checked) {
-                    insurancePayCustomerPayGroup.style.display = 'flex'; // Use 'flex' to make them side-by-side
-                    soldInput.setAttribute('readonly', true); // Make sold field read-only
+                    insurancePayCustomerPayGroup.style.display = 'flex';
+                    soldInput.setAttribute('readonly', true);
                 } else {
                     insurancePayCustomerPayGroup.style.display = 'none';
-                    soldInput.removeAttribute('readonly'); // Make sold field editable
-                    // Clear values when hidden
+                    soldInput.removeAttribute('readonly');
                     const insuranceSoldInput = rowElement.querySelector('input[name="carInsuranceSold[]"]');
                     const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
                     if (insuranceSoldInput) insuranceSoldInput.value = '';
                     if (customerPaySoldInput) customerPaySoldInput.value = '';
                 }
-                updateCarRowTotals(rowElement); // Recalculate sold for this row
-                // Removed: updateRunningTotals(); // This is now called by updateCarRowTotals
+                updateCarRowTotals(rowElement);
             }
         }
-
 
         function addCallEntry() {
             callEntryCount++;
@@ -590,7 +576,6 @@
             callEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('callEntries');
             updateRunningTotals();
-            // Initialize visibility for the newly added row
             toggleCallFieldsVisibility(callEntryCount);
         }
 
@@ -650,30 +635,28 @@
             `;
             carSalesEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal(); // Update goal when a new car entry is added
-            updateRunningTotals(); // Update totals when a new car entry is added
-            toggleInsuranceFields(newEntry); // Initialize visibility for new entry by passing the new row
+            updateRemainingGoal();
+            updateRunningTotals();
+            toggleInsuranceFields(newEntry);
         }
 
         function removeCarEntry(button) {
             button.closest('.form-row').remove();
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal(); // Update goal when a car entry is removed
-            updateRunningTotals(); // Update totals when a car entry is removed
+            updateRemainingGoal();
+            updateRunningTotals();
         }
 
-        // Function to toggle visibility of the "Other Reason Details" textarea
         function toggleOtherReason(selectElement, index, type) {
             const otherReasonContainer = document.getElementById(`${type}OtherReasonContainer_${index}`);
             if (selectElement.value === 'Other') {
                 otherReasonContainer.style.display = 'block';
             } else {
                 otherReasonContainer.style.display = 'none';
-                document.getElementById(`${type}OtherReason_${index}`).value = ''; // Clear content when hidden
+                document.getElementById(`${type}OtherReason_${index}`).value = '';
             }
         }
 
-        // Consolidated function to toggle visibility of fields in 'New Customer Leads' section
         function toggleCallFieldsVisibility(index) {
             const bookedCheckbox = document.getElementById(`callBookedAppointment_${index}`);
             const lostLeadCheckbox = document.getElementById(`callLostLead_${index}`);
@@ -681,23 +664,19 @@
             const lostCostContainer = document.getElementById(`callLostCostContainer_${index}`);
             const reasonContainer = document.getElementById(`callReasonContainer_${index}`);
             const sourceContainer = document.getElementById(`callSourceContainer_${index}`);
-            const otherReasonContainer = document.getElementById(`callOtherReasonContainer_${index}`); // Get other reason container
+            const otherReasonContainer = document.getElementById(`callOtherReasonContainer_${index}`);
 
-            // Handle Lost Lead fields
             if (lostLeadCheckbox && lostCostContainer && reasonContainer) {
                 if (lostLeadCheckbox.checked) {
                     lostCostContainer.style.display = 'block';
                     reasonContainer.style.display = 'block';
-                    // Add w-full to force them to a new line and align
                     lostCostContainer.classList.add('w-full');
                     reasonContainer.classList.add('w-full');
 
-                    // Re-check other reason visibility if 'Other' was selected
                     const reasonSelect = document.getElementById(`callReason_${index}`);
                     if (reasonSelect && reasonSelect.value === 'Other') {
                         if (otherReasonContainer) otherReasonContainer.style.display = 'block';
                     }
-                    // If lost lead is checked, uncheck booked appointment and hide source
                     if (bookedCheckbox && bookedCheckbox.checked) {
                         bookedCheckbox.checked = false;
                         if (sourceContainer) sourceContainer.style.display = 'none';
@@ -707,24 +686,21 @@
                 } else {
                     lostCostContainer.style.display = 'none';
                     reasonContainer.style.display = 'none';
-                    if (otherReasonContainer) otherReasonContainer.style.display = 'none'; // Ensure other reason is also hidden
+                    if (otherReasonContainer) otherReasonContainer.style.display = 'none';
                     lostCostContainer.classList.remove('w-full');
                     reasonContainer.classList.remove('w-full');
 
-                    // Clear values when hidden
                     if (document.getElementById(`callLostCost_${index}`)) document.getElementById(`callLostCost_${index}`).value = '';
                     if (document.getElementById(`callReason_${index}`)) document.getElementById(`callReason_${index}`).value = '';
                     if (document.getElementById(`callOtherReason_${index}`)) document.getElementById(`callOtherReason_${index}`).value = '';
                 }
             }
 
-            // Handle Booked Appointment fields (specifically Source)
             if (bookedCheckbox && sourceContainer) {
                 if (bookedCheckbox.checked) {
                     sourceContainer.style.display = 'block';
-                    sourceContainer.classList.add('w-full'); // Add w-full to force it to a new line and align
+                    sourceContainer.classList.add('w-full');
 
-                    // If booked appointment is checked, uncheck lost lead and hide lost cost/reason
                     if (lostLeadCheckbox && lostLeadCheckbox.checked) {
                         lostLeadCheckbox.checked = false;
                         if (lostCostContainer) lostCostContainer.style.display = 'none';
@@ -738,17 +714,15 @@
                     }
                 } else {
                     sourceContainer.style.display = 'none';
-                    sourceContainer.classList.remove('w-full'); // Remove w-full when hidden
-                    // Clear value when hidden
+                    sourceContainer.classList.remove('w-full');
                     if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
                 }
             }
         }
 
-
         function updateRemoveButtonsVisibility(containerId) {
             const container = document.getElementById(containerId);
-            if (!container) return; // Exit if container not found
+            if (!container) return;
 
             const removeButtons = container.querySelectorAll('.form-row .btn-remove');
             if (removeButtons.length <= 1) {
@@ -758,32 +732,69 @@
             }
         }
 
-        // Function to generate PDF and submit the form
-        async function generatePdfAndSubmit() {
-            showMessageBox('Generating PDF...', 'Please wait while the form is converted to PDF.');
+        async function savePageAsImage() {
+            showMessageBox('Generating Image...', 'Please wait while the form is converted to an image.');
 
-            const formContainer = document.querySelector('.container'); // Target the main form container
+            const formContainer = document.querySelector('.container');
             const originalOverflow = document.body.style.overflow;
-            document.body.style.overflow = 'auto'; // Temporarily allow overflow for full capture
+            document.body.style.overflow = 'auto';
 
-            // Use a timeout to ensure all dynamic updates are rendered before capture
             setTimeout(async () => {
                 try {
                     const canvas = await html2canvas(formContainer, {
-                        scale: 2, // Increase scale for better resolution
-                        useCORS: true, // Enable CORS if you have external images (like logo)
-                        windowWidth: formContainer.scrollWidth, // Capture full width
-                        windowHeight: formContainer.scrollHeight, // Capture full height
-                        scrollX: -window.scrollX, // Adjust for current scroll position
+                        scale: 2,
+                        useCORS: true,
+                        windowWidth: formContainer.scrollWidth,
+                        windowHeight: formContainer.scrollHeight,
+                        scrollX: -window.scrollX,
+                        scrollY: -window.scrollY,
+                    });
+
+                    const imgDataUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = imgDataUrl;
+                    a.download = `DailySalesForm_${getFormattedDateForFilename()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    closeMessageBox();
+                } catch (error) {
+                    console.error('Error generating image:', error);
+                    showMessageBox('Error', 'Failed to generate image. Please try again.');
+                } finally {
+                    document.body.style.overflow = originalOverflow;
+                }
+            }, 100);
+        }
+
+
+        async function generatePdfAndSubmit(event) {
+            event.preventDefault();
+
+            showMessageBox('Generating PDF & Submitting...', 'Please wait while the report is prepared and submitted.');
+
+            const formContainer = document.querySelector('.container');
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'auto';
+
+            setTimeout(async () => {
+                try {
+                    const canvas = await html2canvas(formContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        windowWidth: formContainer.scrollWidth,
+                        windowHeight: formContainer.scrollHeight,
+                        scrollX: -window.scrollX,
                         scrollY: -window.scrollY,
                     });
 
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
+                    const pdf = new jsPDF('p', 'mm', 'a4');
 
-                    const imgWidth = 210; // A4 width in mm
-                    const pageHeight = 297; // A4 height in mm
+                    const imgWidth = 210;
+                    const pageHeight = 297;
                     const imgHeight = canvas.height * imgWidth / canvas.width;
                     let heightLeft = imgHeight;
                     let position = 0;
@@ -798,42 +809,108 @@
                         heightLeft -= pageHeight;
                     }
 
-                    // Get the PDF as a Data URL (base64)
                     const pdfData = pdf.output('datauristring');
-
-                    // Set the hidden input field's value
                     document.getElementById('pdfData').value = pdfData;
 
-                    // Submit the form programmatically
+                    const formDataCollected = {
+                        reportDate: document.getElementById('reportDate').value,
+                        serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
+                        dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
+                        priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
+                        carSales: [],
+                        customerLeads: [],
+                        totals: {
+                            totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
+                            totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
+                            closeRatio: document.getElementById('closeRatio').innerText,
+                            totalCars: parseInt(document.getElementById('totalCars').innerText) || 0,
+                            averageDiscoveredSales: parseFloat(document.getElementById('averageDiscoveredSales').innerText) || 0,
+                            averageSoldSales: parseFloat(document.getElementById('averageSoldSales').innerText) || 0,
+                            newCustomerCalls: parseInt(document.getElementById('totalCustomerCalls').innerText) || 0,
+                            totalInsuranceClaims: parseInt(document.getElementById('totalInsuranceClaims').innerText) || 0,
+                            percentageOfInsuranceClaims: document.getElementById('percentageOfInsuranceClaims').innerText,
+                            remainingDailyGoal: parseFloat(document.getElementById('remainingDailyGoalValueBottom').innerText) || 0,
+                        }
+                    };
+
+                    document.querySelectorAll('#carSalesEntries .form-row').forEach(row => {
+                        const roNum = row.querySelector('input[name="carRepairOrderNumber[]"]')?.value || '';
+                        const lastName = row.querySelector('input[name="carLastName[]"]')?.value || '';
+                        const discovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value || '0');
+                        const sold = parseFloat(row.querySelector('input[name="carSoldSales[]"]')?.value || '0');
+                        const individualCloseRatio = row.querySelector('input[name="carIndividualCloseRatio[]"]')?.value || '';
+                        const appointmentScheduled = row.querySelector('input[name="carAppointmentScheduled[]"]')?.checked || false;
+                        const insuranceClaim = row.querySelector('input[name="carInsuranceClaim[]"]')?.checked || false;
+                        const insuranceSold = parseFloat(row.querySelector('input[name="carInsuranceSold[]"]')?.value || '0');
+                        const customerPaySold = parseFloat(row.querySelector('input[name="carCustomerPaySold[]"]')?.value || '0');
+
+                        if (roNum || lastName || discovered > 0 || sold > 0 || appointmentScheduled || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
+                            formDataCollected.carSales.push({
+                                repairOrderNumber: roNum,
+                                lastName: lastName,
+                                discoveredSales: discovered,
+                                soldSales: sold,
+                                individualCloseRatio: individualCloseRatio,
+                                appointmentScheduled: appointmentScheduled,
+                                insuranceClaim: insuranceClaim,
+                                insuranceSold: insuranceSold,
+                                customerPaySold: customerPaySold
+                            });
+                        }
+                    });
+
+                    document.querySelectorAll('#callEntries .form-row').forEach(row => {
+                        const customerName = row.querySelector('input[name="callCustomerName[]"]')?.value || '';
+                        const customerPhone = row.querySelector('input[name="callCustomerPhone[]"]')?.value || '';
+                        const bookedAppointment = row.querySelector('input[name="callBookedAppointment[]"]')?.checked || false;
+                        const lostLead = row.querySelector('input[name="callLostLead[]"]')?.checked || false;
+                        const lostCost = parseFloat(row.querySelector('input[name="callLostCost[]"]')?.value || '0');
+                        const reason = row.querySelector('select[name="callReason[]"]')?.value || '';
+                        const otherReasonDetails = row.querySelector('textarea[name="callOtherReason[]"]')?.value || '';
+                        const source = row.querySelector('select[name="callSource[]"]')?.value || '';
+
+                        if (customerName || customerPhone || bookedAppointment || lostLead || lostCost > 0 || reason || source) {
+                            formDataCollected.customerLeads.push({
+                                customerName: customerName,
+                                customerPhone: customerPhone,
+                                bookedAppointment: bookedAppointment,
+                                lostLead: lostLead,
+                                lostCost: lostCost,
+                                reason: reason,
+                                otherReasonDetails: (reason === 'Other' && otherReasonDetails) ? otherReasonDetails : '',
+                                source: source
+                            });
+                        }
+                    });
+
+                    document.getElementById('formDataJson').value = JSON.stringify(formDataCollected, null, 2);
+
                     document.getElementById('salesForm').submit();
 
                 } catch (error) {
-                    console.error('Error generating PDF:', error);
-                    showMessageBox('Error', 'Failed to generate PDF. Please try again.');
+                    console.error('Error generating PDF or submitting form:', error);
+                    showMessageBox('Error', 'Failed to generate PDF or submit form. Please try again.');
                 } finally {
-                    document.body.style.overflow = originalOverflow; // Restore original overflow
+                    document.body.style.overflow = originalOverflow;
                 }
-            }, 100); // Small delay to ensure rendering is complete
+            }, 100);
         }
 
 
         // Initial calls to set button visibility and calculate goal on page load
         document.addEventListener('DOMContentLoaded', () => {
-            setCurrentDate(); // Set the current date when the page loads
+            setCurrentDate();
             updateRemoveButtonsVisibility('callEntries');
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
-            updateRunningTotals(); // Calculate initial totals on load
+            updateDailyGoalBasedOnPriorDay();
+            updateRunningTotals();
 
-            // Initialize visibility for existing call entries (if any)
             document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
-                // Ensure correct index for toggleCallFieldsVisibility
                 toggleCallFieldsVisibility(index + 1);
             });
 
-            // Initialize visibility for existing car entries (if any)
             document.querySelectorAll('#carSalesEntries .form-row').forEach((row) => {
-                toggleInsuranceFields(row); // Initialize visibility for insurance fields by passing the row
+                toggleInsuranceFields(row);
             });
         });
 
@@ -852,7 +929,7 @@
 
         // Phone number formatting function
         function formatPhoneNumber(input) {
-            let value = input.value.replace(/\D/g, ''); // Remove all non-digits
+            let value = input.value.replace(/\D/g, '');
             let formattedValue = '';
 
             if (value.length > 0) {
@@ -867,90 +944,8 @@
             input.value = formattedValue;
         }
 
-        // Handle form submission (now relies on Formspree's action attribute)
-        document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            // Collect all data into a structured object
-            const formDataCollected = {
-                reportDate: document.getElementById('reportDate').value,
-                serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
-                dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
-                priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
-                carSales: [],
-                customerLeads: [], // Renamed from 'calls' for clarity
-                totals: {
-                    totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
-                    totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
-                    closeRatio: document.getElementById('closeRatio').innerText,
-                    totalCars: parseInt(document.getElementById('totalCars').innerText) || 0,
-                    averageDiscoveredSales: parseFloat(document.getElementById('averageDiscoveredSales').innerText) || 0,
-                    averageSoldSales: parseFloat(document.getElementById('averageSoldSales').innerText) || 0,
-                    newCustomerCalls: parseInt(document.getElementById('totalCustomerCalls').innerText) || 0,
-                    totalInsuranceClaims: parseInt(document.getElementById('totalInsuranceClaims').innerText) || 0,
-                    percentageOfInsuranceClaims: document.getElementById('percentageOfInsuranceClaims').innerText,
-                    remainingDailyGoal: parseFloat(document.getElementById('remainingDailyGoalValueBottom').innerText) || 0,
-                }
-            };
-
-            // Collect car sales data
-            document.querySelectorAll('#carSalesEntries .form-row').forEach(row => {
-                const roNum = row.querySelector('input[name="carRepairOrderNumber[]"]')?.value || '';
-                const lastName = row.querySelector('input[name="carLastName[]"]')?.value || '';
-                const discovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value || '0');
-                const sold = parseFloat(row.querySelector('input[name="carSoldSales[]"]')?.value || '0');
-                const individualCloseRatio = row.querySelector('input[name="carIndividualCloseRatio[]"]')?.value || '';
-                const appointmentScheduled = row.querySelector('input[name="carAppointmentScheduled[]"]')?.checked || false;
-                const insuranceClaim = row.querySelector('input[name="carInsuranceClaim[]"]')?.checked || false;
-                const insuranceSold = parseFloat(row.querySelector('input[name="carInsuranceSold[]"]')?.value || '0');
-                const customerPaySold = parseFloat(row.querySelector('input[name="carCustomerPaySold[]"]')?.value || '0');
-
-                if (roNum || lastName || discovered > 0 || sold > 0 || appointmentScheduled || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
-                    formDataCollected.carSales.push({
-                        repairOrderNumber: roNum,
-                        lastName: lastName,
-                        discoveredSales: discovered,
-                        soldSales: sold,
-                        individualCloseRatio: individualCloseRatio,
-                        appointmentScheduled: appointmentScheduled,
-                        insuranceClaim: insuranceClaim,
-                        insuranceSold: insuranceSold,
-                        customerPaySold: customerPaySold
-                    });
-                }
-            });
-
-            // Collect customer leads data
-            document.querySelectorAll('#callEntries .form-row').forEach(row => {
-                const customerName = row.querySelector('input[name="callCustomerName[]"]')?.value || '';
-                const customerPhone = row.querySelector('input[name="callCustomerPhone[]"]')?.value || '';
-                const bookedAppointment = row.querySelector('input[name="callBookedAppointment[]"]')?.checked || false;
-                const lostLead = row.querySelector('input[name="callLostLead[]"]')?.checked || false;
-                const lostCost = parseFloat(row.querySelector('input[name="callLostCost[]"]')?.value || '0');
-                const reason = row.querySelector('select[name="callReason[]"]')?.value || '';
-                const otherReasonDetails = row.querySelector('textarea[name="callOtherReason[]"]')?.value || '';
-                const source = row.querySelector('select[name="callSource[]"]')?.value || '';
-
-                if (customerName || customerPhone || bookedAppointment || lostLead || lostCost > 0 || reason || source) {
-                    formDataCollected.customerLeads.push({
-                        customerName: customerName,
-                        customerPhone: customerPhone,
-                        bookedAppointment: bookedAppointment,
-                        lostLead: lostLead,
-                        lostCost: lostCost,
-                        reason: reason,
-                        otherReasonDetails: (reason === 'Other' && otherReasonDetails) ? otherReasonDetails : '',
-                        source: source
-                    });
-                }
-            });
-
-            // Set the JSON string to the hidden input
-            document.getElementById('formDataJson').value = JSON.stringify(formDataCollected, null, 2);
-
-            // For Formspree, it's best to let the form submit naturally after populating the hidden JSON field.
-            // If you were using a custom backend, you would preventDefault and send a fetch request.
-            // event.preventDefault(); // Uncomment this if you want to handle submission via fetch API
-            console.log('Form Data for Formspree:', formDataCollected);
-        });
+        // The form's submit event listener is now handled by generatePdfAndSubmit
+        // document.getElementById('salesForm').addEventListener('submit', async function(event) { ... });
     </script>
 </body>
 </html>
