@@ -512,7 +512,7 @@
                     const insuranceSoldInput = rowElement.querySelector('input[name="carInsuranceSold[]"]');
                     const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
                     if (insuranceSoldInput) insuranceSoldInput.value = '';
-                    if (customerPaySoldInput) customerPaySoldInput.value = '';
+                    if (customerPaySoldInput) customerPaySoldInput.value = ''; // Fixed typo here
                 }
                 updateCarRowTotals(rowElement);
             }
@@ -734,6 +734,14 @@
             showMessageBox('Generating Image...', 'Please wait while the form is converted to an image.');
 
             const formContainer = document.querySelector('.container');
+            const messageBox = document.getElementById('messageBox');
+
+            // Store original visibility and hide message box
+            const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
+            if (wasMessageBoxVisible) {
+                messageBox.classList.add('hidden');
+            }
+
             const originalOverflow = document.body.style.overflow;
             document.body.style.overflow = 'auto';
 
@@ -756,12 +764,16 @@
                     a.click();
                     document.body.removeChild(a);
 
-                    closeMessageBox();
+                    closeMessageBox(); // Close message box on success
                 } catch (error) {
                     console.error('Error generating image:', error);
                     showMessageBox('Error', 'Failed to generate image. Please try again.');
                 } finally {
                     document.body.style.overflow = originalOverflow;
+                    // Restore message box visibility if it was visible
+                    if (wasMessageBoxVisible) {
+                        messageBox.classList.remove('hidden');
+                    }
                 }
             }, 100);
         }
@@ -773,6 +785,14 @@
             showMessageBox('Generating PDF & Submitting...', 'Please wait while the report is prepared and submitted.');
 
             const formContainer = document.querySelector('.container');
+            const messageBox = document.getElementById('messageBox');
+
+            // Store original visibility and hide message box
+            const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
+            if (wasMessageBoxVisible) {
+                messageBox.classList.add('hidden');
+            }
+
             const originalOverflow = document.body.style.overflow;
             document.body.style.overflow = 'auto';
 
@@ -890,6 +910,10 @@
                     showMessageBox('Error', 'Failed to generate PDF or submit form. Please try again.');
                 } finally {
                     document.body.style.overflow = originalOverflow;
+                    // Restore message box visibility if it was visible
+                    if (wasMessageBoxVisible) {
+                        messageBox.classList.remove('hidden');
+                    }
                 }
             }, 100);
         }
