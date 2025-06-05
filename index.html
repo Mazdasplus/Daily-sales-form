@@ -1647,7 +1647,8 @@
 
         function loadThemePreference() {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
+            // Default to dark mode if no preference is saved or if it's explicitly dark
+            if (savedTheme === 'dark' || savedTheme === null) {
                 document.body.classList.add('dark-mode');
                 updateDarkModeToggleText(true);
             } else {
