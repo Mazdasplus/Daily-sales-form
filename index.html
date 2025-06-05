@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark"> <!-- Added 'dark' class to enable dark mode -->
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,244 +10,371 @@
         /* Custom styles for Inter font and general body styling */
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
+            background-color: #f3f4f6; /* Light gray background */
             display: flex;
             justify-content: center;
             align-items: flex-start; /* Align to top for better form visibility */
             min-height: 100vh;
             padding: 2rem;
-        }
-
-        /* Light Mode Defaults (if 'dark' class is not present on html tag) - Unchanged */
-        body {
-            background-color: #f3f4f6; /* Light gray background */
-            color: #1f2937; /* Dark text */
+            color: #1f2937; /* Default text color for light mode */
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .container {
             background-color: #ffffff;
-            /* INCREASED PADDING ON ALL SIDES FOR BETTER MARGINS IN CAPTURED IMAGE */
-            padding: 3rem; /* Increased from 2rem */
+            padding: 2rem;
             border-radius: 0.75rem; /* rounded-xl */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
             width: 100%;
             max-width: 960px; /* max-w-3xl */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
-        input[type="text"], input[type="number"], textarea, select, input[type="date"] {
-            border: 1px solid #d1d5db;
-            background-color: #ffffff;
-            color: #1f2937;
-            text-align: center; /* Centered text */
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select,
+        input[type="date"] { /* Added input[type="date"] to styling */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.625rem 1rem; /* py-2.5 px-4 */
+            width: 100%;
+            background-color: #ffffff; /* Default input background */
+            color: #1f2937; /* Default input text color */
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, background-color 0.15s ease-in-out;
         }
-        input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus, input[type="date"]:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus,
+        input[type="date"]:focus { /* Added input[type="date"] to styling */
+            border-color: #3b82f6; /* ring-blue-500 */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* ring-blue-500/25 */
         }
         .section-title {
-            border-bottom: 2px solid #e5e7eb;
-            color: #374151;
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #1f2937; /* Default title color */
         }
+        /* Primary button: Consistently Darker Muted Blue */
         .btn-primary {
-            background-color: #3b82f6;
-            color: #ffffff;
+            background-color: #1f4287; /* A darker blue */
+            color: #ffffff; /* text-white */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.2s ease-in-out;
         }
         .btn-primary:hover {
-            background-color: #2563eb;
+            background-color: #1f4287; /* Stays dark blue on hover */
         }
-        .btn-remove {
-            background-color: #ef4444;
-            color: #ffffff;
+        /* Secondary button: Muted Gray */
+        .btn-secondary {
+            background-color: #e5e7eb; /* bg-gray-200 */
+            color: #1f2937; /* text-gray-800 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db; /* bg-gray-300 */
+        }
+        .btn-remove { /* Style for remove buttons */
+            background-color: #ef4444; /* bg-red-500 */
+            color: #ffffff; /* text-white */
+            padding: 0.5rem 0.75rem; /* p-2 */
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 500; /* font-medium */
+            transition: background-color 0.2s ease-in-out;
         }
         .btn-remove:hover {
-            background-color: #dc2626;
+            background-color: #dc2626; /* bg-red-600 */
         }
-        .goal-display {
-            background-color: #e0f2fe; /* light blue */
-            border-left-color: #38b2ac; /* teal */
-            color: #1a202c;
-        }
-        .totals-section {
-            background-color: #f0f9ff;
-            border: 1px solid #bfdbfe;
-        }
-        .totals-section p {
-            color: #1e3a8a;
-        }
-        .totals-section p span {
-            color: #000;
-        }
-        .highlighted-goal {
-            background-color: #e0f2fe; /* light blue */
-            border-color: #38b2ac; /* teal */
-            color: #1a202c;
-        }
-        input.conversion-met {
-            background-color: #dcfce7; /* green-100 */
-            border-color: #22c55e; /* green-500 */
-            color: #16a34a; /* green-700 */
-        }
-        input.conversion-not-met {
-            background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
-            color: #dc2626; /* red-700 */
-        }
-        .message-box-content, .confirmation-content {
-            background-color: #ffffff;
-            color: #374151;
-        }
-        .confirmation-content h3 {
-            color: #1f2937;
-        }
-        .confirmation-buttons .btn-confirm {
-            background-color: #3b82f6;
-            color: #ffffff;
-        }
-        .confirmation-buttons .btn-confirm:hover {
-            background-color: #2563eb;
-        }
-        .confirmation-buttons .btn-cancel {
-            background-color: #e5e7eb;
-            color: #374151;
-        }
-        .confirmation-buttons .btn-cancel:hover {
-            background-color: #d1d5db;
-        }
-
-
-        /* NEW Dark Mode Overrides (when 'dark' class is present on html tag) */
-        html.dark body {
-            background-color: #1a202c; /* Deeper, less saturated dark blue/gray */
-            color: #e2e8f0; /* Lighter off-white text */
-        }
-        html.dark .container {
-            background-color: #2d3748; /* Slightly lighter than body background */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15); /* More prominent shadow */
-        }
-        html.dark input[type="text"], html.dark input[type="number"], html.dark textarea, html.dark select, html.dark input[type="date"] {
-            border: 1px solid #4a5568; /* Slightly darker border */
-            background-color: #4a5568; /* Darker input background */
-            color: #e2e8f0; /* Light text */
-            text-align: center; /* Centered text */
-        }
-        html.dark input[type="text"]:focus, html.dark input[type="number"]:focus, html.dark textarea:focus, html.dark select:focus, html.dark input[type="date"]:focus {
-            border-color: #63b3ed; /* Brighter blue focus */
-            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.4); /* Matching focus shadow */
-        }
-        html.dark .section-title {
-            border-bottom: 2px solid #4a5568; /* Darker border */
-            color: #cbd5e0; /* Lighter text */
-        }
-        /* UPDATED BUTTON COLORS FOR DARK MODE */
-        html.dark .btn-primary {
-            background-color: #3a4780; /* Muted indigo/blue */
-            color: #ffffff; /* white text */
-        }
-        html.dark .btn-primary:hover {
-            background-color: #2c3a6b; /* darker muted indigo/blue on hover */
-        }
-        html.dark .btn-remove {
-            background-color: #c53030; /* dark red */
-            color: #ffffff; /* white text */
-        }
-        html.dark .btn-remove:hover {
-            background-color: #9b2c2c; /* darker red on hover */
-        }
-        /* END UPDATED BUTTON COLORS */
-
-        html.dark .goal-display {
-            background-color: #2d3748; /* Same as container for subtlety */
-            border-left-color: #48bb78; /* Muted green border */
-            color: #e2e8f0;
-        }
-        html.dark .goal-met {
-            color: #48bb78; /* Muted green */
-            background-color: #2f855a; /* Darker green background */
-            border-color: #48bb78; /* Muted green border */
-        }
-        html.dark .goal-not-met {
-            color: #fc8181; /* Muted red */
-            background-color: #9b2c2c; /* Darker red background */
-            border-color: #fc8181; /* Muted red border */
-        }
-        html.dark .totals-section {
-            background-color: #2d3748; /* Same as container */
-            border: 1px solid #4a5568; /* Darker border */
-        }
-        html.dark .totals-section p {
-            color: #cbd5e0; /* Lighter text */
-        }
-        html.dark .totals-section p span {
-            color: #e2e8f0; /* Very light for values */
-        }
-        /* Removed specific dark mode color for h2 in totals-section,
-           as inline Tailwind classes will now control it */
-        /* html.dark .totals-section h2 {
-            color: #3a4780;
-        } */
-        html.dark .highlighted-goal {
-            background-color: #2d3748;
-            border-color: #48bb78;
-            color: #e2e8f0;
-        }
-        html.dark input.conversion-met {
-            background-color: #2f855a; /* Darker green */
-            border-color: #48bb78; /* Muted green */
-            color: #48bb78; /* Muted green */
-        }
-        html.dark input.conversion-not-met {
-            background-color: #9b2c2c; /* Darker red */
-            border-color: #fc8181; /* Muted red */
-            color: #fc8181; /* Muted red */
-        }
-        html.dark .message-box-content,
-        html.dark .confirmation-content {
-            background-color: #2d3748; /* Darker content background */
-            color: #e2e8f0;
-        }
-        html.dark .confirmation-content h3 {
-            color: #e2e8f0;
-        }
-        html.dark .confirmation-buttons .btn-cancel {
-            background-color: #4a5568;
-            color: #e2e8f0;
-        }
-        html.dark .confirmation-buttons .btn-cancel:hover {
-            background-color: #646b76;
-        }
-
-        /* Flexbox and width for responsive columns */
         .form-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1rem; /* space-x-4 and space-y-4 for stacking */
         }
         .form-col {
             flex: 1;
-            min-width: 180px;
+            min-width: 180px; /* Adjusted min-width for more columns in car sales */
         }
-        @media (min-width: 640px) {
+        @media (min-width: 640px) { /* sm breakpoint */
             .form-row > div {
                 flex: 1;
             }
         }
+        /* Generic goal display styles - colors handled by JS */
+        .goal-display {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border-left: 4px solid; /* Border color handled by JS */
+        }
+        .totals-section {
+            background-color: #f0f9ff; /* Light blue background for totals */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #bfdbfe; /* Light blue border */
+            margin-top: 2rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .totals-section p {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500;
+            color: #1e3a8a; /* Darker blue text */
+            margin-bottom: 0.5rem;
+        }
+        .totals-section p span {
+            font-weight: 700; /* bold */
+            color: #000; /* Black for values */
+        }
+        /* Generic highlighted goal styles - colors handled by JS */
+        .highlighted-goal {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-top: 1rem;
+            border: 2px solid; /* Border color handled by JS */
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Classes for dynamic color changes for Remaining Goal */
+        .goal-met {
+            color: #16a34a; /* green-700 */
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+        }
+        .goal-not-met {
+            color: #dc2626; /* red-700 */
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+
+        /* Classes for dynamic color changes for individual Close Ratio inputs */
+        input.conversion-met {
+            color: #16a34a; /* green-700 */
+            border-color: #22c55e; /* green-500 */
+            background-color: #dcfce7; /* green-100 */
+        }
+        input.conversion-not-met {
+            color: #dc2626; /* red-700 */
+            border-color: #ef4444; /* red-500 */
+            background-color: #fee2e2; /* red-100 */
+        }
+
+        /* Styles for the confirmation box */
+        .confirmation-box {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        .confirmation-content {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .confirmation-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-content p {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .confirmation-buttons button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .confirmation-buttons .btn-confirm {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .confirmation-buttons .btn-confirm:hover {
+            background-color: #2563eb;
+        }
+
+        .confirmation-buttons .btn-cancel {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .confirmation-buttons .btn-cancel:hover {
+            background-color: #d1d5db;
+        }
+
+        /* --- Dark Mode Styles --- */
+        body.dark-mode {
+            background-color: #1a202c; /* Darker background */
+            color: #e2e8f0; /* Lighter text color */
+        }
+
+        body.dark-mode .container {
+            background-color: #2d3748; /* Darker container background */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="number"],
+        body.dark-mode textarea,
+        body.dark-mode select,
+        body.dark-mode input[type="date"] {
+            background-color: #4a5568; /* Darker input background */
+            border-color: #4a5568; /* Darker input border */
+            color: #e2e8f0; /* Lighter input text color */
+        }
+
+        body.dark-mode input[type="text"]:focus,
+        body.dark-mode input[type="number"]:focus,
+        body.dark-mode textarea:focus,
+        body.dark-mode select:focus,
+        body.dark-mode input[type="date"]:focus {
+            border-color: #63b3ed; /* Lighter blue focus border */
+            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.25);
+        }
+
+        body.dark-mode .section-title {
+            border-color: #4a5568; /* Darker border for titles */
+            color: #e2e8f0; /* Lighter title color */
+        }
+
+        body.dark-mode .totals-section {
+            background-color: #2f495e; /* Darker blue for totals section */
+            border-color: #4a5568; /* Darker border for totals */
+        }
+
+        body.dark-mode .totals-section p {
+            color: #e2e8f0; /* Lighter text for totals section */
+        }
+
+        body.dark-mode .totals-section p span {
+            color: #cbd5e0; /* Slightly lighter black for values in dark mode */
+        }
+
+        /* Dark mode adjustments for goal displays */
+        body.dark-mode .goal-display {
+            border-left-color: #63b3ed; /* Adjusted border color for dark mode */
+            color: #e2e8f0; /* Lighter text for goal display */
+        }
+
+        body.dark-mode .highlighted-goal {
+            /* Text and border colors will be handled by .goal-met and .goal-not-met below */
+            color: #e2e8f0;
+        }
+
+        /* Dark mode specific colors for goal met/not met */
+        body.dark-mode .goal-met {
+            color: #68d391; /* Adjusted green for dark mode */
+            background-color: #276749; /* Darker green background */
+            border-color: #68d391;
+        }
+        body.dark-mode .goal-not-met {
+            color: #fc8181; /* Adjusted red for dark mode */
+            background-color: #9b2c2c; /* Darker red background */
+            border-color: #fc8181;
+        }
+
+        /* Dark mode specific colors for individual close ratio inputs */
+        body.dark-mode input.conversion-met {
+            color: #68d391; /* Adjusted green for dark mode */
+            border-color: #68d391;
+            background-color: #276749;
+        }
+        body.dark-mode input.conversion-not-met {
+            color: #fc8181; /* Adjusted red for dark mode */
+            border-color: #fc8181;
+            background-color: #9b2c2c;
+        }
+
+        /* Dark mode toggle button styling */
+        .dark-mode-toggle-container {
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+        .dark-mode-toggle {
+            background-color: #4a5568; /* Dark grey for toggle button */
+            color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .dark-mode-toggle:hover {
+            background-color: #2d3748; /* Even darker on hover */
+        }
+
+        /* Dark mode for primary button (now consistently darker muted blue) */
+        body.dark-mode .btn-primary {
+            background-color: #1f4287; /* A darker blue for dark mode primary */
+            color: #e2e8f0;
+        }
+        body.dark-mode .btn-primary:hover {
+            background-color: #1f4287; /* Stays darker on hover */
+        }
+
+        /* Dark mode for secondary button (muted gray) */
+        body.dark-mode .btn-secondary {
+            background-color: #4a5568; /* bg-gray-700 */
+            color: #e2e8f0; /* text-gray-200 */
+        }
+        body.dark-mode .btn-secondary:hover {
+            background-color: #2d3748; /* bg-gray-800 */
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="text-center mb-8">
-            <!-- Consider using a dark mode friendly logo or a CSS filter for contrast -->
-            <img src="https://raw.githubusercontent.com/Mazdasplus/Daily-sales-form/main/IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto; filter: invert(0.8) hue-rotate(180deg) saturate(1.2);">
+        <div class="dark-mode-toggle-container">
+            <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Daily Sales Form</h1>
-        <p class="text-gray-600 dark:text-gray-400 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
+        <div class="text-center mb-8">
+            <!-- The logo source has been updated to your actual GitHub image. -->
+            <img src="https://raw.githubusercontent.com/Mazdasplus/Daily-sales-form/main/IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+        </div>
+        <h1 class="text-3xl font-bold mb-6 text-center">Daily Sales Form</h1>
+        <p class="mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
             <div class="form-row mb-4">
                 <div class="form-col">
-                    <label for="reportDate" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Date</label>
+                    <label for="reportDate" class="block text-sm font-medium mb-1">Date</label>
                     <input type="date" id="reportDate" name="reportDate" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="serviceAdvisorName" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Service Advisor Name</label>
+                    <label for="serviceAdvisorName" class="block text-sm font-medium mb-1">Service Advisor Name</label>
                     <select id="serviceAdvisorName" name="serviceAdvisorName" class="w-full rounded-md">
                         <option value="Beto Calderon">Beto Calderon</option>
                         <option value="Scott Carvalho">Scott Carvalho</option>
@@ -256,15 +383,15 @@
             </div>
 
             <div class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-100 section-title">Sales Metrics</h2>
+                <h2 class="text-2xl font-semibold section-title">Sales Metrics</h2>
 
                 <div class="form-row mb-4">
                     <div class="form-col">
-                        <label for="priorDayTotal" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
+                        <label for="priorDayTotal" class="block text-sm font-medium mb-1">Prior Day Total ($)</label>
+                        <input type="text" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
                     </div>
                     <div class="form-col">
-                        <label for="dailyGoal" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Daily Goal ($)</label>
+                        <label for="dailyGoal" class="block text-sm font-medium mb-1">Daily Goal ($)</label>
                         <input type="number" id="dailyGoal" name="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                     </div>
                 </div>
@@ -273,55 +400,54 @@
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueTop">0.00</span>
                 </div>
 
-                <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600 mt-6">
-                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-100">Individual Car Sales</h3>
+                <div class="space-y-4 pt-4 border-t mt-6">
+                    <h3 class="text-xl font-semibold">Individual Car Sales</h3>
                     <div id="carSalesEntries" class="space-y-4">
                         <div class="form-row items-end">
                             <div class="form-col">
-                                <label for="carRepairOrderNumber_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">RO#</label>
-                                <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                                <label for="carRepairOrderNumber_1" class="block text-sm font-medium mb-1">RO#</label>
+                                <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md" oninput="handleCarInput(1)">
                             </div>
                             <div class="form-col">
-                                <label for="carLastName_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Last Name</labeL>
-                                <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
+                                <label for="carLastName_1" class="block text-sm font-medium mb-1">Last Name</labeL>
+                                <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md" oninput="handleCarInput(1)">
                             </div>
                             <div class="form-col">
-                                <label for="carDiscoveredSales_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Discovered ($)</label>
-                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                                <label for="carDiscoveredSales_1" class="block text-sm font-medium mb-1">Total Discovered ($)</label>
+                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                             </div>
 
                             <div class="w-full flex flex-wrap items-center gap-4 mt-2">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="carHasInsurancePortion_1" name="carHasInsurancePortion[]" class="mr-2">
-                                    <label for="carHasInsurancePortion_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Insurance Portion?</label>
+                                    <input type="checkbox" id="carHasInsurancePortion_1" name="carHasInsurancePortion[]" class="mr-2" onchange="toggleCarPortionFields(1)">
+                                    <label for="carHasInsurancePortion_1" class="text-sm font-medium">Has Insurance Portion?</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2">
-                                    <label for="carAppointmentScheduled_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Future Appointment Scheduled?</label>
+                                    <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
+                                    <label for="carAppointmentScheduled_1" class="text-sm font-medium">Future Appointment Scheduled?</label>
                                 </div>
                             </div>
 
                             <div class="form-col w-full" id="carInsurancePortionContainer_1" style="display:none;">
-                                <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Insurance Sold ($)</label>
-                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
+                                <label class="block text-sm font-medium mb-1">Insurance Pay ($)</label>
+                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                             </div>
 
-                            <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_1" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_1" name="carHasCustomerPayPortion[]" class="mr-2">
-                                <label for="carHasCustomerPayPortion_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Customer Pay Portion?</label>
+                            <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_1" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_1" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(1)">
+                                <label for="carHasCustomerPayPortion_1" class="text-sm font-medium">Has Customer Pay Portion?</label>
                             </div>
                             <div class="form-col w-full" id="carCustomerPayPortionContainer_1" style="display:none;">
-                                <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
-                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
+                                <label class="block text-sm font-medium mb-1">Customer Pay ($)</label>
+                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                             </div>
 
-                            <!-- CORRECTED: Changed 'form-row' to a plain 'div' with flex classes -->
-                            <div class="flex flex-wrap w-full mt-2 gap-4">
+                            <div class="form-row w-full mt-2">
                                 <div class="form-col">
-                                    <label for="carTotalSold_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Sold ($)</label>
-                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md">
+                                    <label for="carTotalSold_1" class="block text-sm font-medium mb-1">Total Sold ($)</label>
+                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md" oninput="updateRunningTotals()" value="0.00">
                                 </div>
                                 <div class="form-col">
-                                    <label for="carIndividualCloseRatio_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Close Ratio (%)</label>
+                                    <label for="carIndividualCloseRatio_1" class="block text-sm font-medium mb-1">Close Ratio (%)</label>
                                     <input type="text" id="carIndividualCloseRatio_1" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                                 </div>
                             </div>
@@ -336,31 +462,31 @@
             </div>
 
             <div class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-100 section-title">New Customer Leads</h2>
+                <h2 class="text-2xl font-semibold section-title">New Customer Leads</h2>
                 <div id="callEntries" class="space-y-4">
                     <div class="form-row items-end">
                         <div class="form-col">
-                            <label for="callCustomerName_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Name</label>
+                            <label for="callCustomerName_1" class="block text-sm font-medium mb-1">Customer Name</label>
                             <input type="text" id="callCustomerName_1" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
                         </div>
                         <div class="form-col">
-                            <label for="callCustomerPhone_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Phone Number</label>
+                            <label for="callCustomerPhone_1" class="block text-sm font-medium mb-1">Phone Number</label>
                             <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                         </div>
                         <div class="form-col flex items-center">
                             <input type="checkbox" id="callBookedAppointment_1" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
-                            <label for="callBookedAppointment_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Booked Appointment?</label>
+                            <label for="callBookedAppointment_1" class="text-sm font-medium">Booked Appointment?</label>
                         </div>
                         <div class="form-col flex items-center">
                             <input type="checkbox" id="callLostLead_1" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
-                            <label for="callLostLead_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Lost Lead?</label>
+                            <label for="callLostLead_1" class="text-sm font-medium">Lost Lead?</label>
                         </div>
                         <div class="form-col" id="callLostCostContainer_1" style="display:none;">
-                            <label for="callLostCost_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                            <label for="callLostCost_1" class="block text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                             <input type="number" id="callLostCost_1" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                         </div>
                         <div class="form-col" id="callReasonContainer_1" style="display:none;">
-                            <label for="callReason_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Reason for Loss</label>
+                            <label for="callReason_1" class="block text-sm font-medium mb-1">Reason for Loss</label>
                             <select id="callReason_1" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1, 'call')">
                                 <option value="">Select Reason</option>
                                 <option value="Cost">Cost</option>
@@ -369,7 +495,7 @@
                             </select>
                         </div>
                         <div class="form-col" id="callSourceContainer_1" style="display:none;">
-                            <label for="callSource_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Source</label>
+                            <label for="callSource_1" class="block text-sm font-medium mb-1">Source</label>
                             <select id="callSource_1" name="callSource[]" class="w-full rounded-md">
                                 <option value="">Select Source</option>
                                 <option value="Referral">Referral</option>
@@ -381,9 +507,9 @@
                         <div class="w-full sm:w-auto">
                             <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
                         </div>
-                        <div class="form-col w-full" id="callOtherReasonContainer_${callEntryCount}" style="display:none;">
-                            <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Other Reason Details</label>
-                            <textarea id="callOtherReason_${callEntryCount}" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
+                        <div class="form-col w-full" id="callOtherReasonContainer_1" style="display:none;">
+                            <label for="callOtherReason_1" class="block text-sm font-medium mb-1">Other Reason Details</label>
+                            <textarea id="callOtherReason_1" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                         </div>
                     </div>
                 </div>
@@ -391,29 +517,55 @@
             </div>
 
             <div class="text-center mt-6 flex justify-center space-x-4">
+                <!-- Changed type to button and onclick to savePageAsImage() -->
                 <button type="button" onclick="savePageAsImage()" class="btn-primary">Submit Daily Report (Save Image)</button>
             </div>
 
             <div class="totals-section">
-                <!-- Applied button-like styling directly here -->
-                <h2 class="text-2xl font-bold text-white bg-[#3a4780] p-3 rounded-md text-center mb-4">Daily Totals</h2>
-                <p class="text-gray-700 dark:text-gray-200">Total Discovered Sales: $<span id="totalDiscoveredSales" class="dark:text-gray-100">0.00</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Total Sold Sales: $<span id="totalSoldSales" class="dark:text-gray-100">0.00</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Close Ratio: <span id="closeRatio" class="dark:text-gray-100">0.00%</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Total Cars: <span id="totalCars" class="dark:text-gray-100">0</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Average Discovered Sales: $<span id="averageDiscoveredSales" class="dark:text-gray-100">0.00</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Average Sale: $<span id="averageSoldSales" class="dark:text-gray-100">0.00</span></p>
-                <p class="text-gray-700 dark:text-gray-200">New Customer Calls: <span id="totalCustomerCalls" class="dark:text-gray-100">0</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Total Insurance Claims Jobs: <span id="totalInsuranceClaims" class="dark:text-gray-100">0</span></p>
-                <p class="text-gray-700 dark:text-gray-200">Insurance Percentage of Sales: <span id="percentageOfInsuranceClaims" class="dark:text-gray-100">0.00%</span></p>
+                <h2 class="text-2xl font-semibold section-title">Daily Totals</h2>
+                <p>Total Discovered Sales: $<span id="totalDiscoveredSales">0.00</span></p>
+                <p>Total Sold Sales: $<span id="totalSoldSales">0.00</span></p>
+                <!-- Changed to Total Insurance Pay -->
+                <p>Total Insurance Pay: $<span id="totalInsurancePay">0.00</span></p>
+                <!-- Added Total Customer Pay -->
+                <p>Total Customer Pay: $<span id="totalCustomerPay">0.00</span></p>
+                <p>Close Ratio: <span id="closeRatio">0.00%</span></p>
+                <p>Total Cars: <span id="totalCars">0</span></p>
+                <p>Average Discovered Sales: $<span id="averageDiscoveredSales">0.00</span></p>
+                <p>Average Sale: $<span id="averageSoldSales">0.00</span></p>
+                <p>New Customer Calls: <span id="totalCustomerCalls">0</span></p>
+                <p>Total Insurance Claims Jobs: <span id="totalInsuranceClaims">0</span></p>
+                <p>Insurance Percentage of Sales: <span id="percentageOfInsuranceClaims">0.00%</span></p>
                 <div class="highlighted-goal" id="remainingDailyGoalBottom">
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueBottom">0.00</span>
                 </div>
             </div>
 
+            <!-- New section for Weekly Totals -->
+            <div class="totals-section mt-6">
+                <h2 class="text-2xl font-semibold section-title">Weekly Totals</h2>
+                <p>Weekly Goal: $<span id="weeklyGoalDisplay">26000.00</span></p>
+                <p class="highlighted-goal" id="remainingWeeklyGoalContainer">
+                    Remaining Weekly Goal: $<span id="remainingWeeklyGoalValue">0.00</span>
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 font-medium">
+                    <div><strong>Mon:</strong> $<span id="monSales">0.00</span></div>
+                    <div><strong>Tue:</strong> $<span id="tueSales">0.00</span></div>
+                    <div><strong>Wed:</strong> $<span id="wedSales">0.00</span></div>
+                    <div><strong>Thu:</strong> $<span id="thuSales">0.00</span></div>
+                    <div><strong>Fri:</strong> $<span id="friSales">0.00</span></div>
+                    <div><strong>Sat:</strong> $<span id="satSales">0.00</span></div>
+                    <div><strong>Sun:</strong> $<span id="sunSales">0.00</span></div>
+                </div>
+                <button type="button" onclick="resetWeeklyTotals()" class="btn-primary text-sm mt-4">Reset Weekly Totals</button>
+            </div>
+
+
             <!-- Hidden inputs for Formspree are still here if needed for other integrations -->
             <input type="hidden" id="hiddenTotalDiscoveredSales" name="Total Discovered Sales">
             <input type="hidden" id="hiddenTotalSoldSales" name="Total Sold Sales">
+            <input type="hidden" id="hiddenTotalInsurancePay" name="Total Insurance Pay"> <!-- Changed hidden input for Insurance Pay -->
+            <input type="hidden" id="hiddenTotalCustomerPay" name="Total Customer Pay"> <!-- New hidden input for Customer Pay -->
             <input type="hidden" id="hiddenCloseRatio" name="Close Ratio">
             <input type="hidden" id="hiddenRemainingDailyGoal" name="Remaining Daily Goal">
             <input type="hidden" id="hiddenTotalCars" name="Total Cars">
@@ -425,8 +577,8 @@
 
         </form>
 
-        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
-            <div class="message-box-content p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-content-center p-4 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
                 <h3 class="text-xl font-semibold mb-4" id="messageBoxTitle"></h3>
                 <p class="mb-6" id="messageBoxContent"></p>
                 <button onclick="closeMessageBox()" class="btn-primary">OK</button>
@@ -434,9 +586,9 @@
         </div>
 
         <div id="confirmationBox" class="confirmation-box hidden">
-            <div class="confirmation-content p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-                <h3 id="confirmationBoxTitle" class="text-xl font-semibold mb-4"></h3>
-                <p id="confirmationBoxContent" class="mb-6"></p>
+            <div class="confirmation-content">
+                <h3 id="confirmationBoxTitle"></h3>
+                <p id="confirmationBoxContent"></p>
                 <div class="confirmation-buttons">
                     <button class="btn-confirm" onclick="confirmAction(true)">Yes</button>
                     <button class="btn-cancel" onclick="confirmAction(false)">No</button>
@@ -446,9 +598,10 @@
     </div>
 
     <script>
-        // Constants defined at the top
-        let callEntryCount = 1;
+        // Initialize counts based on the first existing HTML entry for each section
+        // The HTML template always includes one entry for car and one for call.
         let carEntryCount = 1;
+        let callEntryCount = 1;
         const baseDailyGoal = 5200; // Define the base daily goal here
 
         // Variables to store the context for confirmation box
@@ -457,182 +610,164 @@
         let currentDuplicateRowIndex = null;
         let originalEntryIndexForCombine = null;
 
-        // --- Core Functions for Calculations and Updates (Moved to top) ---
+        // Global variables for weekly sales data and goal
+        let weeklySalesData = {
+            weekStart: null, // Timestamp of the Monday of the current week (midnight UTC)
+            dailyTotals: {
+                'Mon': 0,
+                'Tue': 0,
+                'Wed': 0,
+                'Thu': 0,
+                'Fri': 0,
+                'Sat': 0,
+                'Sun': 0
+            }
+        };
+        const WEEKLY_GOAL = 26000;
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-        // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims)
-        function updateRunningTotals() {
-            let totalDiscovered = 0;
-            let totalSold = 0;
-            // Get all direct children with 'form-row' class under #carSalesEntries
-            const carRows = document.querySelectorAll('#carSalesEntries > .form-row');
-            const numberOfCars = carRows.length;
 
-            const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
-            let totalInsuranceClaims = 0; // Counter for entries with an insurance portion
-
-            // Reset the duplicate check context
-            currentDuplicateRo = null;
-            currentDuplicateLastName = null;
-            currentDuplicateRowIndex = null;
-            originalEntryIndexForCombine = null;
-
-            const roLastNameMap = new Map(); // Stores {combinedKey: {index: row_index, hasInsurance: bool, hasCustomerPay: bool}}
-
-            carRows.forEach((row, index) => {
-                const roInput = row.querySelector('input[name="carRepairOrderNumber[]"]');
-                const lastNameInput = row.querySelector('input[name="carLastName[]"]');
-                const totalDiscoveredInput = row.querySelector('input[name="carDiscoveredSales[]"]'); // Now Total Discovered for the RO
-                const totalSoldInput = row.querySelector('input[name="carTotalSold[]"]'); // Now Total Sold for the RO
-                const individualCloseRatioInput = row.querySelector('input[name="carIndividualCloseRatio[]"]');
-                const hasInsuranceCheckbox = row.querySelector('input[name="carHasInsurancePortion[]"]');
-
-                const ro = roInput ? roInput.value.trim() : '';
-                const lastName = lastNameInput ? lastNameInput.value.trim() : '';
-
-                // Check for duplicate RO number and Last Name
-                if (ro && lastName) {
-                    const combinedKey = `${ro}-${lastName}`.toLowerCase();
-                    if (roLastNameMap.has(combinedKey)) {
-                        // Found a duplicate, store context and show confirmation
-                        currentDuplicateRo = ro;
-                        currentDuplicateLastName = lastName;
-                        currentDuplicateRowIndex = index; // Index of the newly typed duplicate row
-                        originalEntryIndexForCombine = roLastNameMap.get(combinedKey).index; // Index of the original row
-
-                        showConfirmationBox(
-                            'Duplicate Entry Detected',
-                            `RO Number "${ro}" with Last Name "${lastName}" has been entered before. ` +
-                            `Do you want to combine this new entry with the existing one?`,
-                            (confirmed) => {
-                                if (confirmed) {
-                                    combineCarEntries(originalEntryIndexForCombine, currentDuplicateRowIndex);
-                                } else {
-                                    showMessageBox('Entry Not Combined', 'The duplicate entry was not combined. Please review and adjust manually if needed.');
-                                }
-                                // Clear the context after action
-                                currentDuplicateRo = null;
-                                currentDuplicateLastName = null;
-                                currentDuplicateRowIndex = null;
-                                originalEntryIndexForCombine = null;
-                            }
-                        );
-                        // Stop further processing of totals for now, will re-run after confirmation
-                        return;
-                    }
-                    // Add the current combination to the map for future checks
-                    roLastNameMap.set(combinedKey, {
-                        index: index,
-                        hasInsurance: hasInsuranceCheckbox.checked,
-                    });
-                }
-
-                let rowTotalDiscovered = 0;
-                if (totalDiscoveredInput) { // Explicit null check
-                    rowTotalDiscovered = parseFloat(totalDiscoveredInput.value) || 0;
-                }
-
-                let rowTotalSold = 0;
-                if (totalSoldInput) { // Explicit null check
-                    rowTotalSold = parseFloat(totalSoldInput.value) || 0;
-                }
-
-                totalDiscovered += rowTotalDiscovered;
-                totalSold += rowTotalSold;
-
-                if (hasInsuranceCheckbox && hasInsuranceCheckbox.checked) {
-                    totalInsuranceClaims++; // Increment if this entry has an insurance portion
-                }
-
-                let individualConversionRate = 0;
-                if (rowTotalDiscovered > 0) {
-                    individualConversionRate = (rowTotalSold / rowTotalDiscovered) * 100;
-                }
-                if (individualCloseRatioInput) { // Null check for individualCloseRatioInput
-                    individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
-                    individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
-                    if (individualConversionRate >= 50) {
-                        individualCloseRatioInput.classList.add('conversion-met');
-                    } else {
-                        individualCloseRatioInput.classList.add('conversion-not-met');
-                    }
-                }
-            });
-
-            const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
-            const averageDiscoveredSales = numberOfCars > 0 ? (totalDiscovered / numberOfCars) : 0;
-            const averageSoldSales = numberOfCars > 0 ? (totalSold / numberOfCars) : 0;
-            const percentageOfInsuranceClaims = numberOfCars > 0 ? (totalInsuranceClaims / numberOfCars * 100) : 0; // Calculate percentage
-
-            document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
-            document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
-            document.getElementById('closeRatio').innerText = closeRatio.toFixed(2) + '%';
-            document.getElementById('totalCars').innerText = numberOfCars;
-            document.getElementById('averageDiscoveredSales').innerText = averageDiscoveredSales.toFixed(2);
-            document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
-            document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
-            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims; // Update display
-            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update display
-
-            document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
-            document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
-            document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
-            document.getElementById('hiddenTotalCars').value = numberOfCars;
-            document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
-            document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
-            document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
-            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims; // Update hidden input
-            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update hidden input
-
-            updateRemainingGoal();
+        // Helper to get Monday of the current week (normalized to 00:00:00 local time)
+        function getMondayOfCurrentWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday of the current week
+            const monday = new Date(d.setDate(diff));
+            monday.setHours(0, 0, 0, 0); // Normalize to midnight
+            return monday.getTime(); // Return timestamp for comparison
         }
 
-        // New function to calculate totals for a single car row
-        function updateCarRowTotals(index) {
-            const totalDiscoveredInput = document.getElementById(`carDiscoveredSales_${index}`);
-            const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
-            const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
-            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
-            const individualCloseRatioInput = document.getElementById(`carIndividualCloseRatio_${index}`);
+        // Load weekly sales data from local storage
+        function loadWeeklySales() {
+            const today = new Date();
+            const currentMondayTimestamp = getMondayOfCurrentWeek(today);
+            const storedData = localStorage.getItem('weeklySalesData');
 
-            const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
-            const hasCustomerPayCheckbox = document.getElementById(`carHasCustomerPayPortion_${index}`);
-
-            const totalDiscovered = parseFloat(totalDiscoveredInput?.value) || 0;
-
-            let totalSoldForCalculation = 0;
-
-            // If insurance or customer pay portions are active, sum them for totalSoldForCalculation
-            if (hasInsuranceCheckbox?.checked || hasCustomerPayCheckbox?.checked) {
-                const insuranceSold = parseFloat(insuranceSoldInput?.value) || 0;
-                const customerPaySold = parseFloat(customerPaySoldInput?.value) || 0;
-                totalSoldForCalculation = insuranceSold + customerPaySold;
-                // Also update the carTotalSoldInput field with this calculated value
-                if (carTotalSoldInput) {
-                    carTotalSoldInput.value = totalSoldForCalculation.toFixed(2);
+            if (storedData) {
+                const parsedData = JSON.parse(storedData);
+                // Check if stored data belongs to the current week
+                if (parsedData.weekStart === currentMondayTimestamp) {
+                    weeklySalesData = parsedData; // Continue with existing week's data
+                    console.log('Loaded weekly sales for current week:', weeklySalesData);
+                } else {
+                    // New week, reset totals and start fresh
+                    console.log('New week detected, resetting weekly totals.');
+                    weeklySalesData = {
+                        weekStart: currentMondayTimestamp,
+                        dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                    };
+                    saveWeeklySales(); // Save the reset data immediately
                 }
             } else {
-                // If no insurance/customer pay portions are active, use the manually entered value in carTotalSoldInput
-                totalSoldForCalculation = parseFloat(carTotalSoldInput?.value) || 0;
+                // No data in local storage, initialize for the current week
+                console.log('No weekly sales data found, initializing.');
+                weeklySalesData = {
+                    weekStart: currentMondayTimestamp,
+                    dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                };
+                saveWeeklySales(); // Save the initialized data immediately
+            }
+            updateWeeklyTotalsDisplay(); // Update display immediately after loading
+        }
+
+        // Save weekly sales data to local storage
+        function saveWeeklySales() {
+            localStorage.setItem('weeklySalesData', JSON.stringify(weeklySalesData));
+            // console.log('Saved weekly sales data:', weeklySalesData); // For debugging
+        }
+
+        // Update the weekly totals display in the HTML
+        function updateWeeklyTotalsDisplay() {
+            let totalSoldThisWeek = 0;
+            for (const day in weeklySalesData.dailyTotals) {
+                const element = document.getElementById(`${day.toLowerCase()}Sales`);
+                if (element) {
+                    element.innerText = (weeklySalesData.dailyTotals[day] || 0).toFixed(2);
+                }
+                totalSoldThisWeek += weeklySalesData.dailyTotals[day] || 0;
             }
 
-            let individualConversionRate = 0;
-            if (totalDiscovered > 0) {
-                individualConversionRate = (totalSoldForCalculation / totalDiscovered) * 100;
+            const weeklyGoalDisplay = document.getElementById('weeklyGoalDisplay');
+            if (weeklyGoalDisplay) {
+                weeklyGoalDisplay.innerText = WEEKLY_GOAL.toFixed(2);
             }
 
-            if (individualCloseRatioInput) {
-                individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
-                individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
-                if (individualConversionRate >= 50) {
-                    individualCloseRatioInput.classList.add('conversion-met');
+            const remainingWeeklyGoal = WEEKLY_GOAL - totalSoldThisWeek;
+            const remainingWeeklyGoalValue = document.getElementById('remainingWeeklyGoalValue');
+            const remainingWeeklyGoalContainer = document.getElementById('remainingWeeklyGoalContainer');
+
+            if (remainingWeeklyGoalValue) {
+                remainingWeeklyGoalValue.innerText = remainingWeeklyGoal.toFixed(2);
+            }
+
+            if (remainingWeeklyGoalContainer) {
+                remainingWeeklyGoalContainer.classList.remove('goal-not-met', 'goal-met');
+                if (remainingWeeklyGoal <= 0) {
+                    remainingWeeklyGoalContainer.classList.add('goal-met');
                 } else {
-                    individualCloseRatioInput.classList.add('conversion-not-met');
+                    remainingWeeklyGoalContainer.classList.add('goal-not-met');
                 }
             }
         }
 
+        // New function to update the current day's sales in weeklyData and recalculate weekly totals
+        function updateCurrentDayAndWeeklyTotals() {
+            const reportDateInput = document.getElementById('reportDate');
+            const reportDateValue = reportDateInput.value;
 
-        // Function declarations for other helper functions
+            // Only proceed if a date is selected in the form
+            if (reportDateValue) {
+                const selectedDate = new Date(reportDateValue);
+                const dayIndex = selectedDate.getDay(); // 0 for Sun, 1 for Mon, etc.
+                const currentDayName = dayNames[dayIndex];
+
+                // Get the totalSoldSales for the current form's entries
+                const currentDaySoldSales = parseFloat(document.getElementById('totalSoldSales').innerText) || 0;
+                console.log(`[Weekly Update] Current Day Sold Sales: ${currentDaySoldSales.toFixed(2)} for ${currentDayName}`);
+
+                // Make sure we are operating on the correct week's data
+                const currentMondayTimestamp = getMondayOfCurrentWeek(selectedDate);
+                if (weeklySalesData.weekStart !== currentMondayTimestamp) {
+                    console.log(`[Weekly Update] Week changed from ${weeklySalesData.weekStart} to ${currentMondayTimestamp}. Resetting daily totals.`);
+                    weeklySalesData.weekStart = currentMondayTimestamp;
+                    weeklySalesData.dailyTotals = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 };
+                }
+
+                // Update the specific day's total in our weeklySalesData
+                weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
+                console.log(`[Weekly Update] weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+
+                saveWeeklySales(); // Save changes to local storage
+                updateWeeklyTotalsDisplay(); // Update the HTML display for weekly totals
+            } else {
+                console.warn('Report date is not set, cannot update specific day sales for weekly totals.');
+            }
+        }
+
+
+        // Reset weekly totals function
+        function resetWeeklyTotals() {
+            showConfirmationBox(
+                'Reset Weekly Data?',
+                'Are you sure you want to reset all weekly sales data? This cannot be undone.',
+                (confirmed) => {
+                    if (confirmed) {
+                        const currentMondayTimestamp = getMondayOfCurrentWeek(new Date());
+                        weeklySalesData = {
+                            weekStart: currentMondayTimestamp,
+                            dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                        };
+                        saveWeeklySales();
+                        updateWeeklyTotalsDisplay();
+                        showMessageBox('Weekly Data Reset', 'All weekly sales data has been reset to zero.');
+                    } else {
+                        showMessageBox('Reset Cancelled', 'Weekly data reset cancelled.');
+                    }
+                }
+            );
+        }
+
+        // Function to set the current date
         function setCurrentDate() {
             const today = new Date();
             const year = today.getFullYear();
@@ -641,6 +776,7 @@
             document.getElementById('reportDate').value = `${year}-${month}-${day}`;
         }
 
+        // Function to get the date in MMDDYY format for filename
         function getFormattedDateForFilename() {
             const today = new Date();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -649,18 +785,27 @@
             return `${mm}${dd}${yy}`;
         }
 
+        // Function to update the daily goal based on prior day's total (now as carry-over)
         function updateDailyGoalBasedOnPriorDay() {
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
             const dailyGoalInput = document.getElementById('dailyGoal');
+
+            // Calculate the adjusted daily goal by ADDING the priorDayTotal
             const adjustedDailyGoal = baseDailyGoal + priorDayTotal;
+
+            // Update the daily goal input field
             dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
+
+            // Also update the remaining goal display as it depends on the dailyGoal
             updateRemainingGoal();
         }
 
+        // Function to update the Remaining Daily Goal display and its color
         function updateRemainingGoal() {
             const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
             let currentDaySoldSales = 0;
 
+            // Sum up the 'Total Sold' from each car entry
             document.querySelectorAll('input[name="carTotalSold[]"]').forEach(input => {
                 currentDaySoldSales += parseFloat(input.value) || 0;
             });
@@ -687,9 +832,164 @@
                 remainingGoalContainerBottom.classList.remove('goal-met');
                 remainingGoalContainerBottom.classList.add('goal-not-met');
             }
+
+            // Save the remaining goal and current date to local storage
+            localStorage.setItem('lastDayRemainingGoal', JSON.stringify({
+                date: document.getElementById('reportDate').value,
+                remainingGoal: remainingGoal
+            }));
         }
 
+        // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims, Total Insurance Pay, Total Customer Pay)
+        function updateRunningTotals() {
+            console.log('--- updateRunningTotals started ---');
+            let totalDiscovered = 0;
+            let totalSold = 0;
+            let totalInsurancePay = 0; // Changed variable name
+            let totalCustomerPay = 0; // New variable to track total customer pay
+            let actualNumberOfCars = 0; // Renamed to accurately reflect counted cars
+            const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
+            let totalInsuranceClaims = 0; // Counter for entries with an insurance portion
+
+            // Reset the duplicate check context
+            currentDuplicateRo = null;
+            currentDuplicateLastName = null;
+            currentDuplicateRowIndex = null;
+            originalEntryIndexForCombine = null;
+
+            const roLastNameMap = new Map(); // Stores {combinedKey: {index: row_index, hasInsurance: bool, hasCustomerPay: bool}}
+
+            const carRows = document.querySelectorAll('#carSalesEntries .form-row');
+
+            carRows.forEach((row, index) => {
+                const roInput = row.querySelector('input[name="carRepairOrderNumber[]"]');
+                const lastNameInput = row.querySelector('input[name="carLastName[]"]');
+                const hasInsuranceCheckbox = row.querySelector('input[name="carHasInsurancePortion[]"]');
+                const hasCustomerPayCheckbox = row.querySelector('input[name="carHasCustomerPayPortion[]"]'); // Get customer pay checkbox
+                const insuranceSoldInput = row.querySelector('input[name="carInsuranceSold[]"]');
+                const customerPaySoldInput = row.querySelector('input[name="carCustomerPaySold[]"]'); // Get customer pay input for this row
+
+                const ro = roInput ? roInput.value.trim() : '';
+                const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+
+                // CRITICAL: First, calculate/update this individual row's totals, even if empty.
+                updateCarRowTotals(index + 1);
+
+                // Only count this as an active car entry and add its values to totals if RO# or Last Name is filled
+                if (ro || lastName) {
+                    actualNumberOfCars++;
+                    const rowTotalDiscovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value) || 0;
+                    const rowTotalSold = parseFloat(row.querySelector('input[name="carTotalSold[]"]')?.value) || 0; // Read directly from the updated input
+
+                    totalDiscovered += rowTotalDiscovered;
+                    totalSold += rowTotalSold;
+                    console.log(`Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Read Discovered: ${rowTotalDiscovered.toFixed(2)}, Read Sold: ${rowTotalSold.toFixed(2)}`);
+                    console.log(`Running totals (after adding active car ${index + 1}): Discovered: ${totalDiscovered.toFixed(2)}, Sold: ${totalSold.toFixed(2)}`);
+
+                    if (hasInsuranceCheckbox && hasInsuranceCheckbox.checked) {
+                        totalInsuranceClaims++; // Increment if this active entry has an insurance portion
+                        totalInsurancePay += parseFloat(insuranceSoldInput?.value) || 0; // Add insurance pay to total
+                        console.log(`Car ${index + 1} - Insurance Pay: ${insuranceSoldInput?.value || 0}. Total Insurance Pay: ${totalInsurancePay.toFixed(2)}`);
+                    }
+                    // Accumulate Total Customer Pay
+                    if (hasCustomerPayCheckbox && hasCustomerPayCheckbox.checked) {
+                        totalCustomerPay += parseFloat(customerPaySoldInput?.value) || 0;
+                        console.log(`Car ${index + 1} - Customer Pay: ${customerPaySoldInput?.value || 0}. Total Customer Pay: ${totalCustomerPay.toFixed(2)}`);
+                    }
+                } else {
+                    console.log(`Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Skipped from total calculation (inactive row).`);
+                }
+
+                // Check for duplicate RO number and Last Name only for active entries
+                if (ro && lastName) {
+                    const combinedKey = `${ro}-${lastName}`.toLowerCase();
+                    // Ensure not comparing to itself and that the duplicate is a new entry (higher index)
+                    if (roLastNameMap.has(combinedKey) && index !== roLastNameMap.get(combinedKey).index) {
+                        // Found a duplicate, store context and show confirmation
+                        currentDuplicateRo = ro;
+                        currentDuplicateLastName = lastName;
+                        currentDuplicateRowIndex = index; // Index of the newly typed duplicate row
+                        originalEntryIndexForCombine = roLastNameMap.get(combinedKey).index; // Index of the original row
+
+                        // Remove focus from the current input to prevent re-triggering this event
+                        if (roInput) roInput.blur();
+                        if (lastNameInput) lastNameInput.blur();
+
+                        showConfirmationBox(
+                            'Duplicate Entry Detected',
+                            `RO Number "${ro}" with Last Name "${lastName}" has been entered before. ` +
+                            `Do you want to combine this new entry with the existing one?`,
+                            (confirmed) => {
+                                if (confirmed) {
+                                    combineCarEntries(originalEntryIndexForCombine, currentDuplicateRowIndex);
+                                } else {
+                                    showMessageBox('Entry Not Combined', 'The duplicate entry was not combined. Please review and adjust manually if needed.');
+                                    // If not combined, clear the duplicate row's RO and Last Name to prevent further false positives
+                                    if (roInput) roInput.value = '';
+                                    if (lastNameInput) lastNameInput.value = '';
+                                    updateRunningTotals(); // Recalculate without the problematic entry
+                                }
+                                // Clear the context after action
+                                currentDuplicateRo = null;
+                                currentDuplicateLastName = null;
+                                currentDuplicateRowIndex = null;
+                                originalEntryIndexForCombine = null;
+                            }
+                        );
+                        // Stop further processing for the current update cycle if a duplicate is found
+                        return;
+                    }
+                    // Add the current combination to the map for future checks
+                    roLastNameMap.set(combinedKey, {
+                        index: index,
+                        hasInsurance: hasInsuranceCheckbox.checked,
+                    });
+                }
+            });
+
+            const closeRatio = totalDiscovered > 0 ? (totalSold / totalDiscovered * 100) : 0;
+            const averageDiscoveredSales = actualNumberOfCars > 0 ? (totalDiscovered / actualNumberOfCars) : 0;
+            const averageSoldSales = actualNumberOfCars > 0 ? (totalSold / actualNumberOfCars) : 0;
+            const percentageOfInsuranceClaims = actualNumberOfCars > 0 ? (totalInsuranceClaims / actualNumberOfCars * 100) : 0;
+
+            document.getElementById('totalDiscoveredSales').innerText = totalDiscovered.toFixed(2);
+            document.getElementById('totalSoldSales').innerText = totalSold.toFixed(2);
+            document.getElementById('totalInsurancePay').innerText = totalInsurancePay.toFixed(2); // Update display for total insurance pay
+            document.getElementById('totalCustomerPay').innerText = totalCustomerPay.toFixed(2); // Update display for total customer pay
+            document.getElementById('closeRatio').innerText = closeRatio.toFixed(2) + '%';
+            document.getElementById('totalCars').innerText = actualNumberOfCars;
+            document.getElementById('averageDiscoveredSales').innerText = averageDiscoveredSales.toFixed(2);
+            document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
+            document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
+            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims;
+            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%';
+
+            document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
+            document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
+            document.getElementById('hiddenTotalInsurancePay').value = totalInsurancePay.toFixed(2); // Update hidden input for total insurance pay
+            document.getElementById('hiddenTotalCustomerPay').value = totalCustomerPay.toFixed(2); // Update hidden input for total customer pay
+            document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
+            document.getElementById('hiddenTotalCars').value = actualNumberOfCars;
+            document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
+            document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
+            document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
+            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
+            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
+
+            updateRemainingGoal();
+            updateCurrentDayAndWeeklyTotals(); // Ensure weekly totals are updated after all daily calculations
+            console.log(`Final totalDiscovered before display: ${totalDiscovered.toFixed(2)}`);
+            console.log(`Final totalSold before display: ${totalSold.toFixed(2)}`);
+            console.log(`Final totalInsurancePay before display: ${totalInsurancePay.toFixed(2)}`); // Log new total
+            console.log(`Final totalCustomerPay before display: ${totalCustomerPay.toFixed(2)}`); // Log new total
+            console.log('Value displayed for Total Sold Sales:', document.getElementById('totalSoldSales').innerText);
+            console.log('--- updateRunningTotals finished ---');
+        };
+
+
+        // New function to combine car entries
         function combineCarEntries(originalIndex, duplicateIndex) {
+            console.log(`[Combine Entries] Combining row ${duplicateIndex + 1} into row ${originalIndex + 1}`);
             const originalRow = document.querySelectorAll('#carSalesEntries .form-row')[originalIndex];
             const duplicateRow = document.querySelectorAll('#carSalesEntries .form-row')[duplicateIndex];
 
@@ -703,44 +1003,75 @@
             const origCustomerPaySoldInput = originalRow.querySelector(`#carCustomerPaySold_${originalIndex + 1}`);
             const origHasInsuranceCheckbox = originalRow.querySelector(`#carHasInsurancePortion_${originalIndex + 1}`);
             const origHasCustomerPayCheckbox = originalRow.querySelector(`#carHasCustomerPayPortion_${originalIndex + 1}`);
-            const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`);
+            const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`); // Get original total sold input
 
+            // Get values from the duplicate row's fields (already safely accessed with ?.value)
             const dupDiscovered = parseFloat(duplicateRow.querySelector(`input[name="carDiscoveredSales[]"]`)?.value) || 0;
             const dupInsuranceSold = parseFloat(duplicateRow.querySelector(`#carInsuranceSold_${duplicateIndex + 1}`)?.value) || 0;
             const dupCustomerPaySold = parseFloat(duplicateRow.querySelector(`#carCustomerPaySold_${duplicateIndex + 1}`)?.value) || 0;
-            const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0;
+            const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0; // Get duplicate total sold input
 
+            // Add duplicate's discovered to original's total discovered
             if (origDiscoveredInput) {
-                origDiscoveredInput.value = ((parseFloat(origDiscoveredInput.value) || 0) + dupDiscovered).toFixed(2);
+                const newDiscovered = (parseFloat(origDiscoveredInput.value) || 0) + dupDiscovered;
+                origDiscoveredInput.value = newDiscovered.toFixed(2);
+                console.log(`[Combine Entries] Original Discovered updated to: ${newDiscovered.toFixed(2)}`);
             }
 
+            // Add duplicate's insurance sold to original's insurance sold
             if (origInsuranceSoldInput) {
-                origInsuranceSoldInput.value = ((parseFloat(origInsuranceSoldInput.value) || 0) + dupInsuranceSold).toFixed(2);
+                const newInsuranceSold = (parseFloat(origInsuranceSoldInput.value) || 0) + dupInsuranceSold;
+                origInsuranceSoldInput.value = newInsuranceSold.toFixed(2);
+                console.log(`[Combine Entries] Original Insurance Sold updated to: ${newInsuranceSold.toFixed(2)}`);
             }
-            if (origHasInsuranceCheckbox) {
+            if (origHasInsuranceCheckbox && dupInsuranceSold > 0) { // Only check if dup had insurance sold
                 origHasInsuranceCheckbox.checked = true;
+                console.log(`[Combine Entries] Original Has Insurance checkbox checked.`);
             }
 
+            // Add duplicate's customer pay sold to original's customer pay sold
             if (origCustomerPaySoldInput) {
-                origCustomerPaySoldInput.value = ((parseFloat(origCustomerPaySoldInput.value) || 0) + dupCustomerPaySold).toFixed(2);
+                const newCustomerPaySold = (parseFloat(origCustomerPaySoldInput.value) || 0) + dupCustomerPaySold;
+                origCustomerPaySoldInput.value = newCustomerPaySold.toFixed(2);
+                console.log(`[Combine Entries] Original Customer Pay Sold updated to: ${newCustomerPaySold.toFixed(2)}`);
             }
-            if (origHasCustomerPayCheckbox) {
+            if (origHasCustomerPayCheckbox && dupCustomerPaySold > 0) { // Only check if dup had customer pay sold
                 origHasCustomerPayCheckbox.checked = true;
+                console.log(`[Combine Entries] Original Has Customer Pay checkbox checked.`);
             }
 
-            if (origTotalSoldInput) {
-                origTotalSoldInput.value = ((parseFloat(origTotalSoldInput.value) || 0) + dupTotalSold).toFixed(2);
+            // If the original row has portions, carTotalSoldInput will be readonly and recalculated by toggleCarPortionFields.
+            // If the original row does not have portions, we manually add the duplicate's total sold.
+            if (!origHasInsuranceCheckbox?.checked && !origHasCustomerPayCheckbox?.checked && origTotalSoldInput) {
+                const newTotalSoldManual = (parseFloat(origTotalSoldInput.value) || 0) + dupTotalSold;
+                origTotalSoldInput.value = newTotalSoldManual.toFixed(2);
+                console.log(`[Combine Entries] Original Total Sold (manual) updated to: ${newTotalSoldManual.toFixed(2)}`);
             }
 
-            toggleCarPortionFields(originalIndex + 1);
+
+            // Update visibility and totals for the original row based on its new state
+            toggleCarPortionFields(originalIndex + 1); // This will call updateCarRowTotals and then updateRunningTotals
+
+            // Remove the duplicate row from the DOM
             duplicateRow.remove();
+            reindexCarEntries(); // Reindex entries after removal
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRunningTotals();
             showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}.`);
+            // updateRunningTotals will be called by toggleCarPortionFields in its flow, which is the desired outcome.
         }
 
-        // Function to toggle visibility of insurance and customer pay portion fields
-        function toggleCarPortionFields(index) {
+
+        // New function to calculate totals for a single car row
+        function updateCarRowTotals(index) {
+            console.log(`--- updateCarRowTotals(${index}) started ---`);
+            const roInput = document.getElementById(`carRepairOrderNumber_${index}`);
+            const lastNameInput = document.getElementById(`carLastName_${index}`);
+            const totalDiscoveredInput = document.getElementById(`carDiscoveredSales_${index}`);
+            const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
+            const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
+            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
+            const individualCloseRatioInput = document.getElementById(`carIndividualCloseRatio_${index}`);
+
             const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
             const hasCustomerPayCheckbox = document.getElementById(`carHasCustomerPayPortion_${index}`);
 
@@ -748,36 +1079,168 @@
             const customerPayCheckboxContainer = document.getElementById(`carCustomerPayCheckboxContainer_${index}`);
             const customerPayContainer = document.getElementById(`carCustomerPayPortionContainer_${index}`);
 
-            // Only hide/show containers, do not clear values automatically
-            if (hasInsuranceCheckbox && insuranceContainer) {
-                insuranceContainer.style.display = hasInsuranceCheckbox.checked ? 'block' : 'none';
-            }
-            if (customerPayCheckboxContainer) {
-                customerPayCheckboxContainer.style.display = (hasInsuranceCheckbox && hasInsuranceCheckbox.checked) ? 'flex' : 'none';
-            }
-            if (hasCustomerPayCheckbox && customerPayContainer) {
-                customerPayContainer.style.display = hasCustomerPayCheckbox.checked ? 'block' : 'none';
+            const ro = roInput ? roInput.value.trim() : '';
+            const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+
+            // CRITICAL: If row is not active, zero out its sold and ratio
+            if (!ro && !lastName) {
+                if (carTotalSoldInput) {
+                    carTotalSoldInput.value = '0.00';
+                    carTotalSoldInput.removeAttribute('readonly'); // Ensure it's editable if it becomes inactive
+                }
+                if (totalDiscoveredInput) totalDiscoveredInput.value = '0.00';
+                if (insuranceSoldInput) insuranceSoldInput.value = '0.00';
+                if (customerPaySoldInput) customerPaySoldInput.value = '0.00';
+                if (individualCloseRatioInput) {
+                    individualCloseRatioInput.value = 'N/A%';
+                    individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
+                }
+
+                // Directly handle visibility and checkbox state for inactive rows
+                if (insuranceContainer) insuranceContainer.style.display = 'none';
+                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none';
+                if (customerPayContainer) customerPayContainer.style.display = 'none';
+                
+                if (hasInsuranceCheckbox) hasInsuranceCheckbox.checked = false;
+                if (hasCustomerPayCheckbox) hasCustomerPayCheckbox.checked = false;
+
+                console.log(`Car ${index} is inactive (no RO/Last Name). Values zeroed and containers hidden.`);
+                console.log(`--- updateCarRowTotals(${index}) finished ---`);
+                return; // Exit early as this row won't contribute to totals if it's inactive
             }
 
-            // Ensure customer pay checkbox is unchecked if insurance is unchecked
-            if (hasInsuranceCheckbox && !hasInsuranceCheckbox.checked && hasCustomerPayCheckbox) {
-                hasCustomerPayCheckbox.checked = false;
+
+            const totalDiscovered = parseFloat(totalDiscoveredInput?.value) || 0;
+
+            let currentCarSold = 0; // The actual sold value for this specific car entry
+
+            // If insurance or customer pay portions are active, sum them for currentCarSold
+            if (hasInsuranceCheckbox?.checked || hasCustomerPayCheckbox?.checked) {
+                const insuranceSold = parseFloat(insuranceSoldInput?.value) || 0;
+                const customerPaySold = parseFloat(customerPaySoldInput?.value) || 0;
+                currentCarSold = insuranceSold + customerPaySold;
+                // Also update the carTotalSoldInput field with this calculated value and make it readonly
+                if (carTotalSoldInput) {
+                    carTotalSoldInput.value = currentCarSold.toFixed(2);
+                    carTotalSoldInput.setAttribute('readonly', true);
+                    console.log(`Car ${index} - carTotalSoldInput calculated from portions: ${currentCarSold.toFixed(2)} (READONLY)`);
+                }
+            } else {
+                // If no insurance/customer pay portions are active, use the manually entered value in carTotalSoldInput
+                // And ensure it's not readonly
+                if (carTotalSoldInput) {
+                    currentCarSold = parseFloat(carTotalSoldInput.value) || 0;
+                    carTotalSoldInput.removeAttribute('readonly');
+                    console.log(`Car ${index} - carTotalSoldInput manually entered: ${currentCarSold.toFixed(2)} (EDITABLE)`);
+                }
             }
 
-            updateCarRowTotals(index); // Recalculate totals for this row (based on current values)
-            updateRunningTotals(); // Update overall totals
+
+            // Individual Close Ratio calculation
+            if (individualCloseRatioInput) {
+                if (totalDiscovered === 0) {
+                    individualCloseRatioInput.value = 'N/A%'; // Display N/A when total discovered is 0
+                    individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met'); // Clear colors
+                    console.log(`Car ${index} - Close Ratio: N/A% (discovered is 0)`);
+                } else {
+                    const individualConversionRate = (currentCarSold / totalDiscovered) * 100;
+                    individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
+                    individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
+                    if (individualConversionRate >= 50) {
+                        individualCloseRatioInput.classList.add('conversion-met');
+                    } else {
+                        individualCloseRatioInput.classList.add('conversion-not-met');
+                    }
+                    console.log(`Car ${index} - Close Ratio: ${individualConversionRate.toFixed(2)}% (Sold: ${currentCarSold.toFixed(2)}, Discovered: ${totalDiscovered.toFixed(2)})`);
+                }
+            }
+            console.log(`--- updateCarRowTotals(${index}) finished ---`);
         }
 
-        // New function to handle input on RO# and Last Name fields (now triggered by delegation)
+        // Function to toggle visibility of insurance and customer pay portion fields
+        function toggleCarPortionFields(index) {
+            console.log(`--- toggleCarPortionFields(${index}) started ---`);
+            const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
+            const hasCustomerPayCheckbox = document.getElementById(`carHasCustomerPayPortion_${index}`);
+
+            const insuranceContainer = document.getElementById(`carInsurancePortionContainer_${index}`);
+            const customerPayCheckboxContainer = document.getElementById(`carCustomerPayCheckboxContainer_${index}`);
+            const customerPayContainer = document.getElementById(`carCustomerPayPortionContainer_${index}`);
+
+            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
+            const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
+            const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
+
+
+            // Logic when "Has Insurance Portion?" is checked
+            if (hasInsuranceCheckbox?.checked) {
+                console.log(`Car ${index} - Has Insurance Portion CHECKED`);
+                if (insuranceContainer) insuranceContainer.style.display = 'block';
+                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'flex';
+                // Make carTotalSoldInput readonly (updateCarRowTotals will handle value)
+                if (carTotalSoldInput) {
+                    carTotalSoldInput.setAttribute('readonly', true);
+                    console.log(`Car ${index} - carTotalSoldInput set to READONLY due to insurance check.`);
+                }
+
+                // Logic for "Has Customer Pay Portion?" checkbox if insurance is active
+                if (hasCustomerPayCheckbox?.checked) {
+                    console.log(`Car ${index} - Has Customer Pay Portion CHECKED`);
+                    if (customerPayContainer) customerPayContainer.style.display = 'block';
+                } else {
+                    console.log(`Car ${index} - Has Customer Pay Portion UNCHECKED`);
+                    if (customerPayContainer) customerPayContainer.style.display = 'none';
+                    if (customerPaySoldInput) {
+                        customerPaySoldInput.value = '0.00'; // Clear customer pay if its checkbox is not active
+                        console.log(`Car ${index} - customerPaySoldInput cleared to 0`);
+                    }
+                }
+            } else { // Logic when "Has Insurance Portion?" is UNCHECKED
+                console.log(`Car ${index} - Has Insurance Portion UNCHECKED`);
+                if (insuranceContainer) insuranceContainer.style.display = 'none';
+                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none';
+                if (customerPayContainer) customerPayContainer.style.display = 'none';
+
+                // Uncheck customer pay checkbox if insurance is unchecked
+                if (hasCustomerPayCheckbox) {
+                    hasCustomerPayCheckbox.checked = false;
+                    console.log(`Car ${index} - hasCustomerPayCheckbox UNCHECKED`);
+                }
+
+                // Clear input fields when their containers are hidden
+                if (insuranceSoldInput) {
+                    insuranceSoldInput.value = '0.00';
+                    console.log(`Car ${index} - insuranceSoldInput cleared to 0`);
+                }
+                if (customerPaySoldInput) {
+                    customerPaySoldInput.value = '0.00';
+                    console.log(`Car ${index} - customerPaySoldInput cleared to 0`);
+                }
+
+                // IMPORTANT: Make carTotalSoldInput editable and clear its value
+                if (carTotalSoldInput) {
+                    carTotalSoldInput.removeAttribute('readonly');
+                    carTotalSoldInput.value = '0.00'; // Reset to 0 when it becomes manually editable
+                    console.log(`Car ${index} - carTotalSoldInput set to EDITABLE and cleared to 0`);
+                }
+            }
+
+            // Ensure individual car row totals are correct before updating running totals
+            // Call updateCarRowTotals BEFORE updateRunningTotals to ensure currentCarSold is correct
+            updateCarRowTotals(index);
+            updateRunningTotals(); // Then update overall totals
+            console.log(`--- toggleCarPortionFields(${index}) finished ---`);
+        }
+
+        // New function to handle input on RO# and Last Name fields
         function handleCarInput(index) {
-            // This function is now mostly for duplicate check logic.
-            // Actual calculation updates are handled by event delegation on relevant number inputs.
-            updateRunningTotals(); // Trigger overall update for duplicate check
+            // This function is called on input for RO# and Last Name.
+            // It will trigger updateRunningTotals which now contains the duplicate check and confirmation logic.
+            updateRunningTotals();
         }
 
 
-        // --- UI Manipulation and Helper Functions ---
-
+        // Function to add a new call entry row
         function addCallEntry() {
             callEntryCount++;
             const callEntriesDiv = document.getElementById('callEntries');
@@ -785,27 +1248,27 @@
             newEntry.className = 'form-row items-end';
             newEntry.innerHTML = `
                 <div class="form-col">
-                    <label for="callCustomerName_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Name</label>
+                    <label for="callCustomerName_${callEntryCount}" class="block text-sm font-medium mb-1">Customer Name</label>
                     <input type="text" id="callCustomerName_${callEntryCount}" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Phone Number</label>
+                    <label for="callCustomerPhone_${callEntryCount}" class="block text-sm font-medium mb-1">Phone Number</label>
                     <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                 </div>
                 <div class="form-col flex items-center">
-                    <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
-                    <label for="callBookedAppointment_${callEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Booked Appointment?</label>
-                </div>
-                <div class="form-col flex items-center">
-                    <input type="checkbox" id="callLostLead_${callEntryCount}" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
-                    <label for="callLostLead_${callEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Lost Lead?</label>
-                </div>
+                            <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
+                            <label for="callBookedAppointment_${callEntryCount}" class="text-sm font-medium">Booked Appointment?</label>
+                        </div>
+                        <div class="form-col flex items-center">
+                            <input type="checkbox" id="callLostLead_${callEntryCount}" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
+                            <label for="callLostLead_${callEntryCount}" class="text-sm font-medium">Lost Lead?</label>
+                        </div>
                 <div class="form-col" id="callLostCostContainer_${callEntryCount}" style="display:none;">
-                    <label for="callLostCost_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                    <label for="callLostCost_${callEntryCount}" class="block text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                     <input type="number" id="callLostCost_${callEntryCount}" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                 </div>
                 <div class="form-col" id="callReasonContainer_${callEntryCount}" style="display:none;">
-                    <label for="callReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Reason for Loss</label>
+                    <label for="callReason_${callEntryCount}" class="block text-sm font-medium mb-1">Reason for Loss</label>
                     <select id="callReason_${callEntryCount}" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${callEntryCount}, 'call')">
                         <option value="">Select Reason</option>
                         <option value="Cost">Cost</option>
@@ -814,7 +1277,7 @@
                     </select>
                 </div>
                 <div class="form-col" id="callSourceContainer_${callEntryCount}" style="display:none;">
-                    <label for="callSource_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Source</label>
+                    <label for="callSource_${callEntryCount}" class="block text-sm font-medium mb-1">Source</label>
                     <select id="callSource_${callEntryCount}" name="callSource[]" class="w-full rounded-md">
                         <option value="">Select Source</option>
                         <option value="Referral">Referral</option>
@@ -827,13 +1290,13 @@
                     <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
                 </div>
                 <div class="form-col w-full" id="callOtherReasonContainer_${callEntryCount}" style="display:none;">
-                    <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Other Reason Details</label>
+                    <label for="callOtherReason_${callEntryCount}" class="block text-sm font-medium mb-1">Other Reason Details</label>
                     <textarea id="callOtherReason_${callEntryCount}" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                 </div>
             `;
             callEntriesDiv.appendChild(newEntry);
             updateRemoveButtonsVisibility('callEntries');
-            updateRunningTotals();
+            updateRunningTotals(); // Call this after adding, so the count includes the new entry
             // Initialize visibility for the newly added row
             toggleCallFieldsVisibility(callEntryCount);
         }
@@ -841,62 +1304,63 @@
         function removeCallEntry(button) {
             button.closest('.form-row').remove();
             updateRemoveButtonsVisibility('callEntries');
-            updateRunningTotals();
+            updateRunningTotals(); // Re-calculate totals after removal
         }
 
         // Function to add a new car entry row
         function addCarEntry() {
+            console.log(`[addCarEntry] Adding new car entry. Current carEntryCount before increment: ${carEntryCount}`);
             carEntryCount++;
+            console.log(`[addCarEntry] carEntryCount after increment: ${carEntryCount}`);
+
             const carSalesEntriesDiv = document.getElementById('carSalesEntries');
             const newEntry = document.createElement('div');
             newEntry.className = 'form-row items-end';
             newEntry.innerHTML = `
                 <div class="form-col">
-                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">RO#</label>
-                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
+                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-sm font-medium mb-1">RO#</label>
+                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
                 </div>
                 <div class="form-col">
-                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Last Name</label>
-                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
+                    <label for="carLastName_${carEntryCount}" class="block text-sm font-medium mb-1">Last Name</label>
+                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
                 </div>
                 <div class="form-col">
-                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Discovered ($)</label>
-                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
+                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-sm font-medium mb-1">Total Discovered ($)</label>
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                 </div>
 
                 <div class="w-full flex flex-wrap items-center gap-4 mt-2">
                     <div class="flex items-center">
-                        <input type="checkbox" id="carHasInsurancePortion_${carEntryCount}" name="carHasInsurancePortion[]" class="mr-2">
-                        <label for="carHasInsurancePortion_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Insurance Portion?</label>
+                        <input type="checkbox" id="carHasInsurancePortion_${carEntryCount}" name="carHasInsurancePortion[]" class="mr-2" onchange="toggleCarPortionFields(${carEntryCount})">
+                        <label for="carHasInsurancePortion_${carEntryCount}" class="text-sm font-medium">Has Insurance Portion?</label>
                     </div>
                     <div class="flex items-center">
-                        <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2">
-                        <label for="carAppointmentScheduled_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Future Appointment Scheduled?</label>
+                        <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
+                        <label for="carAppointmentScheduled_${carEntryCount}" class="text-sm font-medium">Future Appointment Scheduled?</label>
                     </div>
                 </div>
 
                 <div class="form-col w-full" id="carInsurancePortionContainer_${carEntryCount}" style="display:none;">
-                    <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Insurance Sold ($)</label>
-                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
+                    <label class="block text-sm font-medium mb-1">Insurance Pay ($)</label>
+                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                 </div>
 
-                <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_${carEntryCount}" style="display:none;">
-                    <input type="checkbox" id="carHasCustomerPayPortion_${carEntryCount}" name="carHasCustomerPayPortion[]" class="mr-2">
-                    <label for="carHasCustomerPayPortion_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Customer Pay Portion?</label>
+                <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_${carEntryCount}" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_${carEntryCount}" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(${carEntryCount})">
+                    <label for="carHasCustomerPayPortion_${carEntryCount}" class="text-sm font-medium">Has Customer Pay Portion?</label>
                 </div>
                 <div class="form-col w-full" id="carCustomerPayPortionContainer_${carEntryCount}" style="display:none;">
-                    <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
-                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
+                    <label class="block text-sm font-medium mb-1">Customer Pay ($)</label>
+                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                 </div>
 
-                <!-- CORRECTED: Changed 'form-row' to a plain 'div' with flex classes -->
-                <div class="flex flex-wrap w-full mt-2 gap-4">
+                <div class="form-row w-full mt-2">
                     <div class="form-col">
-                        <label for="carTotalSold_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Sold ($)</label>
-                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md">
+                        <label for="carTotalSold_${carEntryCount}" class="block text-sm font-medium mb-1">Total Sold ($)</label>
+                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md" oninput="updateRunningTotals()" value="0.00">
                     </div>
                     <div class="form-col">
-                        <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Close Ratio (%)</label>
+                        <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-sm font-medium mb-1">Close Ratio (%)</label>
                         <input type="text" id="carIndividualCloseRatio_${carEntryCount}" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                     </div>
                 </div>
@@ -907,17 +1371,70 @@
             `;
             carSalesEntriesDiv.appendChild(newEntry); // Append the new entry first
             updateRemoveButtonsVisibility('carSalesEntries');
-            updateRemainingGoal();
-            // No direct updateCarRowTotals or toggleCarPortionFields here, let delegation handle it
-            updateRunningTotals(); // Call updateRunningTotals to ensure new row counts are updated
+            toggleCarPortionFields(carEntryCount); // Initialize visibility for new entry AND triggers updateRunningTotals
         }
 
         function removeCarEntry(button) {
+            console.log(`[removeCarEntry] Removing car entry.`);
             button.closest('.form-row').remove();
+            reindexCarEntries(); // Reindex entries after removal
             updateRemoveButtonsVisibility('carSalesEntries');
             updateRemainingGoal();
-            updateRunningTotals();
+            updateRunningTotals(); // Re-calculate totals after removal
         }
+
+        // NEW: Function to reindex car entries after removal
+        function reindexCarEntries() {
+            console.log('[reindexCarEntries] Reindexing car entries...');
+            const carSalesEntriesDiv = document.getElementById('carSalesEntries');
+            const carRows = carSalesEntriesDiv.querySelectorAll('.form-row');
+            carEntryCount = carRows.length; // Reset carEntryCount based on actual rows
+
+            carRows.forEach((row, index) => {
+                const newIndex = index + 1; // New 1-based index
+
+                // Update IDs and 'for' attributes
+                row.querySelectorAll('[id^="car"]').forEach(element => {
+                    const oldId = element.id;
+                    const baseId = oldId.substring(0, oldId.lastIndexOf('_') + 1);
+                    element.id = `${baseId}${newIndex}`;
+                    // Update 'for' attribute for labels
+                    if (element.tagName === 'LABEL') {
+                        element.setAttribute('for', `${baseId}${newIndex}`);
+                    }
+                });
+
+                // Update 'name' attributes (important for form submission)
+                // For car[] array names, they remain as is, no index needed in name for array.
+                // For other non-array names, ensure they don't get an index in name.
+                // This part ensures that names like carRepairOrderNumber[] don't become carRepairOrderNumber_1[]
+                row.querySelectorAll('[name^="car"]').forEach(element => {
+                    let oldName = element.name;
+                    if (!oldName.endsWith('[]')) { // If it's not already an array name
+                        const baseName = oldName.split('_')[0]; // Get the base name without existing index
+                        element.name = `${baseName}_${newIndex}`; // Reapply new index
+                    }
+                    // For oninput/onchange, replace only the function parameter index
+                    if (element.hasAttribute('oninput')) {
+                        let currentAttr = element.getAttribute('oninput');
+                        element.setAttribute('oninput', currentAttr.replace(/(\w+\()(\d+)(\))/g, `$1${newIndex}$3`));
+                    }
+                    if (element.hasAttribute('onchange')) {
+                        let currentAttr = element.getAttribute('onchange');
+                        element.setAttribute('onchange', currentAttr.replace(/(\w+\()(\d+)(\))/g, `$1${newIndex}$3`));
+                    }
+                });
+
+
+                // Update onclick for remove button
+                const removeButton = row.querySelector('.btn-remove');
+                if (removeButton) {
+                    removeButton.setAttribute('onclick', 'removeCarEntry(this)'); // `this` context remains correct
+                }
+            });
+            console.log(`[reindexCarEntries] Reindexing complete. New carEntryCount: ${carEntryCount}`);
+        }
+
 
         // Function to toggle visibility of the "Other Reason Details" textarea
         function toggleOtherReason(selectElement, index, type) {
@@ -1000,6 +1517,7 @@
                     if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
                 }
             }
+            updateRunningTotals(); // Re-calculate totals after visibility changes
         }
 
 
@@ -1044,8 +1562,7 @@
                         const image = canvas.toDataURL('image/png');
                         const a = document.createElement('a');
                         const filenameDate = getFormattedDateForFilename();
-                        const advisorName = document.getElementById('serviceAdvisorName').value.replace(/\s/g, '');
-                        const filename = `DailySalesForm_${advisorName}_${filenameDate}.png`;
+                        const filename = `DailySalesForm_${document.getElementById('serviceAdvisorName').value.replace(/\s/g, '')}_${filenameDate}.png`;
 
                         a.href = image;
                         a.download = filename;
@@ -1120,72 +1637,101 @@
             input.value = formattedValue;
         }
 
-        // Handle form submission (now relies on Formspree's action attribute)
-        document.getElementById('salesForm').addEventListener('submit', async function(event) {
-            // Formspree will automatically collect all named inputs.
-            // We just need to ensure calculated hidden fields are updated.
-            updateRunningTotals(); // Ensure all totals are up-to-date before submission
-        });
+        /* --- Dark Mode Functions --- */
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateDarkModeToggleText(isDarkMode);
+        }
+
+        function loadThemePreference() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                updateDarkModeToggleText(true);
+            } else {
+                document.body.classList.remove('dark-mode');
+                updateDarkModeToggleText(false);
+            }
+        }
+
+        function updateDarkModeToggleText(isDarkMode) {
+            const toggleButton = document.getElementById('darkModeToggle');
+            if (toggleButton) {
+                toggleButton.innerText = isDarkMode ? 'Light Mode' : 'Dark Mode';
+            }
+        }
 
         // Initial calls to set button visibility and calculate goal on page load
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('--- DOMContentLoaded started ---');
             setCurrentDate();
-            updateRemoveButtonsVisibility('callEntries');
-            updateRemoveButtonsVisibility('carSalesEntries');
-            updateDailyGoalBasedOnPriorDay();
-            updateRunningTotals(); // Call updateRunningTotals to set initial values
+            loadWeeklySales(); // Load weekly sales data on startup
 
-            // Event delegation for car sales inputs (numerical and text for duplicate check)
-            document.getElementById('carSalesEntries').addEventListener('input', (event) => {
-                const target = event.target;
-                // Check if the target is an input field relevant to car calculations
-                if (target.matches('input[name^="carDiscoveredSales"], input[name^="carInsuranceSold"], input[name^="carCustomerPaySold"], input[name^="carTotalSold"]')) {
-                    // Get the index from the ID (e.g., carDiscoveredSales_1 -> 1)
-                    const indexMatch = target.id.match(/_(\d+)$/);
-                    if (indexMatch) {
-                        const index = parseInt(indexMatch[1]);
-                        updateCarRowTotals(index); // This recalculates the individual row's totalSold and close ratio
-                        updateRunningTotals(); // This sums ALL carTotalSold values.
-                    }
-                } else if (target.matches('input[name^="carRepairOrderNumber"], input[name^="carLastName"]')) {
-                    // For RO# and Last Name, only need to update running totals for duplicate check
-                    updateRunningTotals();
+            // Initialize counts based on existing rows
+            carEntryCount = document.querySelectorAll('#carSalesEntries .form-row').length;
+            callEntryCount = document.querySelectorAll('#callEntries .form-row').length;
+
+
+            // --- New logic for carrying over prior day total ---
+            const priorDayTotalInput = document.getElementById('priorDayTotal');
+            const storedDailyReportState = localStorage.getItem('lastDayRemainingGoal');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
+
+            if (storedDailyReportState) {
+                const parsedState = JSON.parse(storedDailyReportState);
+                const lastReportDate = new Date(parsedState.date);
+                lastReportDate.setHours(0, 0, 0, 0); // Normalize last report date to midnight
+
+                const timeDiff = today.getTime() - lastReportDate.getTime();
+                const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+                // If today is exactly one day after the last reported date
+                if (daysDiff === 1) {
+                    priorDayTotalInput.value = parsedState.remainingGoal.toFixed(2);
+                    console.log(`[DOMContentLoaded] Prior day total carried over: ${priorDayTotalInput.value}`);
+                } else {
+                    // If it's not the very next day, clear priorDayTotal or keep it at default 0
+                    priorDayTotalInput.value = '0.00';
+                    console.log(`[DOMContentLoaded] Prior day total cleared: ${priorDayTotalInput.value}`);
                 }
-            });
+            } else {
+                priorDayTotalInput.value = '0.00'; // Default if no stored data
+                console.log(`[DOMContentLoaded] Prior day total initialized to default: ${priorDayTotalInput.value}`);
+            }
+            // --- End of new logic ---
 
-            // Event delegation for car sales checkboxes (for toggling sections and total updates)
-            document.getElementById('carSalesEntries').addEventListener('change', (event) => {
-                const target = event.target;
-                if (target.matches('input[name^="carHasInsurancePortion"]')) {
-                    const indexMatch = target.id.match(/_(\d+)$/);
-                    if (indexMatch) {
-                        const index = parseInt(indexMatch[1]);
-                        // We do NOT call updateRunningTotals here directly, as toggleCarPortionFields will call it.
-                        toggleCarPortionFields(index); // This will also call updateCarRowTotals and then updateRunningTotals
-                    }
-                } else if (target.matches('input[name^="carHasCustomerPayPortion"]')) {
-                    const indexMatch = target.id.match(/_(\d+)$/);
-                    if (indexMatch) {
-                        const index = parseInt(indexMatch[1]);
-                        // We do NOT call updateRunningTotals here directly, as toggleCarPortionFields will call it.
-                        toggleCarPortionFields(index); // This will also call updateCarRowTotals and then updateRunningTotals
-                    }
-                } else if (target.matches('input[name^="carAppointmentScheduled"]')) {
-                    // For appointment scheduled, just trigger overall update
-                    updateRunningTotals();
-                }
-            });
+            updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
 
+            // Initialize visibility for existing car entries
+            document.querySelectorAll('#carSalesEntries .form-row').forEach((row, index) => {
+                // We need to call toggleCarPortionFields here to set initial visibility and readonly states.
+                // This will also trigger updateCarRowTotals and then updateRunningTotals, which is desired.
+                toggleCarPortionFields(index + 1);
+            });
 
             // Initialize visibility for existing call entries (if any)
             document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
+                // This also calls updateRunningTotals()
                 toggleCallFieldsVisibility(index + 1);
             });
 
-            // Initialize visibility for existing car entries (if any)
-            document.querySelectorAll('#carSalesEntries .form-row').forEach((row, index) => {
-                toggleCarPortionFields(index + 1); // Initialize visibility for car portion fields
-            });
+            updateRemoveButtonsVisibility('callEntries');
+            updateRemoveButtonsVisibility('carSalesEntries');
+
+            // Add event listener for dark mode toggle
+            const darkModeToggleButton = document.getElementById('darkModeToggle');
+            if (darkModeToggleButton) {
+                darkModeToggleButton.addEventListener('click', toggleDarkMode);
+            }
+            loadThemePreference(); // Load the saved theme preference on page load
+
+            // Final call to update running totals to ensure everything is calculated after DOM is ready
+            updateRunningTotals();
+
+            console.log('--- DOMContentLoaded finished ---');
         });
     </script>
 </body>
