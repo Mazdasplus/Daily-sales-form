@@ -25,7 +25,12 @@
         }
         .container {
             background-color: #ffffff;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            /* INCREASED PADDING ON ALL SIDES FOR BETTER MARGINS IN CAPTURED IMAGE */
+            padding: 3rem; /* Increased from 2rem */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            width: 100%;
+            max-width: 960px; /* max-w-3xl */
         }
         input[type="text"], input[type="number"], textarea, select, input[type="date"] {
             border: 1px solid #d1d5db;
