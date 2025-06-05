@@ -298,7 +298,6 @@
             </div>
 
             <div class="text-center mt-6 flex justify-center space-x-4">
-                <!-- Removed 'Submit Daily Report' button -->
                 <button type="button" onclick="savePageAsImageAndUpload()" class="btn-primary">Submit</button>
             </div>
 
@@ -758,7 +757,7 @@
             }
         }
 
-        // New function to save page as image and upload to Google Drive
+        // Updated function to save page as image and upload to Google Drive with more detailed error logging
         async function savePageAsImageAndUpload() {
             showMessageBox('Generating Image & Uploading...', 'Please wait while the report image is generated and uploaded to Google Drive.');
 
@@ -782,13 +781,15 @@
                         windowHeight: formContainer.scrollHeight, // Capture full height
                         scrollX: -window.scrollX, // Adjust for current scroll position
                         scrollY: -window.scrollY,
-                        logging: false // Disable logging to console
+                        logging: true // Enable logging to console for html2canvas
                     });
 
                     const imgDataUrl = canvas.toDataURL('image/png'); // Get image data as Data URL
                     const base64Image = imgDataUrl.split(',')[1]; // Extract base64 part
                     const fileName = `DailySalesForm_${document.getElementById('serviceAdvisorName').value.replace(/\s/g, '')}_${getFormattedDateForFilename()}.png`;
                     const mimeType = 'image/png';
+
+                    console.log('Attempting to upload image:', { fileName, mimeType, imageDataLength: base64Image.length });
 
                     // Send to Google Apps Script Web App for upload
                     const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
@@ -808,14 +809,20 @@
                         showMessageBox('Success!', `Report image uploaded to Google Drive: ${result.fileLink}`);
                         console.log('Image upload successful:', result);
                     } else {
-                        const errorData = await response.json();
-                        console.error('Image upload failed:', errorData);
-                        showMessageBox('Error', `Failed to upload image: ${errorData.message || 'Unknown error'}`);
+                        const errorText = await response.text(); // Get raw text for more detail
+                        console.error('Image upload failed with status:', response.status, response.statusText, 'Response Body:', errorText);
+                        try {
+                            const errorData = JSON.parse(errorText); // Try parsing as JSON
+                            showMessageBox('Error', `Failed to upload image: ${errorData.message || response.statusText}`);
+                        } catch (e) {
+                            // If not JSON, show raw text
+                            showMessageBox('Error', `Failed to upload image. Server response: ${errorText || response.statusText}`);
+                        }
                     }
 
                 } catch (error) {
-                    console.error('Error generating image or uploading:', error);
-                    showMessageBox('Error', 'An unexpected error occurred during image generation or upload. Please try again.');
+                    console.error('Error during image generation or fetch operation:', error);
+                    showMessageBox('Error', `An unexpected error occurred during image generation or upload: ${error.message}. Check console for details.`);
                 } finally {
                     document.body.style.overflow = originalOverflow; // Restore original overflow
                     // Restore message box visibility if it was visible
@@ -826,11 +833,11 @@
             }, 100); // Small delay to ensure rendering is complete
         }
 
-        // Original savePageAsImage (now just for local download - renamed for clarity if both are desired)
+        // Original savePageAsImage function (renamed if both local download and Drive upload are desired)
         async function savePageAsImage() {
-            // This function is still here for local download if you want to keep that option.
-            // It's the same as the old savePageAsImage.
-            // You can remove this function and the corresponding button if you only want Drive upload.
+            // This function is commented out as it's not currently linked to a button.
+            // If you want to re-add a local download button, uncomment this and link it.
+            /*
             showMessageBox('Saving Image...', 'Please wait while the page is captured and prepared for download.');
             try {
                 const formContainer = document.querySelector('.container');
@@ -863,9 +870,9 @@
 
                         a.href = image;
                         a.download = filename;
-                        document.body.appendChild(a); // Append to body to make it clickable
-                        a.click(); // Programmatically click the link to trigger download
-                        document.body.removeChild(a); // Remove the link after clicking
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
 
                         showMessageBox('Success!', `The image "${filename}" has been downloaded.`);
 
@@ -878,25 +885,27 @@
                             messageBox.classList.remove('hidden');
                         }
                     }
-                }, 100); // Small delay to ensure rendering is complete
+                }, 100);
 
             } catch (error) {
                 console.error('Error in savePageAsImage function:', error);
                 showMessageBox('Error', 'An unexpected error occurred during image capture.');
             }
+            */
         }
 
 
-        // Function to collect form data for backend submission (for the "Submit Daily Report" button)
+        // Function to collect form data for backend submission (if needed for structured data)
         function collectFormData() {
-            // This function remains the same as before, collecting data for your primary submission
+            // This function is still here for context if you still plan to send structured data elsewhere.
+            // It's not directly called by a button in the current HTML.
             const formData = {
                 reportDate: document.getElementById('reportDate').value,
                 serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
                 dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
                 priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
                 carSales: [],
-                customerLeads: [], // Corrected from 'calls' to 'customerLeads' for consistency
+                customerLeads: [],
                 totals: {
                     totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
                     totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
@@ -965,7 +974,7 @@
         }
 
 
-        // Function to submit data to the backend (for the "Submit Daily Report" button)
+        // Function to submit data to the backend (for the "Submit Daily Report" button - now replaced)
         async function submitFormToBackend() {
             // This function is no longer called by a button in the HTML.
             // It remains here for context if you still plan to send structured data elsewhere.
