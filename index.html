@@ -346,7 +346,7 @@
         const baseDailyGoal = 5200; // Define the base daily goal here
 
         // IMPORTANT: This URL has been updated with the Google Apps Script Web App URL you provided.
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxMB8hKllghR25apfmRIs9ezB908_8WzjEXswhhVmOSZtybXL7KGs3AaqgGn2B53Zf1Sw/exec';
+        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyCL3lk81b2Eqa8pZtdd49C4-cyWj8iyWHvxxfKA3t7zPNzpNMT6uu1rzzAB5o4qJ69gg/exec';
 
         // Function to set the current date
         function setCurrentDate() {
@@ -505,8 +505,8 @@
             document.getElementById('averageDiscoveredSales').innerText = averageDiscoveredSales.toFixed(2);
             document.getElementById('averageSoldSales').innerText = averageSoldSales.toFixed(2);
             document.getElementById('totalCustomerCalls').innerText = totalCustomerCalls;
-            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims;
-            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%';
+            document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims; // Update display
+            document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update display
 
             // Update hidden inputs for Formspree (if still using Formspree for main submission)
             document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
@@ -516,8 +516,8 @@
             document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
             document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
             document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
-            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
-            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
+            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims; // Update hidden input
+            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%'; // Update hidden input
 
 
             updateRemainingGoal();
@@ -618,15 +618,15 @@
             newEntry.innerHTML = `
                 <div class="form-col">
                     <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
-                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
+                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
                     <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</labeL>
-                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
+                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
                     <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Discovered ($)</label>
-                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(this.closest('.form-row')); updateRunningTotals()">
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
                 </div>
                 <div class="form-col">
                     <label for="carSoldSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Sold ($)</label>
