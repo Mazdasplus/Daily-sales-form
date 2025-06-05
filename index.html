@@ -346,7 +346,7 @@
         const baseDailyGoal = 5200; // Define the base daily goal here
 
         // IMPORTANT: This URL has been updated with the Google Apps Script Web App URL you provided.
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbya51Y5qdNJsPnsDYxv8QgnlcYJpzjvxEV8679nBoOSVNEDIUY_ADpx2YcFy-VVOS_vow/exec';
+        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyiH0t4yfSF5lUfO5_La6xlBj0_fFe8ZDGQ24hz1sSDAd1607cr-aESA-COlOzCUNsmZA/exec';
 
         // Function to set the current date
         function setCurrentDate() {
@@ -774,6 +774,7 @@
 
             setTimeout(async () => {
                 try {
+                    console.log('html2canvas: Starting image capture.');
                     const canvas = await html2canvas(formContainer, {
                         scale: 2, // Increase scale for better resolution
                         useCORS: true, // Enable CORS if you have external images (like logo)
@@ -783,13 +784,17 @@
                         scrollY: -window.scrollY,
                         logging: true // Enable logging to console for html2canvas
                     });
+                    console.log('html2canvas: Image capture complete. Converting to Data URL.');
 
                     const imgDataUrl = canvas.toDataURL('image/png'); // Get image data as Data URL
                     const base64Image = imgDataUrl.split(',')[1]; // Extract base64 part
                     const fileName = `DailySalesForm_${document.getElementById('serviceAdvisorName').value.replace(/\s/g, '')}_${getFormattedDateForFilename()}.png`;
                     const mimeType = 'image/png';
 
-                    console.log('Attempting to upload image:', { fileName, mimeType, imageDataLength: base64Image.length });
+                    console.log('Attempting to send fetch request to Apps Script.');
+                    console.log('Apps Script URL:', APPS_SCRIPT_WEB_APP_URL);
+                    console.log('Request Body Preview (first 100 chars of imageData):', JSON.stringify({ fileName, mimeType, imageDataPreview: base64Image.substring(0, 100) + '...' }));
+
 
                     // Send to Google Apps Script Web App for upload
                     const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
@@ -804,6 +809,7 @@
                         }),
                     });
 
+                    console.log('Fetch request completed. Checking response.');
                     if (response.ok) {
                         const result = await response.json();
                         showMessageBox('Success!', `Report image uploaded to Google Drive: ${result.fileLink}`);
@@ -813,10 +819,10 @@
                         console.error('Image upload failed with status:', response.status, response.statusText, 'Response Body:', errorText);
                         try {
                             const errorData = JSON.parse(errorText); // Try parsing as JSON
-                            showMessageBox('Error', `Failed to upload image: ${errorData.message || response.statusText}`);
+                            showMessageBox('Error', `Failed to upload image: ${errorData.message || response.statusText}. Check console and email for details.`);
                         } catch (e) {
                             // If not JSON, show raw text
-                            showMessageBox('Error', `Failed to upload image. Server response: ${errorText || response.statusText}`);
+                            showMessageBox('Error', `Failed to upload image. Server response: ${errorText || response.statusText}. Check console and email for details.`);
                         }
                     }
 
@@ -974,7 +980,7 @@
         }
 
 
-        // Function to submit data to the backend (for the "Submit Daily Report" button)
+        // Function to submit data to the backend (for the "Submit Daily Report" button - now replaced)
         async function submitFormToBackend() {
             // This function is no longer called by a button in the HTML.
             // It remains here for context if you still plan to send structured data elsewhere.
