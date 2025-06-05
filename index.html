@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark"> <!-- Added 'dark' class to enable dark mode -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,226 +10,232 @@
         /* Custom styles for Inter font and general body styling */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
             display: flex;
             justify-content: center;
             align-items: flex-start; /* Align to top for better form visibility */
             min-height: 100vh;
             padding: 2rem;
         }
+
+        /* Light Mode Defaults (if 'dark' class is not present on html tag) - Unchanged */
+        body {
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark text */
+        }
         .container {
             background-color: #ffffff;
-            padding: 2rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-            width: 100%;
-            max-width: 960px; /* max-w-3xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        input[type="text"],
-        input[type="number"],
-        textarea,
-        select,
-        input[type="date"] { /* Added input[type="date"] to styling */
-            border: 1px solid #d1d5db; /* border-gray-300 */
-            border-radius: 0.375rem; /* rounded-md */
-            padding: 0.625rem 1rem; /* py-2.5 px-4 */
-            width: 100%;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+        input[type="text"], input[type="number"], textarea, select, input[type="date"] {
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            color: #1f2937;
         }
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        textarea:focus,
-        select:focus,
-        input[type="date"]:focus { /* Added input[type="date"] to styling */
-            border-color: #3b82f6; /* ring-blue-500 */
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* ring-blue-500/25 */
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus, input[type="date"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
         .section-title {
-            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            color: #374151;
         }
         .btn-primary {
-            background-color: #3b82f6; /* bg-blue-500 */
-            color: #ffffff; /* text-white */
-            padding: 0.75rem 1.5rem; /* py-3 px-6 */
-            border-radius: 0.5rem; /* rounded-lg */
-            font-weight: 600; /* font-semibold */
-            transition: background-color 0.2s ease-in-out;
+            background-color: #3b82f6;
+            color: #ffffff;
         }
         .btn-primary:hover {
-            background-color: #2563eb; /* bg-blue-600 */
+            background-color: #2563eb;
         }
-        .btn-remove { /* Style for remove buttons */
-            background-color: #ef4444; /* bg-red-500 */
-            color: #ffffff; /* text-white */
-            padding: 0.5rem 0.75rem; /* p-2 */
-            border-radius: 0.375rem; /* rounded-md */
-            font-weight: 500; /* font-medium */
-            transition: background-color 0.2s ease-in-out;
+        .btn-remove {
+            background-color: #ef4444;
+            color: #ffffff;
         }
         .btn-remove:hover {
-            background-color: #dc2626; /* bg-red-600 */
+            background-color: #dc2626;
         }
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem; /* space-x-4 and space-y-4 for stacking */
-        }
-        .form-col {
-            flex: 1;
-            min-width: 180px; /* Adjusted min-width for more columns in car sales */
-        }
-        @media (min-width: 640px) { /* sm breakpoint */
-            .form-row > div {
-                flex: 1;
-            }
-        }
-        /* Generic goal display styles - colors handled by JS */
         .goal-display {
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 600; /* font-semibold */
-            margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem; /* rounded-md */
-            border-left: 4px solid; /* Border color handled by JS */
+            background-color: #e0f2fe; /* light blue */
+            border-left-color: #38b2ac; /* teal */
+            color: #1a202c;
         }
         .totals-section {
-            background-color: #f0f9ff; /* Light blue background for totals */
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid #bfdbfe; /* Light blue border */
-            margin-top: 2rem;
+            background-color: #f0f9ff;
+            border: 1px solid #bfdbfe;
         }
         .totals-section p {
-            font-size: 1.125rem; /* text-lg */
-            font-weight: 500;
-            color: #1e3a8a; /* Darker blue text */
-            margin-bottom: 0.5rem;
+            color: #1e3a8a;
         }
         .totals-section p span {
-            font-weight: 700; /* bold */
-            color: #000; /* Black for values */
+            color: #000;
         }
-        /* Generic highlighted goal styles - colors handled by JS */
         .highlighted-goal {
-            font-size: 1.5rem; /* text-2xl */
-            font-weight: 700; /* font-bold */
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            text-align: center;
-            margin-top: 1rem;
-            border: 2px solid; /* Border color handled by JS */
+            background-color: #e0f2fe; /* light blue */
+            border-color: #38b2ac; /* teal */
+            color: #1a202c;
         }
-
-        /* Classes for dynamic color changes for Remaining Goal */
-        .goal-met {
-            color: #16a34a; /* green-700 */
-            background-color: #dcfce7; /* green-100 */
-            border-color: #22c55e; /* green-500 */
-        }
-        .goal-not-met {
-            color: #dc2626; /* red-700 */
-            background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
-        }
-
-        /* Classes for dynamic color changes for individual Close Ratio inputs */
         input.conversion-met {
-            color: #16a34a; /* green-700 */
-            border-color: #22c55e; /* green-500 */
             background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #16a34a; /* green-700 */
         }
         input.conversion-not-met {
-            color: #dc2626; /* red-700 */
-            border-color: #ef4444; /* red-500 */
             background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+            color: #dc2626; /* red-700 */
         }
-
-        /* Styles for the confirmation box */
-        .confirmation-box {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            z-index: 1000; /* Ensure it's on top */
-        }
-
-        .confirmation-content {
+        .message-box-content, .confirmation-content {
             background-color: #ffffff;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
+            color: #374151;
         }
-
         .confirmation-content h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
             color: #1f2937;
-            margin-bottom: 1rem;
         }
-
-        .confirmation-content p {
-            color: #4b5563;
-            margin-bottom: 1.5rem;
-        }
-
-        .confirmation-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .confirmation-buttons button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-        }
-
         .confirmation-buttons .btn-confirm {
             background-color: #3b82f6;
             color: #ffffff;
         }
-
         .confirmation-buttons .btn-confirm:hover {
             background-color: #2563eb;
         }
-
         .confirmation-buttons .btn-cancel {
             background-color: #e5e7eb;
             color: #374151;
         }
-
         .confirmation-buttons .btn-cancel:hover {
             background-color: #d1d5db;
+        }
+
+
+        /* NEW Dark Mode Overrides (when 'dark' class is present on html tag) */
+        html.dark body {
+            background-color: #1a202c; /* Deeper, less saturated dark blue/gray */
+            color: #e2e8f0; /* Lighter off-white text */
+        }
+        html.dark .container {
+            background-color: #2d3748; /* Slightly lighter than body background */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+        }
+        html.dark input[type="text"], html.dark input[type="number"], html.dark textarea, html.dark select, html.dark input[type="date"] {
+            border: 1px solid #4a5568; /* Slightly darker border */
+            background-color: #4a5568; /* Darker input background */
+            color: #e2e8f0; /* Light text */
+        }
+        html.dark input[type="text"]:focus, html.dark input[type="number"]:focus, html.dark textarea:focus, html.dark select:focus, html.dark input[type="date"]:focus {
+            border-color: #63b3ed; /* Brighter blue focus */
+            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.4); /* Matching focus shadow */
+        }
+        html.dark .section-title {
+            border-bottom: 2px solid #4a5568; /* Darker border */
+            color: #cbd5e0; /* Lighter text */
+        }
+        /* UPDATED BUTTON COLORS FOR DARK MODE */
+        html.dark .btn-primary {
+            background-color: #3a4780; /* Muted indigo/blue */
+            color: #ffffff; /* white text */
+        }
+        html.dark .btn-primary:hover {
+            background-color: #2c3a6b; /* darker muted indigo/blue on hover */
+        }
+        html.dark .btn-remove {
+            background-color: #c53030; /* dark red */
+            color: #ffffff; /* white text */
+        }
+        html.dark .btn-remove:hover {
+            background-color: #9b2c2c; /* darker red on hover */
+        }
+        /* END UPDATED BUTTON COLORS */
+
+        html.dark .goal-display {
+            background-color: #2d3748; /* Same as container for subtlety */
+            border-left-color: #48bb78; /* Muted green border */
+            color: #e2e8f0;
+        }
+        html.dark .goal-met {
+            color: #48bb78; /* Muted green */
+            background-color: #2f855a; /* Darker green background */
+            border-color: #48bb78; /* Muted green border */
+        }
+        html.dark .goal-not-met {
+            color: #fc8181; /* Muted red */
+            background-color: #9b2c2c; /* Darker red background */
+            border-color: #fc8181; /* Muted red border */
+        }
+        html.dark .totals-section {
+            background-color: #2d3748; /* Same as container */
+            border: 1px solid #4a5568; /* Darker border */
+        }
+        html.dark .totals-section p {
+            color: #cbd5e0; /* Lighter text */
+        }
+        html.dark .totals-section p span {
+            color: #e2e8f0; /* Very light for values */
+        }
+        html.dark .highlighted-goal {
+            background-color: #2d3748;
+            border-color: #48bb78;
+            color: #e2e8f0;
+        }
+        html.dark input.conversion-met {
+            background-color: #2f855a; /* Darker green */
+            border-color: #48bb78; /* Muted green */
+            color: #48bb78; /* Muted green */
+        }
+        html.dark input.conversion-not-met {
+            background-color: #9b2c2c; /* Darker red */
+            border-color: #fc8181; /* Muted red */
+            color: #fc8181; /* Muted red */
+        }
+        html.dark .message-box-content,
+        html.dark .confirmation-content {
+            background-color: #2d3748; /* Darker content background */
+            color: #e2e8f0;
+        }
+        html.dark .confirmation-content h3 {
+            color: #e2e8f0;
+        }
+        html.dark .confirmation-buttons .btn-cancel {
+            background-color: #4a5568;
+            color: #e2e8f0;
+        }
+        html.dark .confirmation-buttons .btn-cancel:hover {
+            background-color: #646b76;
+        }
+
+        /* Flexbox and width for responsive columns */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .form-col {
+            flex: 1;
+            min-width: 180px;
+        }
+        @media (min-width: 640px) {
+            .form-row > div {
+                flex: 1;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="text-center mb-8">
-            <img src="IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+            <!-- Consider using a dark mode friendly logo or a CSS filter for contrast -->
+            <img src="https://raw.githubusercontent.com/Mazdasplus/Daily-sales-form/main/IMG_5685.png" alt="Mazda's Plus Logo" style="max-width: 200px; height: auto; margin: 0 auto; filter: invert(0.8) hue-rotate(180deg) saturate(1.2);">
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Daily Sales Form</h1>
-        <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Daily Sales Form</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
             <div class="form-row mb-4">
                 <div class="form-col">
-                    <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
+                    <label for="reportDate" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Date</label>
                     <input type="date" id="reportDate" name="reportDate" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
+                    <label for="serviceAdvisorName" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Service Advisor Name</label>
                     <select id="serviceAdvisorName" name="serviceAdvisorName" class="w-full rounded-md">
                         <option value="Beto Calderon">Beto Calderon</option>
                         <option value="Scott Carvalho">Scott Carvalho</option>
@@ -238,15 +244,15 @@
             </div>
 
             <div class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-700 section-title">Sales Metrics</h2>
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-100 section-title">Sales Metrics</h2>
 
                 <div class="form-row mb-4">
                     <div class="form-col">
-                        <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="text" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
+                        <label for="priorDayTotal" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Prior Day Total ($)</label>
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
                     </div>
                     <div class="form-col">
-                        <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
+                        <label for="dailyGoal" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Daily Goal ($)</label>
                         <input type="number" id="dailyGoal" name="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                     </div>
                 </div>
@@ -255,54 +261,55 @@
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueTop">0.00</span>
                 </div>
 
-                <div class="space-y-4 pt-4 border-t border-gray-200 mt-6">
-                    <h3 class="text-xl font-semibold text-gray-700">Individual Car Sales</h3>
+                <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600 mt-6">
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-100">Individual Car Sales</h3>
                     <div id="carSalesEntries" class="space-y-4">
                         <div class="form-row items-end">
                             <div class="form-col">
-                                <label for="carRepairOrderNumber_1" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
-                                <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md" oninput="handleCarInput(1)">
+                                <label for="carRepairOrderNumber_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">RO#</label>
+                                <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
-                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</labeL>
-                                <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md" oninput="handleCarInput(1)">
+                                <label for="carLastName_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Last Name</labeL>
+                                <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
-                                <label for="carDiscoveredSales_1" class="block text-gray-700 text-sm font-medium mb-1">Total Discovered ($)</label>
-                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals()">
+                                <label for="carDiscoveredSales_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Discovered ($)</label>
+                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
                             </div>
 
                             <div class="w-full flex flex-wrap items-center gap-4 mt-2">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="carHasInsurancePortion_1" name="carHasInsurancePortion[]" class="mr-2" onchange="toggleCarPortionFields(1)">
-                                    <label for="carHasInsurancePortion_1" class="text-gray-700 text-sm font-medium">Has Insurance Portion?</label>
+                                    <input type="checkbox" id="carHasInsurancePortion_1" name="carHasInsurancePortion[]" class="mr-2">
+                                    <label for="carHasInsurancePortion_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Insurance Portion?</label>
                                 </div>
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
-                                    <label for="carAppointmentScheduled_1" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
+                                    <input type="checkbox" id="carAppointmentScheduled_1" name="carAppointmentScheduled[]" class="mr-2">
+                                    <label for="carAppointmentScheduled_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Future Appointment Scheduled?</label>
                                 </div>
                             </div>
 
                             <div class="form-col w-full" id="carInsurancePortionContainer_1" style="display:none;">
-                                <label class="block text-gray-700 text-sm font-medium mb-1">Insurance Sold ($)</label>
-                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals()">
+                                <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Insurance Sold ($)</label>
+                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
                             </div>
 
-                            <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_1" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_1" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(1)">
-                                <label for="carHasCustomerPayPortion_1" class="text-gray-700 text-sm font-medium">Has Customer Pay Portion?</label>
+                            <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_1" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_1" name="carHasCustomerPayPortion[]" class="mr-2">
+                                <label for="carHasCustomerPayPortion_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Customer Pay Portion?</label>
                             </div>
                             <div class="form-col w-full" id="carCustomerPayPortionContainer_1" style="display:none;">
-                                <label class="block text-gray-700 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
-                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals()">
+                                <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
+                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
                             </div>
 
-                            <div class="form-row w-full mt-2">
+                            <!-- CORRECTED: Changed 'form-row' to a plain 'div' with flex classes -->
+                            <div class="flex flex-wrap w-full mt-2 gap-4">
                                 <div class="form-col">
-                                    <label for="carTotalSold_1" class="block text-gray-700 text-sm font-medium mb-1">Total Sold ($)</label>
-                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md" oninput="updateCarRowTotals(1); updateRunningTotals()">
+                                    <label for="carTotalSold_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Sold ($)</label>
+                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md">
                                 </div>
                                 <div class="form-col">
-                                    <label for="carIndividualCloseRatio_1" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
+                                    <label for="carIndividualCloseRatio_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Close Ratio (%)</label>
                                     <input type="text" id="carIndividualCloseRatio_1" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                                 </div>
                             </div>
@@ -317,31 +324,31 @@
             </div>
 
             <div class="space-y-4">
-                <h2 class="text-2xl font-semibold text-gray-700 section-title">New Customer Leads</h2>
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-100 section-title">New Customer Leads</h2>
                 <div id="callEntries" class="space-y-4">
                     <div class="form-row items-end">
                         <div class="form-col">
-                            <label for="callCustomerName_1" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                            <label for="callCustomerName_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Name</label>
                             <input type="text" id="callCustomerName_1" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
                         </div>
                         <div class="form-col">
-                            <label for="callCustomerPhone_1" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                            <label for="callCustomerPhone_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Phone Number</label>
                             <input type="text" id="callCustomerPhone_1" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                         </div>
                         <div class="form-col flex items-center">
                             <input type="checkbox" id="callBookedAppointment_1" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
-                            <label for="callBookedAppointment_1" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
+                            <label for="callBookedAppointment_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Booked Appointment?</label>
                         </div>
                         <div class="form-col flex items-center">
                             <input type="checkbox" id="callLostLead_1" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(1)">
-                            <label for="callLostLead_1" class="text-gray-700 text-sm font-medium">Lost Lead?</label>
+                            <label for="callLostLead_1" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Lost Lead?</label>
                         </div>
                         <div class="form-col" id="callLostCostContainer_1" style="display:none;">
-                            <label for="callLostCost_1" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                            <label for="callLostCost_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                             <input type="number" id="callLostCost_1" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                         </div>
                         <div class="form-col" id="callReasonContainer_1" style="display:none;">
-                            <label for="callReason_1" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                            <label for="callReason_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Reason for Loss</label>
                             <select id="callReason_1" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, 1, 'call')">
                                 <option value="">Select Reason</option>
                                 <option value="Cost">Cost</option>
@@ -350,7 +357,7 @@
                             </select>
                         </div>
                         <div class="form-col" id="callSourceContainer_1" style="display:none;">
-                            <label for="callSource_1" class="block text-gray-700 text-sm font-medium mb-1">Source</label>
+                            <label for="callSource_1" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Source</label>
                             <select id="callSource_1" name="callSource[]" class="w-full rounded-md">
                                 <option value="">Select Source</option>
                                 <option value="Referral">Referral</option>
@@ -363,8 +370,8 @@
                             <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
                         </div>
                         <div class="form-col w-full" id="callOtherReasonContainer_1" style="display:none;">
-                            <label for="callOtherReason_1" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
-                            <textarea id="callOtherReason_1" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
+                            <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Other Reason Details</label>
+                            <textarea id="callOtherReason_${callEntryCount}" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                         </div>
                     </div>
                 </div>
@@ -372,21 +379,20 @@
             </div>
 
             <div class="text-center mt-6 flex justify-center space-x-4">
-                <!-- Changed type to button and onclick to savePageAsImage() -->
                 <button type="button" onclick="savePageAsImage()" class="btn-primary">Submit Daily Report (Save Image)</button>
             </div>
 
             <div class="totals-section">
-                <h2 class="text-2xl font-semibold text-gray-700 section-title">Daily Totals</h2>
-                <p>Total Discovered Sales: $<span id="totalDiscoveredSales">0.00</span></p>
-                <p>Total Sold Sales: $<span id="totalSoldSales">0.00</span></p>
-                <p>Close Ratio: <span id="closeRatio">0.00%</span></p>
-                <p>Total Cars: <span id="totalCars">0</span></p>
-                <p>Average Discovered Sales: $<span id="averageDiscoveredSales">0.00</span></p>
-                <p>Average Sale: $<span id="averageSoldSales">0.00</span></p>
-                <p>New Customer Calls: <span id="totalCustomerCalls">0</span></p>
-                <p>Total Insurance Claims Jobs: <span id="totalInsuranceClaims">0</span></p>
-                <p>Insurance Percentage of Sales: <span id="percentageOfInsuranceClaims">0.00%</span></p>
+                <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-100 section-title">Daily Totals</h2>
+                <p class="text-gray-700 dark:text-gray-200">Total Discovered Sales: $<span id="totalDiscoveredSales" class="dark:text-gray-100">0.00</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Total Sold Sales: $<span id="totalSoldSales" class="dark:text-gray-100">0.00</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Close Ratio: <span id="closeRatio" class="dark:text-gray-100">0.00%</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Total Cars: <span id="totalCars" class="dark:text-gray-100">0</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Average Discovered Sales: $<span id="averageDiscoveredSales" class="dark:text-gray-100">0.00</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Average Sale: $<span id="averageSoldSales" class="dark:text-gray-100">0.00</span></p>
+                <p class="text-gray-700 dark:text-gray-200">New Customer Calls: <span id="totalCustomerCalls" class="dark:text-gray-100">0</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Total Insurance Claims Jobs: <span id="totalInsuranceClaims" class="dark:text-gray-100">0</span></p>
+                <p class="text-gray-700 dark:text-gray-200">Insurance Percentage of Sales: <span id="percentageOfInsuranceClaims" class="dark:text-gray-100">0.00%</span></p>
                 <div class="highlighted-goal" id="remainingDailyGoalBottom">
                     Remaining Daily Goal: $<span id="remainingDailyGoalValueBottom">0.00</span>
                 </div>
@@ -407,17 +413,17 @@
         </form>
 
         <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4" id="messageBoxTitle"></h3>
-                <p class="text-gray-700 mb-6" id="messageBoxContent"></p>
+            <div class="message-box-content p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <h3 class="text-xl font-semibold mb-4" id="messageBoxTitle"></h3>
+                <p class="mb-6" id="messageBoxContent"></p>
                 <button onclick="closeMessageBox()" class="btn-primary">OK</button>
             </div>
         </div>
 
         <div id="confirmationBox" class="confirmation-box hidden">
-            <div class="confirmation-content">
-                <h3 id="confirmationBoxTitle"></h3>
-                <p id="confirmationBoxContent"></p>
+            <div class="confirmation-content p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <h3 id="confirmationBoxTitle" class="text-xl font-semibold mb-4"></h3>
+                <p id="confirmationBoxContent" class="mb-6"></p>
                 <div class="confirmation-buttons">
                     <button class="btn-confirm" onclick="confirmAction(true)">Yes</button>
                     <button class="btn-cancel" onclick="confirmAction(false)">No</button>
@@ -427,6 +433,7 @@
     </div>
 
     <script>
+        // Constants defined at the top
         let callEntryCount = 1;
         let carEntryCount = 1;
         const baseDailyGoal = 5200; // Define the base daily goal here
@@ -437,79 +444,16 @@
         let currentDuplicateRowIndex = null;
         let originalEntryIndexForCombine = null;
 
-
-        // Function to set the current date
-        function setCurrentDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-            const day = String(today.getDate()).padStart(2, '0');
-            document.getElementById('reportDate').value = `${year}-${month}-${day}`;
-        }
-
-        // Function to get the date in MMDDYY format for filename
-        function getFormattedDateForFilename() {
-            const today = new Date();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const yy = String(today.getFullYear()).slice(-2); // Get last two digits of the year
-            return `${mm}${dd}${yy}`;
-        }
-
-        // Function to update the daily goal based on prior day's total (now as carry-over)
-        function updateDailyGoalBasedOnPriorDay() {
-            const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
-            const dailyGoalInput = document.getElementById('dailyGoal');
-
-            // Calculate the adjusted daily goal by ADDING the priorDayTotal
-            const adjustedDailyGoal = baseDailyGoal + priorDayTotal;
-
-            // Update the daily goal input field
-            dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
-
-            // Also update the remaining goal display as it depends on the dailyGoal
-            updateRemainingGoal();
-        }
-
-        // Function to update the Remaining Daily Goal display and its color
-        function updateRemainingGoal() {
-            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
-            let currentDaySoldSales = 0;
-
-            // Sum up the 'Total Sold' from each car entry
-            document.querySelectorAll('input[name="carTotalSold[]"]').forEach(input => {
-                currentDaySoldSales += parseFloat(input.value) || 0;
-            });
-
-            const remainingGoal = dailyGoal - currentDaySoldSales;
-
-            const remainingGoalValueTop = document.getElementById('remainingDailyGoalValueTop');
-            const remainingGoalValueBottom = document.getElementById('remainingDailyGoalValueBottom');
-            const remainingGoalContainerTop = document.getElementById('remainingDailyGoalTop');
-            const remainingGoalContainerBottom = document.getElementById('remainingDailyGoalBottom');
-
-            remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
-            remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
-            document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
-
-            if (remainingGoal <= 0) {
-                remainingGoalContainerTop.classList.remove('goal-not-met');
-                remainingGoalContainerTop.classList.add('goal-met');
-                remainingGoalContainerBottom.classList.remove('goal-not-met');
-                remainingGoalContainerBottom.classList.add('goal-met');
-            } else {
-                remainingGoalContainerTop.classList.remove('goal-met');
-                remainingGoalContainerTop.classList.add('goal-not-met');
-                remainingGoalContainerBottom.classList.remove('goal-met');
-                remainingGoalContainerBottom.classList.add('goal-not-met');
-            }
-        }
+        // --- Core Functions for Calculations and Updates (Moved to top) ---
 
         // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims)
         function updateRunningTotals() {
             let totalDiscovered = 0;
             let totalSold = 0;
-            const numberOfCars = document.querySelectorAll('#carSalesEntries .form-row').length;
+            // Get all direct children with 'form-row' class under #carSalesEntries
+            const carRows = document.querySelectorAll('#carSalesEntries > .form-row');
+            const numberOfCars = carRows.length;
+
             const totalCustomerCalls = document.querySelectorAll('#callEntries .form-row').length;
             let totalInsuranceClaims = 0; // Counter for entries with an insurance portion
 
@@ -521,7 +465,7 @@
 
             const roLastNameMap = new Map(); // Stores {combinedKey: {index: row_index, hasInsurance: bool, hasCustomerPay: bool}}
 
-            document.querySelectorAll('#carSalesEntries .form-row').forEach((row, index) => {
+            carRows.forEach((row, index) => {
                 const roInput = row.querySelector('input[name="carRepairOrderNumber[]"]');
                 const lastNameInput = row.querySelector('input[name="carLastName[]"]');
                 const totalDiscoveredInput = row.querySelector('input[name="carDiscoveredSales[]"]'); // Now Total Discovered for the RO
@@ -566,12 +510,8 @@
                     roLastNameMap.set(combinedKey, {
                         index: index,
                         hasInsurance: hasInsuranceCheckbox.checked,
-                        // hasCustomerPay is not needed here for the map, as it's controlled by insurance checkbox
                     });
                 }
-
-                // Recalculate row totals first
-                updateCarRowTotals(index + 1); // Pass the correct index (1-based)
 
                 let rowTotalDiscovered = 0;
                 if (totalDiscoveredInput) { // Explicit null check
@@ -633,66 +573,6 @@
             updateRemainingGoal();
         }
 
-        // New function to combine car entries
-        function combineCarEntries(originalIndex, duplicateIndex) {
-            const originalRow = document.querySelectorAll('#carSalesEntries .form-row')[originalIndex];
-            const duplicateRow = document.querySelectorAll('#carSalesEntries .form-row')[duplicateIndex];
-
-            if (!originalRow || !duplicateRow) {
-                console.error('Error: Original or duplicate row not found for combining.');
-                return;
-            }
-
-            const origDiscoveredInput = originalRow.querySelector(`input[name="carDiscoveredSales[]"]`);
-            const origInsuranceSoldInput = originalRow.querySelector(`#carInsuranceSold_${originalIndex + 1}`);
-            const origCustomerPaySoldInput = originalRow.querySelector(`#carCustomerPaySold_${originalIndex + 1}`);
-            const origHasInsuranceCheckbox = originalRow.querySelector(`#carHasInsurancePortion_${originalIndex + 1}`);
-            const origHasCustomerPayCheckbox = originalRow.querySelector(`#carHasCustomerPayPortion_${originalIndex + 1}`);
-            const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`); // Get original total sold input
-
-            // Get values from the duplicate row's fields (already safely accessed with ?.value)
-            const dupDiscovered = parseFloat(duplicateRow.querySelector(`input[name="carDiscoveredSales[]"]`)?.value) || 0;
-            const dupInsuranceSold = parseFloat(duplicateRow.querySelector(`#carInsuranceSold_${duplicateIndex + 1}`)?.value) || 0;
-            const dupCustomerPaySold = parseFloat(duplicateRow.querySelector(`#carCustomerPaySold_${duplicateIndex + 1}`)?.value) || 0;
-            const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0; // Get duplicate total sold input
-
-            // Add duplicate's discovered to original's total discovered
-            if (origDiscoveredInput) {
-                origDiscoveredInput.value = ((parseFloat(origDiscoveredInput.value) || 0) + dupDiscovered).toFixed(2);
-            }
-
-            // Add duplicate's insurance sold to original's insurance sold
-            if (origInsuranceSoldInput) { // Check if element exists
-                origInsuranceSoldInput.value = ((parseFloat(origInsuranceSoldInput.value) || 0) + dupInsuranceSold).toFixed(2);
-            }
-            if (origHasInsuranceCheckbox) { // Check if element exists
-                origHasInsuranceCheckbox.checked = true; // Ensure insurance checkbox is checked
-            }
-
-            // Add duplicate's customer pay sold to original's customer pay sold
-            if (origCustomerPaySoldInput) { // Check if element exists
-                origCustomerPaySoldInput.value = ((parseFloat(origCustomerPaySoldInput.value) || 0) + dupCustomerPaySold).toFixed(2);
-            }
-            if (origHasCustomerPayCheckbox) { // Check if element exists
-                origHasCustomerPayCheckbox.checked = true; // Ensure customer pay checkbox is checked
-            }
-
-            // Add duplicate's total sold to original's total sold (if it's editable)
-            if (origTotalSoldInput) {
-                origTotalSoldInput.value = ((parseFloat(origTotalSoldInput.value) || 0) + dupTotalSold).toFixed(2);
-            }
-
-            // Update visibility and totals for the original row
-            toggleCarPortionFields(originalIndex + 1); // This will also update carTotalSold etc.
-
-            // Remove the duplicate row from the DOM
-            duplicateRow.remove();
-            updateRemoveButtonsVisibility('carSalesEntries');
-            updateRunningTotals(); // Recalculate all totals after combining and removing a row
-            showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}.`);
-        }
-
-
         // New function to calculate totals for a single car row
         function updateCarRowTotals(index) {
             const totalDiscoveredInput = document.getElementById(`carDiscoveredSales_${index}`);
@@ -738,6 +618,114 @@
             }
         }
 
+
+        // Function declarations for other helper functions
+        function setCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('reportDate').value = `${year}-${month}-${day}`;
+        }
+
+        function getFormattedDateForFilename() {
+            const today = new Date();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const yy = String(today.getFullYear()).slice(-2); // Get last two digits of the year
+            return `${mm}${dd}${yy}`;
+        }
+
+        function updateDailyGoalBasedOnPriorDay() {
+            const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
+            const dailyGoalInput = document.getElementById('dailyGoal');
+            const adjustedDailyGoal = baseDailyGoal + priorDayTotal;
+            dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
+            updateRemainingGoal();
+        }
+
+        function updateRemainingGoal() {
+            const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
+            let currentDaySoldSales = 0;
+
+            document.querySelectorAll('input[name="carTotalSold[]"]').forEach(input => {
+                currentDaySoldSales += parseFloat(input.value) || 0;
+            });
+
+            const remainingGoal = dailyGoal - currentDaySoldSales;
+
+            const remainingGoalValueTop = document.getElementById('remainingDailyGoalValueTop');
+            const remainingGoalValueBottom = document.getElementById('remainingDailyGoalValueBottom');
+            const remainingGoalContainerTop = document.getElementById('remainingDailyGoalTop');
+            const remainingGoalContainerBottom = document.getElementById('remainingDailyGoalBottom');
+
+            remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
+            remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
+            document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
+
+            if (remainingGoal <= 0) {
+                remainingGoalContainerTop.classList.remove('goal-not-met');
+                remainingGoalContainerTop.classList.add('goal-met');
+                remainingGoalContainerBottom.classList.remove('goal-not-met');
+                remainingGoalContainerBottom.classList.add('goal-met');
+            } else {
+                remainingGoalContainerTop.classList.remove('goal-met');
+                remainingGoalContainerTop.classList.add('goal-not-met');
+                remainingGoalContainerBottom.classList.remove('goal-met');
+                remainingGoalContainerBottom.classList.add('goal-not-met');
+            }
+        }
+
+        function combineCarEntries(originalIndex, duplicateIndex) {
+            const originalRow = document.querySelectorAll('#carSalesEntries .form-row')[originalIndex];
+            const duplicateRow = document.querySelectorAll('#carSalesEntries .form-row')[duplicateIndex];
+
+            if (!originalRow || !duplicateRow) {
+                console.error('Error: Original or duplicate row not found for combining.');
+                return;
+            }
+
+            const origDiscoveredInput = originalRow.querySelector(`input[name="carDiscoveredSales[]"]`);
+            const origInsuranceSoldInput = originalRow.querySelector(`#carInsuranceSold_${originalIndex + 1}`);
+            const origCustomerPaySoldInput = originalRow.querySelector(`#carCustomerPaySold_${originalIndex + 1}`);
+            const origHasInsuranceCheckbox = originalRow.querySelector(`#carHasInsurancePortion_${originalIndex + 1}`);
+            const origHasCustomerPayCheckbox = originalRow.querySelector(`#carHasCustomerPayPortion_${originalIndex + 1}`);
+            const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`);
+
+            const dupDiscovered = parseFloat(duplicateRow.querySelector(`input[name="carDiscoveredSales[]"]`)?.value) || 0;
+            const dupInsuranceSold = parseFloat(duplicateRow.querySelector(`#carInsuranceSold_${duplicateIndex + 1}`)?.value) || 0;
+            const dupCustomerPaySold = parseFloat(duplicateRow.querySelector(`#carCustomerPaySold_${duplicateIndex + 1}`)?.value) || 0;
+            const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0;
+
+            if (origDiscoveredInput) {
+                origDiscoveredInput.value = ((parseFloat(origDiscoveredInput.value) || 0) + dupDiscovered).toFixed(2);
+            }
+
+            if (origInsuranceSoldInput) {
+                origInsuranceSoldInput.value = ((parseFloat(origInsuranceSoldInput.value) || 0) + dupInsuranceSold).toFixed(2);
+            }
+            if (origHasInsuranceCheckbox) {
+                origHasInsuranceCheckbox.checked = true;
+            }
+
+            if (origCustomerPaySoldInput) {
+                origCustomerPaySoldInput.value = ((parseFloat(origCustomerPaySoldInput.value) || 0) + dupCustomerPaySold).toFixed(2);
+            }
+            if (origHasCustomerPayCheckbox) {
+                origHasCustomerPayCheckbox.checked = true;
+            }
+
+            if (origTotalSoldInput) {
+                origTotalSoldInput.value = ((parseFloat(origTotalSoldInput.value) || 0) + dupTotalSold).toFixed(2);
+            }
+
+            toggleCarPortionFields(originalIndex + 1);
+            duplicateRow.remove();
+            updateRemoveButtonsVisibility('carSalesEntries');
+            updateRunningTotals();
+            showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}.`);
+        }
+
         // Function to toggle visibility of insurance and customer pay portion fields
         function toggleCarPortionFields(index) {
             const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
@@ -767,15 +755,16 @@
             updateRunningTotals(); // Update overall totals
         }
 
-        // New function to handle input on RO# and Last Name fields
+        // New function to handle input on RO# and Last Name fields (now triggered by delegation)
         function handleCarInput(index) {
-            // This function is called on input for RO# and Last Name.
-            // It will trigger updateRunningTotals which now contains the duplicate check and confirmation logic.
-            updateRunningTotals();
+            // This function is now mostly for duplicate check logic.
+            // Actual calculation updates are handled by event delegation on relevant number inputs.
+            updateRunningTotals(); // Trigger overall update for duplicate check
         }
 
 
-        // Function to add a new call entry row
+        // --- UI Manipulation and Helper Functions ---
+
         function addCallEntry() {
             callEntryCount++;
             const callEntriesDiv = document.getElementById('callEntries');
@@ -783,27 +772,27 @@
             newEntry.className = 'form-row items-end';
             newEntry.innerHTML = `
                 <div class="form-col">
-                    <label for="callCustomerName_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Customer Name</label>
+                    <label for="callCustomerName_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Name</label>
                     <input type="text" id="callCustomerName_${callEntryCount}" name="callCustomerName[]" placeholder="Customer Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Phone Number</label>
+                    <label for="callCustomerPhone_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Phone Number</label>
                     <input type="text" id="callCustomerPhone_${callEntryCount}" name="callCustomerPhone[]" placeholder="(XXX) XXX-XXXX" class="w-full rounded-md" oninput="formatPhoneNumber(this)">
                 </div>
                 <div class="form-col flex items-center">
                     <input type="checkbox" id="callBookedAppointment_${callEntryCount}" name="callBookedAppointment[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
-                    <label for="callBookedAppointment_${callEntryCount}" class="text-gray-700 text-sm font-medium">Booked Appointment?</label>
+                    <label for="callBookedAppointment_${callEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Booked Appointment?</label>
                 </div>
                 <div class="form-col flex items-center">
                     <input type="checkbox" id="callLostLead_${callEntryCount}" name="callLostLead[]" class="mr-2" onchange="toggleCallFieldsVisibility(${callEntryCount})">
-                    <label for="callLostLead_${callEntryCount}" class="text-gray-700 text-sm font-medium">Lost Lead?</label>
+                    <label for="callLostLead_${callEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Lost Lead?</label>
                 </div>
                 <div class="form-col" id="callLostCostContainer_${callEntryCount}" style="display:none;">
-                    <label for="callLostCost_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
+                    <label for="callLostCost_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Estimated Lost Cost ($)</label>
                     <input type="number" id="callLostCost_${callEntryCount}" name="callLostCost[]" placeholder="e.g., 250" class="w-full rounded-md" min="0" step="0.01">
                 </div>
                 <div class="form-col" id="callReasonContainer_${callEntryCount}" style="display:none;">
-                    <label for="callReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Reason for Loss</label>
+                    <label for="callReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Reason for Loss</label>
                     <select id="callReason_${callEntryCount}" name="callReason[]" class="w-full rounded-md" onchange="toggleOtherReason(this, ${callEntryCount}, 'call')">
                         <option value="">Select Reason</option>
                         <option value="Cost">Cost</option>
@@ -812,7 +801,7 @@
                     </select>
                 </div>
                 <div class="form-col" id="callSourceContainer_${callEntryCount}" style="display:none;">
-                    <label for="callSource_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Source</label>
+                    <label for="callSource_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Source</label>
                     <select id="callSource_${callEntryCount}" name="callSource[]" class="w-full rounded-md">
                         <option value="">Select Source</option>
                         <option value="Referral">Referral</option>
@@ -825,7 +814,7 @@
                     <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
                 </div>
                 <div class="form-col w-full" id="callOtherReasonContainer_${callEntryCount}" style="display:none;">
-                    <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
+                    <label for="callOtherReason_${callEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Other Reason Details</label>
                     <textarea id="callOtherReason_${callEntryCount}" name="callOtherReason[]" rows="2" placeholder="Please specify other reason" class="w-full rounded-md"></textarea>
                 </div>
             `;
@@ -850,50 +839,51 @@
             newEntry.className = 'form-row items-end';
             newEntry.innerHTML = `
                 <div class="form-col">
-                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">RO#</label>
-                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
+                    <label for="carRepairOrderNumber_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">RO#</label>
+                    <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
-                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md" oninput="handleCarInput(${carEntryCount})">
+                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Last Name</label>
+                    <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Total Discovered ($)</label>
-                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals()">
+                    <label for="carDiscoveredSales_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Discovered ($)</label>
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01">
                 </div>
 
                 <div class="w-full flex flex-wrap items-center gap-4 mt-2">
                     <div class="flex items-center">
-                        <input type="checkbox" id="carHasInsurancePortion_${carEntryCount}" name="carHasInsurancePortion[]" class="mr-2" onchange="toggleCarPortionFields(${carEntryCount})">
-                        <label for="carHasInsurancePortion_${carEntryCount}" class="text-gray-700 text-sm font-medium">Has Insurance Portion?</label>
+                        <input type="checkbox" id="carHasInsurancePortion_${carEntryCount}" name="carHasInsurancePortion[]" class="mr-2">
+                        <label for="carHasInsurancePortion_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Insurance Portion?</label>
                     </div>
                     <div class="flex items-center">
-                        <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2" onchange="updateRunningTotals()">
-                        <label for="carAppointmentScheduled_${carEntryCount}" class="text-gray-700 text-sm font-medium">Future Appointment Scheduled?</label>
+                        <input type="checkbox" id="carAppointmentScheduled_${carEntryCount}" name="carAppointmentScheduled[]" class="mr-2">
+                        <label for="carAppointmentScheduled_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Future Appointment Scheduled?</label>
                     </div>
                 </div>
 
                 <div class="form-col w-full" id="carInsurancePortionContainer_${carEntryCount}" style="display:none;">
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Insurance Sold ($)</label>
-                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals()">
+                    <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Insurance Sold ($)</label>
+                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
                 </div>
 
                 <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_${carEntryCount}" style="display:none;">
-                    <input type="checkbox" id="carHasCustomerPayPortion_${carEntryCount}" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(${carEntryCount})">
-                    <label for="carHasCustomerPayPortion_${carEntryCount}" class="text-gray-700 text-sm font-medium">Has Customer Pay Portion?</label>
+                    <input type="checkbox" id="carHasCustomerPayPortion_${carEntryCount}" name="carHasCustomerPayPortion[]" class="mr-2">
+                    <label for="carHasCustomerPayPortion_${carEntryCount}" class="text-gray-700 dark:text-gray-200 text-sm font-medium">Has Customer Pay Portion?</label>
                 </div>
                 <div class="form-col w-full" id="carCustomerPayPortionContainer_${carEntryCount}" style="display:none;">
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
-                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals()">
+                    <label class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Customer Pay Sold ($)</label>
+                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Sold ($)" class="w-full rounded-md" min="0" step="0.01">
                 </div>
 
-                <div class="form-row w-full mt-2">
+                <!-- CORRECTED: Changed 'form-row' to a plain 'div' with flex classes -->
+                <div class="flex flex-wrap w-full mt-2 gap-4">
                     <div class="form-col">
-                        <label for="carTotalSold_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Total Sold ($)</label>
-                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals()">
+                        <label for="carTotalSold_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Total Sold ($)</label>
+                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md">
                     </div>
                     <div class="form-col">
-                        <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Close Ratio (%)</label>
+                        <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-gray-700 dark:text-gray-200 text-sm font-medium mb-1">Close Ratio (%)</label>
                         <input type="text" id="carIndividualCloseRatio_${carEntryCount}" name="carIndividualCloseRatio[]" class="w-full rounded-md" readonly>
                     </div>
                 </div>
@@ -905,9 +895,8 @@
             carSalesEntriesDiv.appendChild(newEntry); // Append the new entry first
             updateRemoveButtonsVisibility('carSalesEntries');
             updateRemainingGoal();
-            updateCarRowTotals(carEntryCount); // Call updateCarRowTotals after appending
-            updateRunningTotals(); // Call updateRunningTotals to ensure new checkbox is counted
-            toggleCarPortionFields(carEntryCount); // Initialize visibility for new entry
+            // No direct updateCarRowTotals or toggleCarPortionFields here, let delegation handle it
+            updateRunningTotals(); // Call updateRunningTotals to ensure new row counts are updated
         }
 
         function removeCarEntry(button) {
@@ -1042,7 +1031,8 @@
                         const image = canvas.toDataURL('image/png');
                         const a = document.createElement('a');
                         const filenameDate = getFormattedDateForFilename();
-                        const filename = `DailySalesForm_${document.getElementById('serviceAdvisorName').value.replace(/\s/g, '')}_${filenameDate}.png`;
+                        const advisorName = document.getElementById('serviceAdvisorName').value.replace(/\s/g, '');
+                        const filename = `DailySalesForm_${advisorName}_${filenameDate}.png`;
 
                         a.href = image;
                         a.download = filename;
@@ -1117,6 +1107,13 @@
             input.value = formattedValue;
         }
 
+        // Handle form submission (now relies on Formspree's action attribute)
+        document.getElementById('salesForm').addEventListener('submit', async function(event) {
+            // Formspree will automatically collect all named inputs.
+            // We just need to ensure calculated hidden fields are updated.
+            updateRunningTotals(); // Ensure all totals are up-to-date before submission
+        });
+
         // Initial calls to set button visibility and calculate goal on page load
         document.addEventListener('DOMContentLoaded', () => {
             setCurrentDate();
@@ -1125,9 +1122,50 @@
             updateDailyGoalBasedOnPriorDay();
             updateRunningTotals(); // Call updateRunningTotals to set initial values
 
+            // Event delegation for car sales inputs (numerical and text for duplicate check)
+            document.getElementById('carSalesEntries').addEventListener('input', (event) => {
+                const target = event.target;
+                // Check if the target is an input field relevant to car calculations
+                if (target.matches('input[name^="carDiscoveredSales"], input[name^="carInsuranceSold"], input[name^="carCustomerPaySold"], input[name^="carTotalSold"]')) {
+                    // Get the index from the ID (e.g., carDiscoveredSales_1 -> 1)
+                    const indexMatch = target.id.match(/_(\d+)$/);
+                    if (indexMatch) {
+                        const index = parseInt(indexMatch[1]);
+                        updateCarRowTotals(index); // This recalculates the individual row's totalSold and close ratio
+                        updateRunningTotals(); // This sums ALL carTotalSold values.
+                    }
+                } else if (target.matches('input[name^="carRepairOrderNumber"], input[name^="carLastName"]')) {
+                    // For RO# and Last Name, only need to update running totals for duplicate check
+                    updateRunningTotals();
+                }
+            });
+
+            // Event delegation for car sales checkboxes (for toggling sections and total updates)
+            document.getElementById('carSalesEntries').addEventListener('change', (event) => {
+                const target = event.target;
+                if (target.matches('input[name^="carHasInsurancePortion"]')) {
+                    const indexMatch = target.id.match(/_(\d+)$/);
+                    if (indexMatch) {
+                        const index = parseInt(indexMatch[1]);
+                        // We do NOT call updateRunningTotals here directly, as toggleCarPortionFields will call it.
+                        toggleCarPortionFields(index); // This will also call updateCarRowTotals and then updateRunningTotals
+                    }
+                } else if (target.matches('input[name^="carHasCustomerPayPortion"]')) {
+                    const indexMatch = target.id.match(/_(\d+)$/);
+                    if (indexMatch) {
+                        const index = parseInt(indexMatch[1]);
+                        // We do NOT call updateRunningTotals here directly, as toggleCarPortionFields will call it.
+                        toggleCarPortionFields(index); // This will also call updateCarRowTotals and then updateRunningTotals
+                    }
+                } else if (target.matches('input[name^="carAppointmentScheduled"]')) {
+                    // For appointment scheduled, just trigger overall update
+                    updateRunningTotals();
+                }
+            });
+
+
             // Initialize visibility for existing call entries (if any)
             document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
-                // Ensure correct index for toggleCallFieldsVisibility
                 toggleCallFieldsVisibility(index + 1);
             });
 
