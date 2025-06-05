@@ -6,7 +6,6 @@
     <title>Daily Sales Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Custom styles for Inter font and general body styling */
         body {
@@ -158,17 +157,16 @@
         <p class="text-gray-600 mb-8 text-center">Track your daily performance as an automotive service writer.</p>
 
         <form id="salesForm" class="space-y-8" action="https://formspree.io/f/xrbqnjwe" method="POST">
-            <input type="hidden" id="pdfData" name="pdfData">
-            <input type="hidden" id="formDataJson" name="formDataJson"> <!-- New hidden input for structured JSON -->
+            <!-- Removed Formspree action for primary submission, but keeping hidden inputs for compatibility if Formspree is still desired elsewhere -->
 
             <div class="form-row mb-4">
                 <div class="form-col">
                     <label for="reportDate" class="block text-gray-700 text-sm font-medium mb-1">Date</label>
-                    <input type="date" id="reportDate" class="w-full rounded-md"> <!-- Removed name attribute -->
+                    <input type="date" id="reportDate" name="reportDate" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
                     <label for="serviceAdvisorName" class="block text-gray-700 text-sm font-medium mb-1">Service Advisor Name</label>
-                    <select id="serviceAdvisorName" class="w-full rounded-md"> <!-- Removed name attribute -->
+                    <select id="serviceAdvisorName" name="serviceAdvisorName" class="w-full rounded-md">
                         <option value="Beto Calderon">Beto Calderon</option>
                         <option value="Scott Carvalho">Scott Carvalho</option>
                     </select>
@@ -181,11 +179,11 @@
                 <div class="form-row mb-4">
                     <div class="form-col">
                         <label for="priorDayTotal" class="block text-gray-700 text-sm font-medium mb-1">Prior Day Total ($)</label>
-                        <input type="number" id="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()"> <!-- Removed name attribute -->
+                        <input type="number" id="priorDayTotal" name="priorDayTotal" placeholder="e.g., -200" class="w-full rounded-md" step="0.01" oninput="updateDailyGoalBasedOnPriorDay()">
                     </div>
                     <div class="form-col">
                         <label for="dailyGoal" class="block text-gray-700 text-sm font-medium mb-1">Daily Goal ($)</label>
-                        <input type="number" id="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()"> <!-- Removed name attribute -->
+                        <input type="number" id="dailyGoal" name="dailyGoal" class="w-full rounded-md" min="0" step="0.01" oninput="updateRemainingGoal()">
                     </div>
                 </div>
 
@@ -202,7 +200,7 @@
                                 <input type="text" id="carRepairOrderNumber_1" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
-                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
+                                <label for="carLastName_1" class="block text-gray-700 text-sm font-medium mb-1">Last Name</labeL>
                                 <input type="text" id="carLastName_1" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                             </div>
                             <div class="form-col">
@@ -288,7 +286,7 @@
                             </select>
                         </div>
                         <div class="w-full sm:w-auto">
-                            <button type="button" onclick="removeCallEntry(this)" class="btn-remove hidden">Remove</button>
+                            <button type="button" onclick="removeCallEntry(this)" class="btn-remove">Remove</button>
                         </div>
                         <div class="form-col w-full" id="callOtherReasonContainer_1" style="display:none;">
                             <label for="callOtherReason_1" class="block text-gray-700 text-sm font-medium mb-1">Other Reason Details</label>
@@ -300,8 +298,8 @@
             </div>
 
             <div class="text-center mt-6 flex justify-center space-x-4">
-                <button type="submit" class="btn-primary" onclick="generatePdfAndSubmit(event)">Submit Daily Report</button>
-                <button type="button" onclick="savePageAsImage()" class="btn-primary bg-gray-600 hover:bg-gray-700">Save Page as Image</button>
+                <!-- Removed 'Submit Daily Report' button -->
+                <button type="button" onclick="savePageAsImageAndUpload()" class="btn-primary">Submit</button>
             </div>
 
             <div class="totals-section">
@@ -320,9 +318,21 @@
                 </div>
             </div>
 
+            <!-- Hidden inputs for Formspree are still here if needed for other integrations -->
+            <input type="hidden" id="hiddenTotalDiscoveredSales" name="Total Discovered Sales">
+            <input type="hidden" id="hiddenTotalSoldSales" name="Total Sold Sales">
+            <input type="hidden" id="hiddenCloseRatio" name="Close Ratio">
+            <input type="hidden" id="hiddenRemainingDailyGoal" name="Remaining Daily Goal">
+            <input type="hidden" id="hiddenTotalCars" name="Total Cars">
+            <input type="hidden" id="hiddenAverageDiscoveredSales" name="Average Discovered Sales">
+            <input type="hidden" id="hiddenAverageSoldSales" name="Average Sale">
+            <input type="hidden" id="hiddenTotalCustomerCalls" name="New Customer Calls">
+            <input type="hidden" id="hiddenTotalInsuranceClaims" name="Total Insurance Claims">
+            <input type="hidden" id="hiddenPercentageOfInsuranceClaims" name="Percentage Of Insurance Claims">
+
         </form>
 
-        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-content-center p-4 hidden">
+        <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4" id="messageBoxTitle"></h3>
                 <p class="text-gray-700 mb-6" id="messageBoxContent"></p>
@@ -335,6 +345,9 @@
         let callEntryCount = 1;
         let carEntryCount = 1;
         const baseDailyGoal = 5200; // Define the base daily goal here
+
+        // IMPORTANT: This URL has been updated with the Google Apps Script Web App URL you provided.
+        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz-G9UdRfl92Kjy-SieFYg4kd2nzfmEYaVmqdv5YrjpKCKDCns9WnCmSAobx6BedhI36w/exec';
 
         // Function to set the current date
         function setCurrentDate() {
@@ -387,6 +400,9 @@
 
             remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
             remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
+
+            document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
+
 
             if (remainingGoal <= 0) {
                 remainingGoalContainerTop.classList.remove('goal-not-met');
@@ -493,6 +509,18 @@
             document.getElementById('totalInsuranceClaims').innerText = totalInsuranceClaims;
             document.getElementById('percentageOfInsuranceClaims').innerText = percentageOfInsuranceClaims.toFixed(2) + '%';
 
+            // Update hidden inputs for Formspree (if still using Formspree for main submission)
+            document.getElementById('hiddenTotalDiscoveredSales').value = totalDiscovered.toFixed(2);
+            document.getElementById('hiddenTotalSoldSales').value = totalSold.toFixed(2);
+            document.getElementById('hiddenCloseRatio').value = closeRatio.toFixed(2) + '%';
+            document.getElementById('hiddenTotalCars').value = numberOfCars;
+            document.getElementById('hiddenAverageDiscoveredSales').value = averageDiscoveredSales.toFixed(2);
+            document.getElementById('hiddenAverageSoldSales').value = averageSoldSales.toFixed(2);
+            document.getElementById('hiddenTotalCustomerCalls').value = totalCustomerCalls;
+            document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
+            document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
+
+
             updateRemainingGoal();
         }
 
@@ -512,7 +540,7 @@
                     const insuranceSoldInput = rowElement.querySelector('input[name="carInsuranceSold[]"]');
                     const customerPaySoldInput = rowElement.querySelector('input[name="carCustomerPaySold[]"]');
                     if (insuranceSoldInput) insuranceSoldInput.value = '';
-                    if (customerPaySoldInput) customerPaySoldInput.value = ''; // Fixed typo here
+                    if (customerPaySoldInput) customerPaySoldInput.value = '';
                 }
                 updateCarRowTotals(rowElement);
             }
@@ -594,7 +622,7 @@
                     <input type="text" id="carRepairOrderNumber_${carEntryCount}" name="carRepairOrderNumber[]" placeholder="RO Number" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
-                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</label>
+                    <label for="carLastName_${carEntryCount}" class="block text-gray-700 text-sm font-medium mb-1">Last Name</labeL>
                     <input type="text" id="carLastName_${carEntryCount}" name="carLastName[]" placeholder="Customer Last Name" class="w-full rounded-md">
                 </div>
                 <div class="form-col">
@@ -730,192 +758,241 @@
             }
         }
 
-        async function savePageAsImage() {
-            showMessageBox('Generating Image...', 'Please wait while the form is converted to an image.');
+        // New function to save page as image and upload to Google Drive
+        async function savePageAsImageAndUpload() {
+            showMessageBox('Generating Image & Uploading...', 'Please wait while the report image is generated and uploaded to Google Drive.');
 
             const formContainer = document.querySelector('.container');
             const messageBox = document.getElementById('messageBox');
 
-            // Store original visibility and hide message box
             const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
             if (wasMessageBoxVisible) {
                 messageBox.classList.add('hidden');
             }
 
             const originalOverflow = document.body.style.overflow;
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = 'auto'; // Temporarily allow overflow for full capture
 
             setTimeout(async () => {
                 try {
                     const canvas = await html2canvas(formContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        windowWidth: formContainer.scrollWidth,
-                        windowHeight: formContainer.scrollHeight,
-                        scrollX: -window.scrollX,
+                        scale: 2, // Increase scale for better resolution
+                        useCORS: true, // Enable CORS if you have external images (like logo)
+                        windowWidth: formContainer.scrollWidth, // Capture full width
+                        windowHeight: formContainer.scrollHeight, // Capture full height
+                        scrollX: -window.scrollX, // Adjust for current scroll position
                         scrollY: -window.scrollY,
+                        logging: false // Disable logging to console
                     });
 
-                    const imgDataUrl = canvas.toDataURL('image/png');
-                    const a = document.createElement('a');
-                    a.href = imgDataUrl;
-                    a.download = `DailySalesForm_${getFormattedDateForFilename()}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    const imgDataUrl = canvas.toDataURL('image/png'); // Get image data as Data URL
+                    const base64Image = imgDataUrl.split(',')[1]; // Extract base64 part
+                    const fileName = `DailySalesForm_${document.getElementById('serviceAdvisorName').value.replace(/\s/g, '')}_${getFormattedDateForFilename()}.png`;
+                    const mimeType = 'image/png';
 
-                    closeMessageBox(); // Close message box on success
+                    // Send to Google Apps Script Web App for upload
+                    const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            imageData: base64Image,
+                            fileName: fileName,
+                            mimeType: mimeType
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        showMessageBox('Success!', `Report image uploaded to Google Drive: ${result.fileLink}`);
+                        console.log('Image upload successful:', result);
+                    } else {
+                        const errorData = await response.json();
+                        console.error('Image upload failed:', errorData);
+                        showMessageBox('Error', `Failed to upload image: ${errorData.message || 'Unknown error'}`);
+                    }
+
                 } catch (error) {
-                    console.error('Error generating image:', error);
-                    showMessageBox('Error', 'Failed to generate image. Please try again.');
+                    console.error('Error generating image or uploading:', error);
+                    showMessageBox('Error', 'An unexpected error occurred during image generation or upload. Please try again.');
                 } finally {
-                    document.body.style.overflow = originalOverflow;
+                    document.body.style.overflow = originalOverflow; // Restore original overflow
                     // Restore message box visibility if it was visible
                     if (wasMessageBoxVisible) {
                         messageBox.classList.remove('hidden');
                     }
                 }
-            }, 100);
+            }, 100); // Small delay to ensure rendering is complete
+        }
+
+        // Original savePageAsImage (now just for local download - renamed for clarity if both are desired)
+        async function savePageAsImage() {
+            // This function is still here for local download if you want to keep that option.
+            // It's the same as the old savePageAsImage.
+            // You can remove this function and the corresponding button if you only want Drive upload.
+            showMessageBox('Saving Image...', 'Please wait while the page is captured and prepared for download.');
+            try {
+                const formContainer = document.querySelector('.container');
+                const messageBox = document.getElementById('messageBox');
+
+                const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
+                if (wasMessageBoxVisible) {
+                    messageBox.classList.add('hidden');
+                }
+
+                const originalOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'auto';
+
+                setTimeout(async () => {
+                    try {
+                        const canvas = await html2canvas(formContainer, {
+                            scale: 2,
+                            useCORS: true,
+                            windowWidth: formContainer.scrollWidth,
+                            windowHeight: formContainer.scrollHeight,
+                            scrollX: -window.scrollX,
+                            scrollY: -window.scrollY,
+                            logging: false
+                        });
+
+                        const image = canvas.toDataURL('image/png');
+                        const a = document.createElement('a');
+                        const filenameDate = getFormattedDateForFilename();
+                        const filename = `mplussales_${filenameDate}.png`;
+
+                        a.href = image;
+                        a.download = filename;
+                        document.body.appendChild(a); // Append to body to make it clickable
+                        a.click(); // Programmatically click the link to trigger download
+                        document.body.removeChild(a); // Remove the link after clicking
+
+                        showMessageBox('Success!', `The image "${filename}" has been downloaded.`);
+
+                    } catch (error) {
+                        console.error('Error generating canvas from page:', error);
+                        showMessageBox('Error', 'Failed to capture page image. Please try again.');
+                    } finally {
+                        document.body.style.overflow = originalOverflow;
+                        if (wasMessageBoxVisible) {
+                            messageBox.classList.remove('hidden');
+                        }
+                    }
+                }, 100); // Small delay to ensure rendering is complete
+
+            } catch (error) {
+                console.error('Error in savePageAsImage function:', error);
+                showMessageBox('Error', 'An unexpected error occurred during image capture.');
+            }
         }
 
 
-        async function generatePdfAndSubmit(event) {
-            event.preventDefault();
+        // Function to collect form data for backend submission (for the "Submit Daily Report" button)
+        function collectFormData() {
+            // This function remains the same as before, collecting data for your primary submission
+            const formData = {
+                reportDate: document.getElementById('reportDate').value,
+                serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
+                dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
+                priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
+                carSales: [],
+                customerLeads: [], // Corrected from 'calls' to 'customerLeads' for consistency
+                totals: {
+                    totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
+                    totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
+                    closeRatio: document.getElementById('closeRatio').innerText,
+                    totalCars: parseInt(document.getElementById('totalCars').innerText) || 0,
+                    averageDiscoveredSales: parseFloat(document.getElementById('averageDiscoveredSales').innerText) || 0,
+                    averageSoldSales: parseFloat(document.getElementById('averageSoldSales').innerText) || 0,
+                    newCustomerCalls: parseInt(document.getElementById('totalCustomerCalls').innerText) || 0,
+                    totalInsuranceClaims: parseInt(document.getElementById('totalInsuranceClaims').innerText) || 0,
+                    percentageOfInsuranceClaims: document.getElementById('percentageOfInsuranceClaims').innerText,
+                    remainingDailyGoal: parseFloat(document.getElementById('remainingDailyGoalValueBottom').innerText) || 0,
+                },
+                submissionDate: new Date().toISOString(),
+            };
 
-            showMessageBox('Generating PDF & Submitting...', 'Please wait while the report is prepared and submitted.');
+            document.querySelectorAll('#carSalesEntries .form-row').forEach(row => {
+                const roNum = row.querySelector('input[name="carRepairOrderNumber[]"]')?.value || '';
+                const lastName = row.querySelector('input[name="carLastName[]"]')?.value || '';
+                const discovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value || '0');
+                const sold = parseFloat(row.querySelector('input[name="carSoldSales[]"]')?.value || '0');
+                const individualCloseRatio = row.querySelector('input[name="carIndividualCloseRatio[]"]')?.value || '';
+                const appointmentScheduled = row.querySelector('input[name="carAppointmentScheduled[]"]')?.checked || false;
+                const insuranceClaim = row.querySelector('input[name="carInsuranceClaim[]"]')?.checked || false;
+                const insuranceSold = parseFloat(row.querySelector('input[name="carInsuranceSold[]"]')?.value || '0');
+                const customerPaySold = parseFloat(row.querySelector('input[name="carCustomerPaySold[]"]')?.value || '0');
 
-            const formContainer = document.querySelector('.container');
-            const messageBox = document.getElementById('messageBox');
-
-            // Store original visibility and hide message box
-            const wasMessageBoxVisible = !messageBox.classList.contains('hidden');
-            if (wasMessageBoxVisible) {
-                messageBox.classList.add('hidden');
-            }
-
-            const originalOverflow = document.body.style.overflow;
-            document.body.style.overflow = 'auto';
-
-            setTimeout(async () => {
-                try {
-                    const canvas = await html2canvas(formContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        windowWidth: formContainer.scrollWidth,
-                        windowHeight: formContainer.scrollHeight,
-                        scrollX: -window.scrollX,
-                        scrollY: -window.scrollY,
+                if (roNum || lastName || discovered > 0 || sold > 0 || appointmentScheduled || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
+                    formData.carSales.push({
+                        repairOrderNumber: roNum,
+                        lastName: lastName,
+                        discoveredSales: discovered,
+                        soldSales: sold,
+                        individualCloseRatio: individualCloseRatio,
+                        appointmentScheduled: appointmentScheduled,
+                        insuranceClaim: insuranceClaim,
+                        insuranceSold: insuranceSold,
+                        customerPaySold: customerPaySold
                     });
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-
-                    const imgWidth = 210;
-                    const pageHeight = 297;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
-
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-
-                    const pdfData = pdf.output('datauristring');
-                    document.getElementById('pdfData').value = pdfData;
-
-                    const formDataCollected = {
-                        reportDate: document.getElementById('reportDate').value,
-                        serviceAdvisorName: document.getElementById('serviceAdvisorName').value,
-                        dailyGoal: parseFloat(document.getElementById('dailyGoal').value) || 0,
-                        priorDayTotal: parseFloat(document.getElementById('priorDayTotal').value) || 0,
-                        carSales: [],
-                        customerLeads: [],
-                        totals: {
-                            totalDiscoveredSales: parseFloat(document.getElementById('totalDiscoveredSales').innerText) || 0,
-                            totalSoldSales: parseFloat(document.getElementById('totalSoldSales').innerText) || 0,
-                            closeRatio: document.getElementById('closeRatio').innerText,
-                            totalCars: parseInt(document.getElementById('totalCars').innerText) || 0,
-                            averageDiscoveredSales: parseFloat(document.getElementById('averageDiscoveredSales').innerText) || 0,
-                            averageSoldSales: parseFloat(document.getElementById('averageSoldSales').innerText) || 0,
-                            newCustomerCalls: parseInt(document.getElementById('totalCustomerCalls').innerText) || 0,
-                            totalInsuranceClaims: parseInt(document.getElementById('totalInsuranceClaims').innerText) || 0,
-                            percentageOfInsuranceClaims: document.getElementById('percentageOfInsuranceClaims').innerText,
-                            remainingDailyGoal: parseFloat(document.getElementById('remainingDailyGoalValueBottom').innerText) || 0,
-                        }
-                    };
-
-                    document.querySelectorAll('#carSalesEntries .form-row').forEach(row => {
-                        const roNum = row.querySelector('input[name="carRepairOrderNumber[]"]')?.value || '';
-                        const lastName = row.querySelector('input[name="carLastName[]"]')?.value || '';
-                        const discovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value || '0');
-                        const sold = parseFloat(row.querySelector('input[name="carSoldSales[]"]')?.value || '0');
-                        const individualCloseRatio = row.querySelector('input[name="carIndividualCloseRatio[]"]')?.value || '';
-                        const appointmentScheduled = row.querySelector('input[name="carAppointmentScheduled[]"]')?.checked || false;
-                        const insuranceClaim = row.querySelector('input[name="carInsuranceClaim[]"]')?.checked || false;
-                        const insuranceSold = parseFloat(row.querySelector('input[name="carInsuranceSold[]"]')?.value || '0');
-                        const customerPaySold = parseFloat(row.querySelector('input[name="carCustomerPaySold[]"]')?.value || '0');
-
-                        if (roNum || lastName || discovered > 0 || sold > 0 || appointmentScheduled || insuranceClaim || insuranceSold > 0 || customerPaySold > 0) {
-                            formDataCollected.carSales.push({
-                                repairOrderNumber: roNum,
-                                lastName: lastName,
-                                discoveredSales: discovered,
-                                soldSales: sold,
-                                individualCloseRatio: individualCloseRatio,
-                                appointmentScheduled: appointmentScheduled,
-                                insuranceClaim: insuranceClaim,
-                                insuranceSold: insuranceSold,
-                                customerPaySold: customerPaySold
-                            });
-                        }
-                    });
-
-                    document.querySelectorAll('#callEntries .form-row').forEach(row => {
-                        const customerName = row.querySelector('input[name="callCustomerName[]"]')?.value || '';
-                        const customerPhone = row.querySelector('input[name="callCustomerPhone[]"]')?.value || '';
-                        const bookedAppointment = row.querySelector('input[name="callBookedAppointment[]"]')?.checked || false;
-                        const lostLead = row.querySelector('input[name="callLostLead[]"]')?.checked || false;
-                        const lostCost = parseFloat(row.querySelector('input[name="callLostCost[]"]')?.value || '0');
-                        const reason = row.querySelector('select[name="callReason[]"]')?.value || '';
-                        const otherReasonDetails = row.querySelector('textarea[name="callOtherReason[]"]')?.value || '';
-                        const source = row.querySelector('select[name="callSource[]"]')?.value || '';
-
-                        if (customerName || customerPhone || bookedAppointment || lostLead || lostCost > 0 || reason || source) {
-                            formDataCollected.customerLeads.push({
-                                customerName: customerName,
-                                customerPhone: customerPhone,
-                                bookedAppointment: bookedAppointment,
-                                lostLead: lostLead,
-                                lostCost: lostCost,
-                                reason: reason,
-                                otherReasonDetails: (reason === 'Other' && otherReasonDetails) ? otherReasonDetails : '',
-                                source: source
-                            });
-                        }
-                    });
-
-                    document.getElementById('formDataJson').value = JSON.stringify(formDataCollected, null, 2);
-
-                    document.getElementById('salesForm').submit();
-
-                } catch (error) {
-                    console.error('Error generating PDF or submitting form:', error);
-                    showMessageBox('Error', 'Failed to generate PDF or submit form. Please try again.');
-                } finally {
-                    document.body.style.overflow = originalOverflow;
-                    // Restore message box visibility if it was visible
-                    if (wasMessageBoxVisible) {
-                        messageBox.classList.remove('hidden');
-                    }
                 }
-            }, 100);
+            });
+
+            document.querySelectorAll('#callEntries .form-row').forEach(row => {
+                const customerName = row.querySelector('input[name="callCustomerName[]"]')?.value || '';
+                const customerPhone = row.querySelector('input[name="callCustomerPhone[]"]')?.value || '';
+                const bookedAppointment = row.querySelector('input[name="callBookedAppointment[]"]')?.checked || false;
+                const lostLead = row.querySelector('input[name="callLostLead[]"]')?.checked || false;
+                const lostCost = parseFloat(row.querySelector('input[name="callLostCost[]"]')?.value || '0');
+                const reason = row.querySelector('select[name="callReason[]"]')?.value || '';
+                const otherReasonDetails = row.querySelector('textarea[name="callOtherReason[]"]')?.value || '';
+                const source = row.querySelector('select[name="callSource[]"]')?.value || '';
+
+                if (customerName || customerPhone || bookedAppointment || lostLead || lostCost > 0 || reason || source) {
+                    formData.customerLeads.push({
+                        customerName: customerName,
+                        customerPhone: customerPhone,
+                        bookedAppointment: bookedAppointment,
+                        lostLead: lostLead,
+                        lostCost: lostCost,
+                        reason: reason,
+                        otherReasonDetails: (reason === 'Other' && otherReasonDetails) ? otherReasonDetails : '',
+                        source: source
+                    });
+                }
+            });
+            return formData;
+        }
+
+
+        // Function to submit data to the backend (for the "Submit Daily Report" button)
+        async function submitFormToBackend() {
+            // This function is no longer called by a button in the HTML.
+            // It remains here for context if you still plan to send structured data elsewhere.
+            showMessageBox('Submitting Report...', 'Please wait while your daily report is being saved.');
+            const formData = collectFormData(); // Collect full form data
+
+            try {
+                // Example: Sending to a placeholder URL or a backend for data storage (not image upload)
+                const response = await fetch('https://example.com/your-data-storage-api-endpoint', { // Replace with your actual data submission endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                if (response.ok) {
+                    showMessageBox('Success!', 'Daily report data submitted successfully!');
+                } else {
+                    const errorData = await response.json();
+                    showMessageBox('Error', `Failed to submit report data: ${errorData.message || response.statusText}`);
+                    console.error('Data submission error:', errorData);
+                }
+            } catch (error) {
+                showMessageBox('Error', 'Network error or data submission backend is unreachable.');
+                console.error('Data fetch error:', error);
+            }
         }
 
 
@@ -965,9 +1042,6 @@
             }
             input.value = formattedValue;
         }
-
-        // The form's submit event listener is now handled by generatePdfAndSubmit
-        // document.getElementById('salesForm').addEventListener('submit', async function(event) { ... });
     </script>
 </body>
 </html>
