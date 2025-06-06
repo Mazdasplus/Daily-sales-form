@@ -548,14 +548,13 @@
                 <p class="highlighted-goal" id="remainingWeeklyGoalContainer">
                     Remaining Weekly Goal: $<span id="remainingWeeklyGoalValue">0.00</span>
                 </p>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 font-medium">
+                <!-- Removed Sat and Sun display elements -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-4 font-medium">
                     <div><strong>Mon:</strong> $<span id="monSales">0.00</span></div>
                     <div><strong>Tue:</strong> $<span id="tueSales">0.00</span></div>
                     <div><strong>Wed:</strong> $<span id="wedSales">0.00</span></div>
                     <div><strong>Thu:</strong> $<span id="thuSales">0.00</span></div>
                     <div><strong>Fri:</strong> $<span id="friSales">0.00</span></div>
-                    <div><strong>Sat:</strong> $<span id="satSales">0.00</span></div>
-                    <div><strong>Sun:</strong> $<span id="sunSales">0.00</span></div>
                 </div>
                 <button type="button" onclick="resetWeeklyTotals()" class="btn-primary text-sm mt-4">Reset Weekly Totals</button>
             </div>
@@ -618,12 +617,11 @@
                 'Tue': 0,
                 'Wed': 0,
                 'Thu': 0,
-                'Fri': 0,
-                'Sat': 0,
-                'Sun': 0
+                'Fri': 0
             }
         };
         const WEEKLY_GOAL = 26000;
+        // Removed 'Sun' and 'Sat' as they are not open days
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
@@ -648,13 +646,16 @@
                 // Check if stored data belongs to the current week
                 if (parsedData.weekStart === currentMondayTimestamp) {
                     weeklySalesData = parsedData; // Continue with existing week's data
+                    // Ensure that Sat and Sun are explicitly zeroed out when loading, even if old data had them.
+                    weeklySalesData.dailyTotals['Sat'] = 0;
+                    weeklySalesData.dailyTotals['Sun'] = 0;
                     console.log('Loaded weekly sales for current week:', weeklySalesData);
                 } else {
                     // New week, reset totals and start fresh
                     console.log('New week detected, resetting weekly totals.');
                     weeklySalesData = {
                         weekStart: currentMondayTimestamp,
-                        dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                        dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
                     };
                     saveWeeklySales(); // Save the reset data immediately
                 }
@@ -663,7 +664,7 @@
                 console.log('No weekly sales data found, initializing.');
                 weeklySalesData = {
                     weekStart: currentMondayTimestamp,
-                    dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                    dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
                 };
                 saveWeeklySales(); // Save the initialized data immediately
             }
@@ -679,13 +680,19 @@
         // Update the weekly totals display in the HTML
         function updateWeeklyTotalsDisplay() {
             let totalSoldThisWeek = 0;
-            for (const day in weeklySalesData.dailyTotals) {
+            const activeWeekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']; // Only active weekdays for display and sum
+
+            // Iterate only through the active weekdays for the total sum
+            activeWeekdays.forEach(day => {
                 const element = document.getElementById(`${day.toLowerCase()}Sales`);
+                const daySales = weeklySalesData.dailyTotals[day] || 0;
                 if (element) {
-                    element.innerText = (weeklySalesData.dailyTotals[day] || 0).toFixed(2);
+                    element.innerText = daySales.toFixed(2);
                 }
-                totalSoldThisWeek += weeklySalesData.dailyTotals[day] || 0;
-            }
+                totalSoldThisWeek += daySales;
+            });
+
+            // No need to explicitly set Sat/Sun to 0.00 on display anymore, as their elements are removed.
 
             const weeklyGoalDisplay = document.getElementById('weeklyGoalDisplay');
             if (weeklyGoalDisplay) {
@@ -719,7 +726,7 @@
             if (reportDateValue) {
                 const selectedDate = new Date(reportDateValue);
                 const dayIndex = selectedDate.getDay(); // 0 for Sun, 1 for Mon, etc.
-                const currentDayName = dayNames[dayIndex];
+                const currentDayName = dayNames[dayIndex]; // Get day name using the full array
 
                 // Get the totalSoldSales for the current form's entries
                 const currentDaySoldSales = parseFloat(document.getElementById('totalSoldSales').innerText) || 0;
@@ -730,12 +737,22 @@
                 if (weeklySalesData.weekStart !== currentMondayTimestamp) {
                     console.log(`[Weekly Update] Week changed from ${weeklySalesData.weekStart} to ${currentMondayTimestamp}. Resetting daily totals.`);
                     weeklySalesData.weekStart = currentMondayTimestamp;
-                    weeklySalesData.dailyTotals = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 };
+                    weeklySalesData.dailyTotals = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 }; // Only Mon-Fri
                 }
 
-                // Update the specific day's total in our weeklySalesData
-                weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
-                console.log(`[Weekly Update] weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                // Update the specific day's total in our weeklySalesData ONLY if it's a weekday (Mon-Fri)
+                if (currentDayName !== 'Sat' && currentDayName !== 'Sun') {
+                    // Check if the property exists before assigning, to prevent adding Sat/Sun keys
+                    if (weeklySalesData.dailyTotals.hasOwnProperty(currentDayName)) {
+                        weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
+                        console.log(`[Weekly Update] weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                    } else {
+                        console.warn(`[Weekly Update] Attempted to set sales for ${currentDayName}, but it's not an active weekday in weeklySalesData.dailyTotals.`);
+                    }
+                } else {
+                    console.log(`[Weekly Update] Weekend (${currentDayName}). Sales not added to weekly total.`);
+                }
+
 
                 saveWeeklySales(); // Save changes to local storage
                 updateWeeklyTotalsDisplay(); // Update the HTML display for weekly totals
@@ -755,7 +772,7 @@
                         const currentMondayTimestamp = getMondayOfCurrentWeek(new Date());
                         weeklySalesData = {
                             weekStart: currentMondayTimestamp,
-                            dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 }
+                            dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
                         };
                         saveWeeklySales();
                         updateWeeklyTotalsDisplay();
@@ -1100,7 +1117,7 @@
                 if (insuranceContainer) insuranceContainer.style.display = 'none';
                 if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none';
                 if (customerPayContainer) customerPayContainer.style.display = 'none';
-                
+
                 if (hasInsuranceCheckbox) hasInsuranceCheckbox.checked = false;
                 if (hasCustomerPayCheckbox) hasCustomerPayCheckbox.checked = false;
 
@@ -1683,21 +1700,9 @@
 
             if (storedDailyReportState) {
                 const parsedState = JSON.parse(storedDailyReportState);
-                const lastReportDate = new Date(parsedState.date);
-                lastReportDate.setHours(0, 0, 0, 0); // Normalize last report date to midnight
-
-                const timeDiff = today.getTime() - lastReportDate.getTime();
-                const daysDiff = timeDiff / (1000 * 3600 * 24);
-
-                // If today is exactly one day after the last reported date
-                if (daysDiff === 1) {
-                    priorDayTotalInput.value = parsedState.remainingGoal.toFixed(2);
-                    console.log(`[DOMContentLoaded] Prior day total carried over: ${priorDayTotalInput.value}`);
-                } else {
-                    // If it's not the very next day, clear priorDayTotal or keep it at default 0
-                    priorDayTotalInput.value = '0.00';
-                    console.log(`[DOMContentLoaded] Prior day total cleared: ${priorDayTotalInput.value}`);
-                }
+                // Always apply the remaining goal from the last stored date
+                priorDayTotalInput.value = parsedState.remainingGoal.toFixed(2);
+                console.log(`[DOMContentLoaded] Prior day total carried over from last report: ${priorDayTotalInput.value}`);
             } else {
                 priorDayTotalInput.value = '0.00'; // Default if no stored data
                 console.log(`[DOMContentLoaded] Prior day total initialized to default: ${priorDayTotalInput.value}`);
