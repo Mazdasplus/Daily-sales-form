@@ -647,8 +647,8 @@
                 if (parsedData.weekStart === currentMondayTimestamp) {
                     weeklySalesData = parsedData; // Continue with existing week's data
                     // Ensure that Sat and Sun are explicitly zeroed out when loading, even if old data had them.
-                    weeklySalesData.dailyTotals['Sat'] = 0;
-                    weeklySalesData.dailyTotals['Sun'] = 0;
+                    weeklySalesData.dailyTotals['Sat'] = 0; // Ensures data consistency if an old format was loaded
+                    weeklySalesData.dailyTotals['Sun'] = 0; // Ensures data consistency if an old format was loaded
                     console.log('Loaded weekly sales for current week:', weeklySalesData);
                 } else {
                     // New week, reset totals and start fresh
@@ -691,8 +691,6 @@
                 }
                 totalSoldThisWeek += daySales;
             });
-
-            // No need to explicitly set Sat/Sun to 0.00 on display anymore, as their elements are removed.
 
             const weeklyGoalDisplay = document.getElementById('weeklyGoalDisplay');
             if (weeklyGoalDisplay) {
@@ -1020,13 +1018,16 @@
             const origCustomerPaySoldInput = originalRow.querySelector(`#carCustomerPaySold_${originalIndex + 1}`);
             const origHasInsuranceCheckbox = originalRow.querySelector(`#carHasInsurancePortion_${originalIndex + 1}`);
             const origHasCustomerPayCheckbox = originalRow.querySelector(`#carHasCustomerPayPortion_${originalIndex + 1}`);
-            const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`); // Get original total sold input
+            // carTotalSoldInput is now always editable, no need to touch its value here directly for combining
+            // const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`); // Get original total sold input
 
             // Get values from the duplicate row's fields (already safely accessed with ?.value)
             const dupDiscovered = parseFloat(duplicateRow.querySelector(`input[name="carDiscoveredSales[]"]`)?.value) || 0;
             const dupInsuranceSold = parseFloat(duplicateRow.querySelector(`#carInsuranceSold_${duplicateIndex + 1}`)?.value) || 0;
             const dupCustomerPaySold = parseFloat(duplicateRow.querySelector(`#carCustomerPaySold_${duplicateIndex + 1}`)?.value) || 0;
-            const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0; // Get duplicate total sold input
+            // The dupTotalSold is also read and can be used to update the original, but as per current requirement,
+            // the total sold field will be manually updated by the user after combining, not automatically.
+            // const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0;
 
             // Add duplicate's discovered to original's total discovered
             if (origDiscoveredInput) {
@@ -1057,14 +1058,6 @@
                 console.log(`[Combine Entries] Original Has Customer Pay checkbox checked.`);
             }
 
-            // If the original row has portions, carTotalSoldInput will be readonly and recalculated by toggleCarPortionFields.
-            // If the original row does not have portions, we manually add the duplicate's total sold.
-            if (!origHasInsuranceCheckbox?.checked && !origHasCustomerPayCheckbox?.checked && origTotalSoldInput) {
-                const newTotalSoldManual = (parseFloat(origTotalSoldInput.value) || 0) + dupTotalSold;
-                origTotalSoldInput.value = newTotalSoldManual.toFixed(2);
-                console.log(`[Combine Entries] Original Total Sold (manual) updated to: ${newTotalSoldManual.toFixed(2)}`);
-            }
-
 
             // Update visibility and totals for the original row based on its new state
             toggleCarPortionFields(originalIndex + 1); // This will call updateCarRowTotals and then updateRunningTotals
@@ -1073,7 +1066,7 @@
             duplicateRow.remove();
             reindexCarEntries(); // Reindex entries after removal
             updateRemoveButtonsVisibility('carSalesEntries');
-            showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}.`);
+            showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}. Please manually update the Total Sold for the combined entry if needed.`);
             // updateRunningTotals will be called by toggleCarPortionFields in its flow, which is the desired outcome.
         }
 
@@ -1086,7 +1079,7 @@
             const totalDiscoveredInput = document.getElementById(`carDiscoveredSales_${index}`);
             const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
             const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
-            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
+            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`); // This is now always editable
             const individualCloseRatioInput = document.getElementById(`carIndividualCloseRatio_${index}`);
 
             const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
@@ -1099,12 +1092,9 @@
             const ro = roInput ? roInput.value.trim() : '';
             const lastName = lastNameInput ? lastNameInput.value.trim() : '';
 
-            // CRITICAL: If row is not active, zero out its sold and ratio
+            // CRITICAL: If row is not active, zero out its discovered, sold, and ratio related fields
             if (!ro && !lastName) {
-                if (carTotalSoldInput) {
-                    carTotalSoldInput.value = '0.00';
-                    carTotalSoldInput.removeAttribute('readonly'); // Ensure it's editable if it becomes inactive
-                }
+                if (carTotalSoldInput) carTotalSoldInput.value = '0.00';
                 if (totalDiscoveredInput) totalDiscoveredInput.value = '0.00';
                 if (insuranceSoldInput) insuranceSoldInput.value = '0.00';
                 if (customerPaySoldInput) customerPaySoldInput.value = '0.00';
@@ -1128,29 +1118,9 @@
 
 
             const totalDiscovered = parseFloat(totalDiscoveredInput?.value) || 0;
-
-            let currentCarSold = 0; // The actual sold value for this specific car entry
-
-            // If insurance or customer pay portions are active, sum them for currentCarSold
-            if (hasInsuranceCheckbox?.checked || hasCustomerPayCheckbox?.checked) {
-                const insuranceSold = parseFloat(insuranceSoldInput?.value) || 0;
-                const customerPaySold = parseFloat(customerPaySoldInput?.value) || 0;
-                currentCarSold = insuranceSold + customerPaySold;
-                // Also update the carTotalSoldInput field with this calculated value and make it readonly
-                if (carTotalSoldInput) {
-                    carTotalSoldInput.value = currentCarSold.toFixed(2);
-                    carTotalSoldInput.setAttribute('readonly', true);
-                    console.log(`Car ${index} - carTotalSoldInput calculated from portions: ${currentCarSold.toFixed(2)} (READONLY)`);
-                }
-            } else {
-                // If no insurance/customer pay portions are active, use the manually entered value in carTotalSoldInput
-                // And ensure it's not readonly
-                if (carTotalSoldInput) {
-                    currentCarSold = parseFloat(carTotalSoldInput.value) || 0;
-                    carTotalSoldInput.removeAttribute('readonly');
-                    console.log(`Car ${index} - carTotalSoldInput manually entered: ${currentCarSold.toFixed(2)} (EDITABLE)`);
-                }
-            }
+            // Get currentCarSold directly from the input, as it's now manually entered.
+            const currentCarSold = parseFloat(carTotalSoldInput?.value) || 0;
+            console.log(`Car ${index} - Current Car Sold (manual): ${currentCarSold.toFixed(2)}`);
 
 
             // Individual Close Ratio calculation
@@ -1184,7 +1154,8 @@
             const customerPayCheckboxContainer = document.getElementById(`carCustomerPayCheckboxContainer_${index}`);
             const customerPayContainer = document.getElementById(`carCustomerPayPortionContainer_${index}`);
 
-            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
+            // carTotalSoldInput is no longer affected by these toggles in terms of readonly or auto-calculation
+            // const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
             const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
             const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
 
@@ -1193,12 +1164,9 @@
             if (hasInsuranceCheckbox?.checked) {
                 console.log(`Car ${index} - Has Insurance Portion CHECKED`);
                 if (insuranceContainer) insuranceContainer.style.display = 'block';
-                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'flex';
-                // Make carTotalSoldInput readonly (updateCarRowTotals will handle value)
-                if (carTotalSoldInput) {
-                    carTotalSoldInput.setAttribute('readonly', true);
-                    console.log(`Car ${index} - carTotalSoldInput set to READONLY due to insurance check.`);
-                }
+                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'flex'; // Show customer pay checkbox
+                // carTotalSoldInput remains editable, no readonly attribute here
+                console.log(`Car ${index} - carTotalSoldInput remains EDITABLE.`);
 
                 // Logic for "Has Customer Pay Portion?" checkbox if insurance is active
                 if (hasCustomerPayCheckbox?.checked) {
@@ -1215,7 +1183,7 @@
             } else { // Logic when "Has Insurance Portion?" is UNCHECKED
                 console.log(`Car ${index} - Has Insurance Portion UNCHECKED`);
                 if (insuranceContainer) insuranceContainer.style.display = 'none';
-                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none';
+                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none'; // Hide customer pay checkbox
                 if (customerPayContainer) customerPayContainer.style.display = 'none';
 
                 // Uncheck customer pay checkbox if insurance is unchecked
@@ -1234,12 +1202,8 @@
                     console.log(`Car ${index} - customerPaySoldInput cleared to 0`);
                 }
 
-                // IMPORTANT: Make carTotalSoldInput editable and clear its value
-                if (carTotalSoldInput) {
-                    carTotalSoldInput.removeAttribute('readonly');
-                    carTotalSoldInput.value = '0.00'; // Reset to 0 when it becomes manually editable
-                    console.log(`Car ${index} - carTotalSoldInput set to EDITABLE and cleared to 0`);
-                }
+                // carTotalSoldInput remains editable and its value is not cleared by this toggle
+                console.log(`Car ${index} - carTotalSoldInput remains EDITABLE.`);
             }
 
             // Ensure individual car row totals are correct before updating running totals
@@ -1692,22 +1656,72 @@
             callEntryCount = document.querySelectorAll('#callEntries .form-row').length;
 
 
-            // --- New logic for carrying over prior day total ---
+            // --- New logic for carrying over prior day total with 8:15 AM update and Monday reset ---
             const priorDayTotalInput = document.getElementById('priorDayTotal');
-            const storedDailyReportState = localStorage.getItem('lastDayRemainingGoal');
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize today's date to midnight
+            const currentDayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+            const todayDateString = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
 
-            if (storedDailyReportState) {
-                const parsedState = JSON.parse(storedDailyReportState);
-                // Always apply the remaining goal from the last stored date
-                priorDayTotalInput.value = parsedState.remainingGoal.toFixed(2);
-                console.log(`[DOMContentLoaded] Prior day total carried over from last report: ${priorDayTotalInput.value}`);
-            } else {
-                priorDayTotalInput.value = '0.00'; // Default if no stored data
-                console.log(`[DOMContentLoaded] Prior day total initialized to default: ${priorDayTotalInput.value}`);
+            // Retrieve the last update state for the prior day total from local storage
+            const lastUpdateState = JSON.parse(localStorage.getItem('priorDayUpdateState')) || {
+                date: null,
+                updatedValue: '0.00',
+                updatedTime: null // Timestamp of when it was last updated today
+            };
+
+            let shouldUpdatePriorDayTotal = false;
+
+            // Determine target update time for today (8:15 AM)
+            const targetUpdateTime = new Date(today);
+            targetUpdateTime.setHours(8, 15, 0, 0); // Set to 8:15:00.000 AM today
+
+            // Condition 1: It's a new day compared to the last update (or no previous update state)
+            if (lastUpdateState.date !== todayDateString) {
+                console.log(`[Prior Day Logic] New day detected (${todayDateString} vs ${lastUpdateState.date}).`);
+                shouldUpdatePriorDayTotal = true;
             }
-            // --- End of new logic ---
+            // Condition 2: It's the same day, but the current time is past 8:15 AM,
+            // AND the prior day total hasn't been updated since 8:15 AM today.
+            else if (today.getTime() >= targetUpdateTime.getTime() && (lastUpdateState.updatedTime === null || new Date(lastUpdateState.updatedTime).getTime() < targetUpdateTime.getTime())) {
+                console.log(`[Prior Day Logic] Same day, but past 8:15 AM and not updated since 8:15 AM today.`);
+                shouldUpdatePriorDayTotal = true;
+            } else {
+                // If neither of the above, load the value from the last stored state without recalculating
+                console.log(`[Prior Day Logic] No update needed. Loading prior day total from last update: ${lastUpdateState.updatedValue}`);
+                priorDayTotalInput.value = lastUpdateState.updatedValue;
+            }
+
+            // Perform the update if conditions are met
+            if (shouldUpdatePriorDayTotal) {
+                let newPriorDayTotal = 0;
+                // Get the remaining goal from the *last* report to carry it over
+                const storedLastDayRemainingGoal = JSON.parse(localStorage.getItem('lastDayRemainingGoal'));
+
+                // If today is Monday (day 1), reset to 0
+                if (currentDayOfWeek === 1) { // Monday
+                    newPriorDayTotal = 0.00;
+                    console.log(`[Prior Day Logic] Today is Monday, Prior Day Total reset to 0.00.`);
+                }
+                // If not Monday, and there's a stored remaining goal from yesterday, carry it over
+                else if (storedLastDayRemainingGoal) {
+                    newPriorDayTotal = storedLastDayRemainingGoal.remainingGoal;
+                    console.log(`[Prior Day Logic] Prior day total carried over from last report: ${newPriorDayTotal.toFixed(2)}`);
+                } else {
+                    newPriorDayTotal = 0.00; // Default if no stored data (e.g., first time using the form)
+                    console.log(`[Prior Day Logic] Prior day total initialized to default: ${newPriorDayTotal.toFixed(2)}`);
+                }
+
+                priorDayTotalInput.value = newPriorDayTotal.toFixed(2);
+
+                // Save the current state of the prior day total update
+                localStorage.setItem('priorDayUpdateState', JSON.stringify({
+                    date: todayDateString,
+                    updatedValue: newPriorDayTotal.toFixed(2),
+                    updatedTime: today.getTime() // Store the timestamp of this specific update
+                }));
+            }
+            // --- End of new logic for prior day total with 8:15 AM update and Monday reset ---
+
 
             updateDailyGoalBasedOnPriorDay(); // Calculate and set daily goal on load
 
