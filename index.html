@@ -167,6 +167,11 @@
             border-color: #ef4444; /* red-500 */
             background-color: #fee2e2; /* red-100 */
         }
+        /* Styles for readonly total sold input */
+        input.readonly-input {
+            background-color: #e5e7eb; /* bg-gray-200 */
+            cursor: not-allowed;
+        }
 
         /* Styles for the confirmation box */
         .confirmation-box {
@@ -316,6 +321,10 @@
             border-color: #fc8181;
             background-color: #9b2c2c;
         }
+        /* Dark mode styles for readonly total sold input */
+        body.dark-mode input.readonly-input {
+            background-color: #4a5568; /* A darker grey for readonly in dark mode */
+        }
 
         /* Dark mode toggle button styling */
         .dark-mode-toggle-container {
@@ -414,7 +423,7 @@
                             </div>
                             <div class="form-col">
                                 <label for="carDiscoveredSales_1" class="block text-sm font-medium mb-1">Total Discovered ($)</label>
-                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                                <input type="number" id="carDiscoveredSales_1" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals();">
                             </div>
 
                             <div class="w-full flex flex-wrap items-center gap-4 mt-2">
@@ -430,7 +439,7 @@
 
                             <div class="form-col w-full" id="carInsurancePortionContainer_1" style="display:none;">
                                 <label class="block text-sm font-medium mb-1">Insurance Pay ($)</label>
-                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                                <input type="number" id="carInsuranceSold_1" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals();">
                             </div>
 
                             <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_1" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_1" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(1)">
@@ -438,13 +447,13 @@
                             </div>
                             <div class="form-col w-full" id="carCustomerPayPortionContainer_1" style="display:none;">
                                 <label class="block text-sm font-medium mb-1">Customer Pay ($)</label>
-                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                                <input type="number" id="carCustomerPaySold_1" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(1); updateRunningTotals();">
                             </div>
 
                             <div class="form-row w-full mt-2">
                                 <div class="form-col">
                                     <label for="carTotalSold_1" class="block text-sm font-medium mb-1">Total Sold ($)</label>
-                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md" oninput="updateRunningTotals()" value="0.00">
+                                    <input type="number" id="carTotalSold_1" name="carTotalSold[]" class="w-full rounded-md" oninput="updateCarRowTotals(1); updateRunningTotals();" value="0.00">
                                 </div>
                                 <div class="form-col">
                                     <label for="carIndividualCloseRatio_1" class="block text-sm font-medium mb-1">Close Ratio (%)</label>
@@ -757,9 +766,7 @@
                     };
                 }
 
-                // ******************* CRITICAL CHANGE START *******************
                 // Get the value stored in weeklySalesData.dailyTotals for the current day *before* any potential overwrite.
-                // This ensures we know if there were sales previously recorded for today.
                 const previouslyStoredSalesForToday = weeklySalesData.dailyTotals[currentDayName] || 0;
 
                 // Only update the daily total in weeklySalesData if:
@@ -777,14 +784,11 @@
                             console.error(`[updateCurrentDayAndWeeklyTotals] Attempted to set sales for ${currentDayName}, but it's not a valid key in weeklySalesData.dailyTotals. Current dailyTotals keys: ${Object.keys(weeklySalesData.dailyTotals)}`);
                         }
                     } else {
-                        // Log for debugging: This condition is met when currentDaySoldSales is 0, but previouslyStoredSalesForToday was > 0.
-                        // We skip saving 0 to preserve the historical value.
                         console.log(`[updateCurrentDayAndWeeklyTotals] Skipping update for ${currentDayName} because Current Day Sold is 0 and there were previously stored sales for today. (Preserving previous state: ${previouslyStoredSalesForToday.toFixed(2)}).`);
                     }
                 } else {
                     console.log(`[updateCurrentDayAndWeeklyTotals] Weekend (${currentDayName}). Sales are not added to weekly total.`);
                 }
-                // ******************* CRITICAL CHANGE END *******************
 
                 saveWeeklySales(); // Save changes to local storage
                 updateWeeklyTotalsDisplay(); // Update the HTML display for weekly totals
@@ -932,14 +936,12 @@
                 const ro = roInput ? roInput.value.trim() : '';
                 const lastName = lastNameInput ? lastNameInput.value.trim() : '';
 
-                // CRITICAL: First, calculate/update this individual row's totals, even if empty.
-                updateCarRowTotals(index + 1);
-
                 // Only count this as an active car entry and add its values to totals if RO# or Last Name is filled
                 if (ro || lastName) {
                     actualNumberOfCars++;
+                    // Read directly from the updated input fields
                     const rowTotalDiscovered = parseFloat(row.querySelector('input[name="carDiscoveredSales[]"]')?.value) || 0;
-                    const rowTotalSold = parseFloat(row.querySelector('input[name="carTotalSold[]"]')?.value) || 0; // Read directly from the updated input
+                    const rowTotalSold = parseFloat(row.querySelector('input[name="carTotalSold[]"]')?.value) || 0;
 
                     totalDiscovered += rowTotalDiscovered;
                     totalSold += rowTotalSold;
@@ -1109,55 +1111,53 @@
         // New function to calculate totals for a single car row
         function updateCarRowTotals(index) {
             console.log(`--- updateCarRowTotals(${index}) started ---`);
-            const roInput = document.getElementById(`carRepairOrderNumber_${index}`);
-            const lastNameInput = document.getElementById(`carLastName_${index}`);
             const totalDiscoveredInput = document.getElementById(`carDiscoveredSales_${index}`);
             const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
             const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
-            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`); // This is now always editable
+            const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
             const individualCloseRatioInput = document.getElementById(`carIndividualCloseRatio_${index}`);
+
+            // Defensive checks: Ensure all required elements are found before proceeding.
+            // If any of these are null, it means the structure for this row is not as expected,
+            // or the element hasn't been rendered yet, which should ideally not happen on DOMContentLoaded.
+            // This prevents "Cannot set properties of null" errors.
+            if (!totalDiscoveredInput || !carTotalSoldInput || !individualCloseRatioInput ||
+                !insuranceSoldInput || !customerPaySoldInput) {
+                console.error(`[updateCarRowTotals] Essential input element(s) missing for car row ${index}. Aborting calculation for this row.`);
+                // Log which specific element was null for better debugging in the future
+                if (!totalDiscoveredInput) console.error(`  - totalDiscoveredInput (carDiscoveredSales_${index}) is null`);
+                if (!insuranceSoldInput) console.error(`  - insuranceSoldInput (carInsuranceSold_${index}) is null`);
+                if (!customerPaySoldInput) console.error(`  - customerPaySoldInput (carCustomerPaySold_${index}) is null`);
+                if (!carTotalSoldInput) console.error(`  - carTotalSoldInput (carTotalSold_${index}) is null`);
+                if (!individualCloseRatioInput) console.error(`  - individualCloseRatioInput (carIndividualCloseRatio_${index}) is null`);
+                return; // Exit the function gracefully if elements are missing
+            }
 
             const hasInsuranceCheckbox = document.getElementById(`carHasInsurancePortion_${index}`);
             const hasCustomerPayCheckbox = document.getElementById(`carHasCustomerPayPortion_${index}`);
 
-            const insuranceContainer = document.getElementById(`carInsurancePortionContainer_${index}`);
-            const customerPayCheckboxContainer = document.getElementById(`carCustomerPayCheckboxContainer_${index}`);
-            const customerPayContainer = document.getElementById(`carCustomerPayPortionContainer_${index}`);
+            const totalDiscovered = parseFloat(totalDiscoveredInput.value) || 0;
+            let currentCarSold = 0; // This will be determined dynamically
 
-            const ro = roInput ? roInput.value.trim() : '';
-            const lastName = lastNameInput ? lastNameInput.value.trim() : '';
-
-            // CRITICAL: If row is not active, zero out its discovered, sold, and ratio related fields
-            if (!ro && !lastName) {
-                console.log(`[updateCarRowTotals(${index})] Inactive row (no RO/Last Name). Zeroing values and hiding containers.`);
-                if (carTotalSoldInput) carTotalSoldInput.value = '0.00';
-                if (totalDiscoveredInput) totalDiscoveredInput.value = '0.00';
-                if (insuranceSoldInput) insuranceSoldInput.value = '0.00';
-                if (customerPaySoldInput) customerPaySoldInput.value = '0.00';
-                if (individualCloseRatioInput) {
-                    individualCloseRatioInput.value = 'N/A%';
-                    individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met');
-                }
-
-                // Directly handle visibility and checkbox state for inactive rows
-                if (insuranceContainer) insuranceContainer.style.display = 'none';
-                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none';
-                if (customerPayContainer) customerPayContainer.style.display = 'none';
-
-                if (hasInsuranceCheckbox) hasInsuranceCheckbox.checked = false;
-                if (hasCustomerPayCheckbox) hasCustomerPayCheckbox.checked = false;
-                return; // Exit early as this row won't contribute to totals if it's inactive
+            // Determine if Total Sold should be calculated or manually entered
+            // Ensure checkboxes are not null before accessing .checked
+            if (hasInsuranceCheckbox?.checked || hasCustomerPayCheckbox?.checked) {
+                const insuranceSold = parseFloat(insuranceSoldInput.value) || 0; // .value is safe as per null check above
+                const customerPaySold = parseFloat(customerPaySoldInput.value) || 0; // .value is safe as per null check above
+                currentCarSold = insuranceSold + customerPaySold;
+                carTotalSoldInput.value = currentCarSold.toFixed(2);
+                carTotalSoldInput.readOnly = true;
+                carTotalSoldInput.classList.add('readonly-input'); // Add visual cue
+                console.log(`[updateCarRowTotals(${index})] Calculated Car Sold: ${currentCarSold.toFixed(2)} (Read-Only)`);
+            } else {
+                carTotalSoldInput.readOnly = false;
+                carTotalSoldInput.classList.remove('readonly-input'); // Remove visual cue
+                currentCarSold = parseFloat(carTotalSoldInput.value) || 0; // Get manual input if not read-only
+                console.log(`[updateCarRowTotals(${index})] Manually entered Car Sold: ${currentCarSold.toFixed(2)} (Editable)`);
             }
 
-
-            const totalDiscovered = parseFloat(totalDiscoveredInput?.value) || 0;
-            // Get currentCarSold directly from the input, as it's now manually entered.
-            const currentCarSold = parseFloat(carTotalSoldInput?.value) || 0;
-            console.log(`[updateCarRowTotals(${index})] Car Sold (manual): ${currentCarSold.toFixed(2)}, Discovered: ${totalDiscovered.toFixed(2)}`);
-
-
             // Individual Close Ratio calculation
-            if (individualCloseRatioInput) {
+            if (individualCloseRatioInput) { // Already checked above, but good to be defensive again here
                 if (totalDiscovered === 0) {
                     individualCloseRatioInput.value = 'N/A%'; // Display N/A when total discovered is 0
                     individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met'); // Clear colors
@@ -1190,52 +1190,56 @@
             const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
             const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
 
+            // Defensive checks for elements potentially affected or controlling visibility
+            if (!hasInsuranceCheckbox || !hasCustomerPayCheckbox || !insuranceContainer ||
+                !customerPayCheckboxContainer || !customerPayContainer || !insuranceSoldInput || !customerPaySoldInput) {
+                console.error(`[toggleCarPortionFields] One or more essential elements are missing for index ${index}. Skipping toggle logic for this row.`);
+                if (!hasInsuranceCheckbox) console.error(`  - hasInsuranceCheckbox (carHasInsurancePortion_${index}) is null`);
+                if (!hasCustomerPayCheckbox) console.error(`  - hasCustomerPayCheckbox (carHasCustomerPayPortion_${index}) is null`);
+                if (!insuranceContainer) console.error(`  - insuranceContainer (carInsurancePortionContainer_${index}) is null`);
+                if (!customerPayCheckboxContainer) console.error(`  - customerPayCheckboxContainer (carCustomerPayCheckboxContainer_${index}) is null`);
+                if (!customerPayContainer) console.error(`  - customerPayContainer (carCustomerPayPortionContainer_${index}) is null`);
+                if (!insuranceSoldInput) console.error(`  - insuranceSoldInput (carInsuranceSold_${index}) is null`);
+                if (!customerPaySoldInput) console.error(`  - customerPaySoldInput (carCustomerPaySold_${index}) is null`);
+                return;
+            }
+
 
             // Logic when "Has Insurance Portion?" is checked
-            if (hasInsuranceCheckbox?.checked) {
+            if (hasInsuranceCheckbox.checked) { // Checked is safe here after the null check above
                 console.log(`[toggleCarPortionFields(${index})] Has Insurance Portion CHECKED`);
-                if (insuranceContainer) insuranceContainer.style.display = 'block';
-                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'flex'; // Show customer pay checkbox
-                console.log(`[toggleCarPortionFields(${index})] Total Sold Input remains EDITABLE.`);
+                insuranceContainer.style.display = 'block';
+                customerPayCheckboxContainer.style.display = 'flex'; // Show customer pay checkbox
 
                 // Logic for "Has Customer Pay Portion?" checkbox if insurance is active
-                if (hasCustomerPayCheckbox?.checked) {
+                if (hasCustomerPayCheckbox.checked) { // Checked is safe here after the null check above
                     console.log(`[toggleCarPortionFields(${index})] Has Customer Pay Portion CHECKED`);
-                    if (customerPayContainer) customerPayContainer.style.display = 'block';
+                    customerPayContainer.style.display = 'block';
                 } else {
                     console.log(`[toggleCarPortionFields(${index})] Has Customer Pay Portion UNCHECKED`);
-                    if (customerPayContainer) customerPayContainer.style.display = 'none';
-                    if (customerPaySoldInput) {
-                        customerPaySoldInput.value = '0.00'; // Clear customer pay if its checkbox is not active
-                        console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
-                    }
+                    customerPayContainer.style.display = 'none';
+                    customerPaySoldInput.value = '0.00'; // Clear customer pay if its checkbox is not active
+                    console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
                 }
             } else { // Logic when "Has Insurance Portion?" is UNCHECKED
                 console.log(`[toggleCarPortionFields(${index})] Has Insurance Portion UNCHECKED`);
-                if (insuranceContainer) insuranceContainer.style.display = 'none';
-                if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none'; // Hide customer pay checkbox
-                if (customerPayContainer) customerPayContainer.style.display = 'none';
+                insuranceContainer.style.display = 'none';
+                customerPayCheckboxContainer.style.display = 'none'; // Hide customer pay checkbox
+                customerPayContainer.style.display = 'none';
 
                 // Uncheck customer pay checkbox if insurance is unchecked
-                if (hasCustomerPayCheckbox) {
-                    hasCustomerPayCheckbox.checked = false;
-                    console.log(`[toggleCarPortionFields(${index})] hasCustomerPayCheckbox UNCHECKED`);
-                }
+                hasCustomerPayCheckbox.checked = false; // Checked is safe here after the null check above
+                console.log(`[toggleCarPortionFields(${index})] hasCustomerPayCheckbox UNCHECKED`);
 
                 // Clear input fields when their containers are hidden
-                if (insuranceSoldInput) {
-                    insuranceSoldInput.value = '0.00';
-                    console.log(`[toggleCarPortionFields(${index})] insuranceSoldInput cleared to 0`);
-                }
-                if (customerPaySoldInput) {
-                    customerPaySoldInput.value = '0.00';
-                    console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
-                }
-
-                console.log(`[toggleCarPortionFields(${index})] Total Sold Input remains EDITABLE.`);
+                insuranceSoldInput.value = '0.00';
+                console.log(`[toggleCarPortionFields(${index})] insuranceSoldInput cleared to 0`);
+                customerPaySoldInput.value = '0.00';
+                console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
             }
 
             // Ensure individual car row totals are correct before updating running totals
+            // This call will also handle the read-only state of carTotalSoldInput
             updateCarRowTotals(index);
             updateRunningTotals(); // Then update overall totals
             console.log(`--- toggleCarPortionFields(${index}) finished ---`);
@@ -1243,6 +1247,9 @@
 
         // New function to handle input on RO# and Last Name fields
         function handleCarInput(index) {
+            // When RO or Last Name changes, we might affect which rows are "active" for totals.
+            // Also, update the individual row's totals, which relies on these fields to exist.
+            updateCarRowTotals(index);
             updateRunningTotals(); // This will trigger overall recalculations
         }
 
@@ -1334,7 +1341,7 @@
                 </div>
                 <div class="form-col">
                     <label for="carDiscoveredSales_${carEntryCount}" class="block text-sm font-medium mb-1">Total Discovered ($)</label>
-                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                    <input type="number" id="carDiscoveredSales_${carEntryCount}" name="carDiscoveredSales[]" placeholder="e.g., 500" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals();">
                 </div>
 
                 <div class="w-full flex flex-wrap items-center gap-4 mt-2">
@@ -1350,7 +1357,7 @@
 
                 <div class="form-col w-full" id="carInsurancePortionContainer_${carEntryCount}" style="display:none;">
                     <label class="block text-sm font-medium mb-1">Insurance Pay ($)</label>
-                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                    <input type="number" id="carInsuranceSold_${carEntryCount}" name="carInsuranceSold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals();">
                 </div>
 
                 <div class="flex items-center mt-2" id="carCustomerPayCheckboxContainer_${carEntryCount}" style="display:none;"> <input type="checkbox" id="carHasCustomerPayPortion_${carEntryCount}" name="carHasCustomerPayPortion[]" class="mr-2" onchange="toggleCarPortionFields(${carEntryCount})">
@@ -1358,13 +1365,13 @@
                 </div>
                 <div class="form-col w-full" id="carCustomerPayPortionContainer_${carEntryCount}" style="display:none;">
                     <label class="block text-sm font-medium mb-1">Customer Pay ($)</label>
-                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateRunningTotals()">
+                    <input type="number" id="carCustomerPaySold_${carEntryCount}" name="carCustomerPaySold[]" placeholder="Pay ($)" class="w-full rounded-md" min="0" step="0.01" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals();">
                 </div>
 
                 <div class="form-row w-full mt-2">
                     <div class="form-col">
                         <label for="carTotalSold_${carEntryCount}" class="block text-sm font-medium mb-1">Total Sold ($)</label>
-                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md" oninput="updateRunningTotals()" value="0.00">
+                        <input type="number" id="carTotalSold_${carEntryCount}" name="carTotalSold[]" class="w-full rounded-md" oninput="updateCarRowTotals(${carEntryCount}); updateRunningTotals();" value="0.00">
                     </div>
                     <div class="form-col">
                         <label for="carIndividualCloseRatio_${carEntryCount}" class="block text-sm font-medium mb-1">Close Ratio (%)</label>
@@ -1424,11 +1431,13 @@
                     // For oninput/onchange, replace only the function parameter index
                     if (element.hasAttribute('oninput')) {
                         let currentAttr = element.getAttribute('oninput');
-                        element.setAttribute('oninput', currentAttr.replace(/(\w+\()(\d+)(\))/g, `$1${newIndex}$3`));
+                        // Use a regular expression to target only the numeric argument of the function
+                        element.setAttribute('oninput', currentAttr.replace(/(\w+\()(\d+)(.*?\))/g, `$1${newIndex}$3`));
                     }
                     if (element.hasAttribute('onchange')) {
                         let currentAttr = element.getAttribute('onchange');
-                        element.setAttribute('onchange', currentAttr.replace(/(\w+\()(\d+)(\))/g, `$1${newIndex}$3`));
+                        // Use a regular expression to target only the numeric argument of the function
+                        element.setAttribute('onchange', currentAttr.replace(/(\w+\()(\d+)(.*?\))/g, `$1${newIndex}$3`));
                     }
                 });
 
@@ -1446,11 +1455,14 @@
         // Function to toggle visibility of the "Other Reason Details" textarea
         function toggleOtherReason(selectElement, index, type) {
             const otherReasonContainer = document.getElementById(`${type}OtherReasonContainer_${index}`);
-            if (selectElement.value === 'Other') {
-                otherReasonContainer.style.display = 'block';
-            } else {
-                otherReasonContainer.style.display = 'none';
-                document.getElementById(`${type}OtherReason_${index}`).value = ''; // Clear content when hidden
+            if (otherReasonContainer) { // Add null check for container
+                if (selectElement.value === 'Other') {
+                    otherReasonContainer.style.display = 'block';
+                } else {
+                    otherReasonContainer.style.display = 'none';
+                    const otherReasonInput = document.getElementById(`${type}OtherReason_${index}`);
+                    if (otherReasonInput) otherReasonInput.value = ''; // Clear content when hidden
+                }
             }
         }
 
@@ -1464,65 +1476,77 @@
             const sourceContainer = document.getElementById(`callSourceContainer_${index}`);
             const otherReasonContainer = document.getElementById(`callOtherReasonContainer_${index}`); // Get other reason container
 
+            // Defensive checks for call elements
+            if (!bookedCheckbox || !lostLeadCheckbox || !lostCostContainer || !reasonContainer || !sourceContainer || !otherReasonContainer) {
+                console.error(`[toggleCallFieldsVisibility] One or more essential elements are missing for call row ${index}. Skipping toggle logic.`);
+                // You can add more specific logs here like in updateCarRowTotals for debugging
+                return;
+            }
+
+
             // Handle Lost Lead fields
-            if (lostLeadCheckbox && lostCostContainer && reasonContainer) {
-                if (lostLeadCheckbox.checked) {
-                    lostCostContainer.style.display = 'block';
-                    reasonContainer.style.display = 'block';
-                    // Add w-full to force them to a new line and align
-                    lostCostContainer.classList.add('w-full');
-                    reasonContainer.classList.add('w-full');
+            if (lostLeadCheckbox.checked) {
+                lostCostContainer.style.display = 'block';
+                reasonContainer.style.display = 'block';
+                // Add w-full to force them to a new line and align
+                lostCostContainer.classList.add('w-full');
+                reasonContainer.classList.add('w-full');
 
-                    // Re-check other reason visibility if 'Other' was selected
-                    const reasonSelect = document.getElementById(`callReason_${index}`);
-                    if (reasonSelect && reasonSelect.value === 'Other') {
-                        if (otherReasonContainer) otherReasonContainer.style.display = 'block';
-                    }
-                    // If lost lead is checked, uncheck booked appointment and hide source
-                    if (bookedCheckbox && bookedCheckbox.checked) {
-                        bookedCheckbox.checked = false;
-                        if (sourceContainer) sourceContainer.style.display = 'none';
-                        if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
-                        sourceContainer.classList.remove('w-full');
-                    }
-                } else {
-                    lostCostContainer.style.display = 'none';
-                    reasonContainer.style.display = 'none';
-                    if (otherReasonContainer) otherReasonContainer.style.display = 'none'; // Ensure other reason is also hidden
-                    lostCostContainer.classList.remove('w-full');
-                    reasonContainer.classList.remove('w-full');
-
-                    // Clear values when hidden
-                    if (document.getElementById(`callLostCost_${index}`)) document.getElementById(`callLostCost_${index}`).value = '';
-                    if (document.getElementById(`callReason_${index}`)) document.getElementById(`callReason_${index}`).value = '';
-                    if (document.getElementById(`callOtherReason_${index}`)) document.getElementById(`callOtherReason_${index}`).value = '';
+                // Re-check other reason visibility if 'Other' was selected
+                const reasonSelect = document.getElementById(`callReason_${index}`);
+                if (reasonSelect && reasonSelect.value === 'Other') {
+                    otherReasonContainer.style.display = 'block';
                 }
+                // If lost lead is checked, uncheck booked appointment and hide source
+                if (bookedCheckbox.checked) {
+                    bookedCheckbox.checked = false;
+                    sourceContainer.style.display = 'none';
+                    const callSourceInput = document.getElementById(`callSource_${index}`);
+                    if (callSourceInput) callSourceInput.value = '';
+                    sourceContainer.classList.remove('w-full');
+                }
+            } else {
+                lostCostContainer.style.display = 'none';
+                reasonContainer.style.display = 'none';
+                otherReasonContainer.style.display = 'none'; // Ensure other reason is also hidden
+                lostCostContainer.classList.remove('w-full');
+                reasonContainer.classList.remove('w-full');
+
+                // Clear values when hidden
+                const callLostCostInput = document.getElementById(`callLostCost_${index}`);
+                if (callLostCostInput) callLostCostInput.value = '';
+                const callReasonSelect = document.getElementById(`callReason_${index}`);
+                if (callReasonSelect) callReasonSelect.value = '';
+                const callOtherReasonInput = document.getElementById(`callOtherReason_${index}`);
+                if (callOtherReasonInput) callOtherReasonInput.value = '';
             }
 
             // Handle Booked Appointment fields (specifically Source)
-            if (bookedCheckbox && sourceContainer) {
-                if (bookedCheckbox.checked) {
-                    sourceContainer.style.display = 'block';
-                    sourceContainer.classList.add('w-full'); // Add w-full to force it to a new line and align
+            if (bookedCheckbox.checked) {
+                sourceContainer.style.display = 'block';
+                sourceContainer.classList.add('w-full'); // Add w-full to force it to a new line and align
 
-                    // If lost lead is checked, uncheck lost lead and hide lost cost/reason
-                    if (lostLeadCheckbox && lostLeadCheckbox.checked) {
-                        lostLeadCheckbox.checked = false;
-                        if (lostCostContainer) lostCostContainer.style.display = 'none';
-                        if (reasonContainer) reasonContainer.style.display = 'none';
-                        if (otherReasonContainer) otherReasonContainer.style.display = 'none';
-                        if (document.getElementById(`callLostCost_${index}`)) document.getElementById(`callLostCost_${index}`).value = '';
-                        if (document.getElementById(`callReason_${index}`)) document.getElementById(`callReason_${index}`).value = '';
-                        if (document.getElementById(`callOtherReason_${index}`)) document.getElementById(`callOtherReason_${index}`).value = '';
-                        lostCostContainer.classList.remove('w-full');
-                        reasonContainer.classList.remove('w-full');
-                    }
-                } else {
-                    sourceContainer.style.display = 'none';
-                    sourceContainer.classList.remove('w-full'); // Remove w-full when hidden
-                    // Clear value when hidden
-                    if (document.getElementById(`callSource_${index}`)) document.getElementById(`callSource_${index}`).value = '';
+                // If lost lead is checked, uncheck lost lead and hide lost cost/reason
+                if (lostLeadCheckbox.checked) {
+                    lostLeadCheckbox.checked = false;
+                    lostCostContainer.style.display = 'none';
+                    reasonContainer.style.display = 'none';
+                    otherReasonContainer.style.display = 'none';
+                    const callLostCostInput = document.getElementById(`callLostCost_${index}`);
+                    if (callLostCostInput) callLostCostInput.value = '';
+                    const callReasonSelect = document.getElementById(`callReason_${index}`);
+                    if (callReasonSelect) callReasonSelect.value = '';
+                    const callOtherReasonInput = document.getElementById(`callOtherReason_${index}`);
+                    if (callOtherReasonInput) callOtherReasonInput.value = '';
+                    lostCostContainer.classList.remove('w-full');
+                    reasonContainer.classList.remove('w-full');
                 }
+            } else {
+                sourceContainer.style.display = 'none';
+                sourceContainer.classList.remove('w-full'); // Remove w-full when hidden
+                // Clear value when hidden
+                const callSourceInput = document.getElementById(`callSource_${index}`);
+                if (callSourceInput) callSourceInput.value = '';
             }
             updateRunningTotals(); // Re-calculate totals after visibility changes
         }
@@ -1757,7 +1781,7 @@
 
             // Initialize visibility for existing car entries
             document.querySelectorAll('#carSalesEntries .form-row').forEach((row, index) => {
-                toggleCarPortionFields(index + 1);
+                toggleCarPortionFields(index + 1); // This also calls updateCarRowTotals and updateRunningTotals
             });
 
             // Initialize visibility for existing call entries (if any)
