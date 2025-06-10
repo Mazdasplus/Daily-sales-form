@@ -734,7 +734,7 @@
             // Only proceed if a date is selected in the form
             if (reportDateValue) {
                 const parts = reportDateValue.split('-'); // ["2025", "06", "10"]
-                // Create a date object in local time using YYYY, MM-1, DD
+                // Create a date object in local time using year, MM-1, DD
                 const selectedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                 selectedDate.setHours(12, 0, 0, 0); // Set to noon to avoid any further edge cases around DST changes
 
@@ -743,7 +743,7 @@
                 console.log(`[updateCurrentDayAndWeeklyTotals] Parsed selectedDate for day calculation: ${selectedDate.toDateString()} (Day Index: ${dayIndex}, Name: ${currentDayName})`);
 
 
-                // Get the totalSoldSales for the current form's entries
+                // Get the totalSoldSales for the current form's entries (this is the live sum from the UI)
                 const currentDaySoldSales = parseFloat(document.getElementById('totalSoldSales').innerText) || 0;
                 console.log(`[updateCurrentDayAndWeeklyTotals] Current Day Sold Sales from UI: ${currentDaySoldSales.toFixed(2)}`);
 
@@ -751,26 +751,40 @@
                 const currentMondayTimestamp = getMondayOfCurrentWeek(selectedDate); // Use selectedDate for Monday calculation
                 if (weeklySalesData.weekStart !== currentMondayTimestamp) {
                     console.warn(`[updateCurrentDayAndWeeklyTotals] Mismatch in weekStart! Expected ${new Date(currentMondayTimestamp).toDateString()} but found ${weeklySalesData.weekStart ? new Date(weeklySalesData.weekStart).toDateString() : 'null'}. Re-initializing weekly data.`);
-                    // This scenario should ideally be handled by loadWeeklySales on page load,
-                    // but as a fallback, ensure the weekly data structure is correct.
                     weeklySalesData = {
                         weekStart: currentMondayTimestamp,
                         dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
                     };
                 }
 
-                // Update the specific day's total in our weeklySalesData ONLY if it's a weekday (Mon-Fri)
+                // ******************* CRITICAL CHANGE START *******************
+                // Get the value stored in weeklySalesData.dailyTotals for the current day *before* any potential overwrite.
+                // This ensures we know if there were sales previously recorded for today.
+                const previouslyStoredSalesForToday = weeklySalesData.dailyTotals[currentDayName] || 0;
+
+                // Only update the daily total in weeklySalesData if:
+                // 1. The current form's total sold is NOT zero (meaning user has entered sales).
+                // OR
+                // 2. The current form's total sold IS zero, AND the previously stored value was also zero (no sales entered yet, so it's safe to set to 0).
+                // This prevents overwriting a non-zero stored value with 0 on page load when no new sales are entered.
                 if (currentDayName !== 'Sat' && currentDayName !== 'Sun') {
-                    if (weeklySalesData.dailyTotals.hasOwnProperty(currentDayName)) {
-                        console.log(`[updateCurrentDayAndWeeklyTotals] Before update, weeklySalesData.dailyTotals[${currentDayName}]: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
-                        weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
-                        console.log(`[updateCurrentDayAndWeeklyTotals] After update, weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                    if (currentDaySoldSales > 0 || (currentDaySoldSales === 0 && previouslyStoredSalesForToday === 0)) {
+                        if (weeklySalesData.dailyTotals.hasOwnProperty(currentDayName)) {
+                            console.log(`[updateCurrentDayAndWeeklyTotals] Before update, weeklySalesData.dailyTotals[${currentDayName}]: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                            weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
+                            console.log(`[updateCurrentDayAndWeeklyTotals] After update, weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                        } else {
+                            console.error(`[updateCurrentDayAndWeeklyTotals] Attempted to set sales for ${currentDayName}, but it's not a valid key in weeklySalesData.dailyTotals. Current dailyTotals keys: ${Object.keys(weeklySalesData.dailyTotals)}`);
+                        }
                     } else {
-                        console.error(`[updateCurrentDayAndWeeklyTotals] Attempted to set sales for ${currentDayName}, but it's not a valid key in weeklySalesData.dailyTotals. Current dailyTotals keys: ${Object.keys(weeklySalesData.dailyTotals)}`);
+                        // Log for debugging: This condition is met when currentDaySoldSales is 0, but previouslyStoredSalesForToday was > 0.
+                        // We skip saving 0 to preserve the historical value.
+                        console.log(`[updateCurrentDayAndWeeklyTotals] Skipping update for ${currentDayName} because Current Day Sold is 0 and there were previously stored sales for today. (Preserving previous state: ${previouslyStoredSalesForToday.toFixed(2)}).`);
                     }
                 } else {
                     console.log(`[updateCurrentDayAndWeeklyTotals] Weekend (${currentDayName}). Sales are not added to weekly total.`);
                 }
+                // ******************* CRITICAL CHANGE END *******************
 
                 saveWeeklySales(); // Save changes to local storage
                 updateWeeklyTotalsDisplay(); // Update the HTML display for weekly totals
