@@ -733,10 +733,11 @@
 
             // Only proceed if a date is selected in the form
             if (reportDateValue) {
-                const selectedDate = new Date(reportDateValue);
+                // IMPORTANT CHANGE: Append 'T12:00:00' to ensure date is parsed as local noon, avoiding timezone shifts
+                const selectedDate = new Date(reportDateValue + 'T12:00:00');
                 const dayIndex = selectedDate.getDay(); // 0 for Sun, 1 for Mon, etc.
                 const currentDayName = dayNames[dayIndex]; // Get day name using the full array
-                console.log(`[updateCurrentDayAndWeeklyTotals] Selected date: ${selectedDate.toDateString()}, Day name: ${currentDayName}`);
+                console.log(`[updateCurrentDayAndWeeklyTotals] Parsed selectedDate for day calculation: ${selectedDate.toDateString()} (Day Index: ${dayIndex}, Name: ${currentDayName})`);
 
 
                 // Get the totalSoldSales for the current form's entries
@@ -744,9 +745,9 @@
                 console.log(`[updateCurrentDayAndWeeklyTotals] Current Day Sold Sales from UI: ${currentDaySoldSales.toFixed(2)}`);
 
                 // Make sure we are operating on the correct week's data
-                const currentMondayTimestamp = getMondayOfCurrentWeek(selectedDate);
+                const currentMondayTimestamp = getMondayOfCurrentWeek(selectedDate); // Use selectedDate for Monday calculation
                 if (weeklySalesData.weekStart !== currentMondayTimestamp) {
-                    console.warn(`[updateCurrentDayAndWeeklyTotals] Mismatch in weekStart! Expected ${new Date(currentMondayTimestamp).toDateString()} but found ${new Date(weeklySalesData.weekStart).toDateString()}. Re-initializing weekly data.`);
+                    console.warn(`[updateCurrentDayAndWeeklyTotals] Mismatch in weekStart! Expected ${new Date(currentMondayTimestamp).toDateString()} but found ${weeklySalesData.weekStart ? new Date(weeklySalesData.weekStart).toDateString() : 'null'}. Re-initializing weekly data.`);
                     // This scenario should ideally be handled by loadWeeklySales on page load,
                     // but as a fallback, ensure the weekly data structure is correct.
                     weeklySalesData = {
@@ -821,7 +822,7 @@
 
         // Function to update the daily goal based on prior day's total (now as carry-over)
         function updateDailyGoalBasedOnPriorDay() {
-            console.log('[updateDailyGoalBasedOnPriorDay] Calculating daily goal...');
+            console.log('[updateDailyGoalBasedOnPriorDay] Calculating daily goal... ');
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
             const dailyGoalInput = document.getElementById('dailyGoal');
 
