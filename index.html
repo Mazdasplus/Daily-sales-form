@@ -611,7 +611,7 @@
 
         // Global variables for weekly sales data and goal
         let weeklySalesData = {
-            weekStart: null, // Timestamp of the Monday of the current week (midnight UTC)
+            weekStart: null, // Timestamp of the Monday of the current week (midnight local time)
             dailyTotals: {
                 'Mon': 0,
                 'Tue': 0,
@@ -627,11 +627,11 @@
 
         // Helper to get Monday of the current week (normalized to 00:00:00 local time)
         function getMondayOfCurrentWeek(date) {
-            const d = new Date(date);
+            const d = new Date(date); // Ensure this is a local date object
             const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
             const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday of the current week
-            const monday = new Date(d.setDate(diff));
-            monday.setHours(0, 0, 0, 0); // Normalize to midnight
+            const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+            monday.setHours(0, 0, 0, 0); // Normalize to midnight local time
             console.log(`[getMondayOfCurrentWeek] Date input: ${date.toDateString()}, Calculated Monday: ${monday.toDateString()}, Timestamp: ${monday.getTime()}`);
             return monday.getTime(); // Return timestamp for comparison
         }
@@ -639,7 +639,7 @@
         // Load weekly sales data from local storage
         function loadWeeklySales() {
             console.log('[loadWeeklySales] Attempting to load weekly sales data...');
-            const today = new Date();
+            const today = new Date(); // This creates a local date object
             const currentMondayTimestamp = getMondayOfCurrentWeek(today);
             const storedData = localStorage.getItem('weeklySalesData');
             console.log(`[loadWeeklySales] Stored data raw: ${storedData}`);
@@ -729,12 +729,15 @@
         function updateCurrentDayAndWeeklyTotals() {
             console.log('[updateCurrentDayAndWeeklyTotals] Updating current day and weekly totals...');
             const reportDateInput = document.getElementById('reportDate');
-            const reportDateValue = reportDateInput.value;
+            const reportDateValue = reportDateInput.value; // e.g., "2025-06-10"
 
             // Only proceed if a date is selected in the form
             if (reportDateValue) {
-                // IMPORTANT CHANGE: Append 'T12:00:00' to ensure date is parsed as local noon, avoiding timezone shifts
-                const selectedDate = new Date(reportDateValue + 'T12:00:00');
+                const parts = reportDateValue.split('-'); // ["2025", "06", "10"]
+                // Create a date object in local time using YYYY, MM-1, DD
+                const selectedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                selectedDate.setHours(12, 0, 0, 0); // Set to noon to avoid any further edge cases around DST changes
+
                 const dayIndex = selectedDate.getDay(); // 0 for Sun, 1 for Mon, etc.
                 const currentDayName = dayNames[dayIndex]; // Get day name using the full array
                 console.log(`[updateCurrentDayAndWeeklyTotals] Parsed selectedDate for day calculation: ${selectedDate.toDateString()} (Day Index: ${dayIndex}, Name: ${currentDayName})`);
