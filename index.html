@@ -632,27 +632,33 @@
             const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday of the current week
             const monday = new Date(d.setDate(diff));
             monday.setHours(0, 0, 0, 0); // Normalize to midnight
+            console.log(`[getMondayOfCurrentWeek] Date input: ${date.toDateString()}, Calculated Monday: ${monday.toDateString()}, Timestamp: ${monday.getTime()}`);
             return monday.getTime(); // Return timestamp for comparison
         }
 
         // Load weekly sales data from local storage
         function loadWeeklySales() {
+            console.log('[loadWeeklySales] Attempting to load weekly sales data...');
             const today = new Date();
             const currentMondayTimestamp = getMondayOfCurrentWeek(today);
             const storedData = localStorage.getItem('weeklySalesData');
+            console.log(`[loadWeeklySales] Stored data raw: ${storedData}`);
 
             if (storedData) {
                 const parsedData = JSON.parse(storedData);
+                console.log('[loadWeeklySales] Parsed stored data:', parsedData);
+
                 // Check if stored data belongs to the current week
                 if (parsedData.weekStart === currentMondayTimestamp) {
                     weeklySalesData = parsedData; // Continue with existing week's data
                     // Ensure that Sat and Sun are explicitly zeroed out when loading, even if old data had them.
-                    weeklySalesData.dailyTotals['Sat'] = 0; // Ensures data consistency if an old format was loaded
-                    weeklySalesData.dailyTotals['Sun'] = 0; // Ensures data consistency if an old format was loaded
-                    console.log('Loaded weekly sales for current week:', weeklySalesData);
+                    // This is defensive coding in case previous versions added these.
+                    weeklySalesData.dailyTotals['Sat'] = 0;
+                    weeklySalesData.dailyTotals['Sun'] = 0;
+                    console.log('[loadWeeklySales] Loaded weekly sales for current week:', weeklySalesData);
                 } else {
                     // New week, reset totals and start fresh
-                    console.log('New week detected, resetting weekly totals.');
+                    console.log(`[loadWeeklySales] New week detected (${new Date(parsedData.weekStart).toDateString()} vs ${new Date(currentMondayTimestamp).toDateString()}), resetting weekly totals.`);
                     weeklySalesData = {
                         weekStart: currentMondayTimestamp,
                         dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
@@ -661,7 +667,7 @@
                 }
             } else {
                 // No data in local storage, initialize for the current week
-                console.log('No weekly sales data found, initializing.');
+                console.log('[loadWeeklySales] No weekly sales data found, initializing new data.');
                 weeklySalesData = {
                     weekStart: currentMondayTimestamp,
                     dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
@@ -669,16 +675,18 @@
                 saveWeeklySales(); // Save the initialized data immediately
             }
             updateWeeklyTotalsDisplay(); // Update display immediately after loading
+            console.log('[loadWeeklySales] Finished loading/initializing weekly sales data.');
         }
 
         // Save weekly sales data to local storage
         function saveWeeklySales() {
+            console.log('[saveWeeklySales] Saving weekly sales data:', weeklySalesData);
             localStorage.setItem('weeklySalesData', JSON.stringify(weeklySalesData));
-            // console.log('Saved weekly sales data:', weeklySalesData); // For debugging
         }
 
         // Update the weekly totals display in the HTML
         function updateWeeklyTotalsDisplay() {
+            console.log('[updateWeeklyTotalsDisplay] Updating weekly totals display...');
             let totalSoldThisWeek = 0;
             const activeWeekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']; // Only active weekdays for display and sum
 
@@ -688,6 +696,7 @@
                 const daySales = weeklySalesData.dailyTotals[day] || 0;
                 if (element) {
                     element.innerText = daySales.toFixed(2);
+                    console.log(`[updateWeeklyTotalsDisplay] Displaying ${day} sales: ${daySales.toFixed(2)}`);
                 }
                 totalSoldThisWeek += daySales;
             });
@@ -713,10 +722,12 @@
                     remainingWeeklyGoalContainer.classList.add('goal-not-met');
                 }
             }
+            console.log(`[updateWeeklyTotalsDisplay] Total sold this week: ${totalSoldThisWeek.toFixed(2)}, Remaining weekly goal: ${remainingWeeklyGoal.toFixed(2)}`);
         }
 
         // New function to update the current day's sales in weeklyData and recalculate weekly totals
         function updateCurrentDayAndWeeklyTotals() {
+            console.log('[updateCurrentDayAndWeeklyTotals] Updating current day and weekly totals...');
             const reportDateInput = document.getElementById('reportDate');
             const reportDateValue = reportDateInput.value;
 
@@ -725,37 +736,43 @@
                 const selectedDate = new Date(reportDateValue);
                 const dayIndex = selectedDate.getDay(); // 0 for Sun, 1 for Mon, etc.
                 const currentDayName = dayNames[dayIndex]; // Get day name using the full array
+                console.log(`[updateCurrentDayAndWeeklyTotals] Selected date: ${selectedDate.toDateString()}, Day name: ${currentDayName}`);
+
 
                 // Get the totalSoldSales for the current form's entries
                 const currentDaySoldSales = parseFloat(document.getElementById('totalSoldSales').innerText) || 0;
-                console.log(`[Weekly Update] Current Day Sold Sales: ${currentDaySoldSales.toFixed(2)} for ${currentDayName}`);
+                console.log(`[updateCurrentDayAndWeeklyTotals] Current Day Sold Sales from UI: ${currentDaySoldSales.toFixed(2)}`);
 
                 // Make sure we are operating on the correct week's data
                 const currentMondayTimestamp = getMondayOfCurrentWeek(selectedDate);
                 if (weeklySalesData.weekStart !== currentMondayTimestamp) {
-                    console.log(`[Weekly Update] Week changed from ${weeklySalesData.weekStart} to ${currentMondayTimestamp}. Resetting daily totals.`);
-                    weeklySalesData.weekStart = currentMondayTimestamp;
-                    weeklySalesData.dailyTotals = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 }; // Only Mon-Fri
+                    console.warn(`[updateCurrentDayAndWeeklyTotals] Mismatch in weekStart! Expected ${new Date(currentMondayTimestamp).toDateString()} but found ${new Date(weeklySalesData.weekStart).toDateString()}. Re-initializing weekly data.`);
+                    // This scenario should ideally be handled by loadWeeklySales on page load,
+                    // but as a fallback, ensure the weekly data structure is correct.
+                    weeklySalesData = {
+                        weekStart: currentMondayTimestamp,
+                        dailyTotals: { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 } // Only Mon-Fri
+                    };
                 }
 
                 // Update the specific day's total in our weeklySalesData ONLY if it's a weekday (Mon-Fri)
                 if (currentDayName !== 'Sat' && currentDayName !== 'Sun') {
-                    // Check if the property exists before assigning, to prevent adding Sat/Sun keys
                     if (weeklySalesData.dailyTotals.hasOwnProperty(currentDayName)) {
+                        console.log(`[updateCurrentDayAndWeeklyTotals] Before update, weeklySalesData.dailyTotals[${currentDayName}]: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
                         weeklySalesData.dailyTotals[currentDayName] = currentDaySoldSales;
-                        console.log(`[Weekly Update] weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
+                        console.log(`[updateCurrentDayAndWeeklyTotals] After update, weeklySalesData.dailyTotals[${currentDayName}] set to: ${weeklySalesData.dailyTotals[currentDayName].toFixed(2)}`);
                     } else {
-                        console.warn(`[Weekly Update] Attempted to set sales for ${currentDayName}, but it's not an active weekday in weeklySalesData.dailyTotals.`);
+                        console.error(`[updateCurrentDayAndWeeklyTotals] Attempted to set sales for ${currentDayName}, but it's not a valid key in weeklySalesData.dailyTotals. Current dailyTotals keys: ${Object.keys(weeklySalesData.dailyTotals)}`);
                     }
                 } else {
-                    console.log(`[Weekly Update] Weekend (${currentDayName}). Sales not added to weekly total.`);
+                    console.log(`[updateCurrentDayAndWeeklyTotals] Weekend (${currentDayName}). Sales are not added to weekly total.`);
                 }
-
 
                 saveWeeklySales(); // Save changes to local storage
                 updateWeeklyTotalsDisplay(); // Update the HTML display for weekly totals
+                console.log('[updateCurrentDayAndWeeklyTotals] Finished updating current day and weekly totals.');
             } else {
-                console.warn('Report date is not set, cannot update specific day sales for weekly totals.');
+                console.warn('[updateCurrentDayAndWeeklyTotals] Report date is not set, cannot update specific day sales for weekly totals.');
             }
         }
 
@@ -775,8 +792,10 @@
                         saveWeeklySales();
                         updateWeeklyTotalsDisplay();
                         showMessageBox('Weekly Data Reset', 'All weekly sales data has been reset to zero.');
+                        console.log('[resetWeeklyTotals] Weekly data explicitly reset by user.');
                     } else {
                         showMessageBox('Reset Cancelled', 'Weekly data reset cancelled.');
+                        console.log('[resetWeeklyTotals] Weekly data reset cancelled by user.');
                     }
                 }
             );
@@ -802,6 +821,7 @@
 
         // Function to update the daily goal based on prior day's total (now as carry-over)
         function updateDailyGoalBasedOnPriorDay() {
+            console.log('[updateDailyGoalBasedOnPriorDay] Calculating daily goal...');
             const priorDayTotal = parseFloat(document.getElementById('priorDayTotal').value) || 0;
             const dailyGoalInput = document.getElementById('dailyGoal');
 
@@ -810,6 +830,7 @@
 
             // Update the daily goal input field
             dailyGoalInput.value = adjustedDailyGoal.toFixed(2);
+            console.log(`[updateDailyGoalBasedOnPriorDay] Prior Day Total: ${priorDayTotal.toFixed(2)}, Base Daily Goal: ${baseDailyGoal.toFixed(2)}, Adjusted Daily Goal: ${adjustedDailyGoal.toFixed(2)}`);
 
             // Also update the remaining goal display as it depends on the dailyGoal
             updateRemainingGoal();
@@ -817,6 +838,7 @@
 
         // Function to update the Remaining Daily Goal display and its color
         function updateRemainingGoal() {
+            console.log('[updateRemainingGoal] Updating remaining daily goal...');
             const dailyGoal = parseFloat(document.getElementById('dailyGoal').value) || 0;
             let currentDaySoldSales = 0;
 
@@ -832,27 +854,32 @@
             const remainingGoalContainerTop = document.getElementById('remainingDailyGoalTop');
             const remainingGoalContainerBottom = document.getElementById('remainingDailyGoalBottom');
 
-            remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
-            remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
+            if (remainingGoalValueTop) remainingGoalValueTop.innerText = remainingGoal.toFixed(2);
+            if (remainingGoalValueBottom) remainingGoalValueBottom.innerText = remainingGoal.toFixed(2);
             document.getElementById('hiddenRemainingDailyGoal').value = remainingGoal.toFixed(2);
 
+            const toggleClass = (element, addClass, removeClass) => {
+                if (element) {
+                    element.classList.remove(removeClass);
+                    element.classList.add(addClass);
+                }
+            };
+
             if (remainingGoal <= 0) {
-                remainingGoalContainerTop.classList.remove('goal-not-met');
-                remainingGoalContainerTop.classList.add('goal-met');
-                remainingGoalContainerBottom.classList.remove('goal-not-met');
-                remainingGoalContainerBottom.classList.add('goal-met');
+                toggleClass(remainingGoalContainerTop, 'goal-met', 'goal-not-met');
+                toggleClass(remainingGoalContainerBottom, 'goal-met', 'goal-not-met');
             } else {
-                remainingGoalContainerTop.classList.remove('goal-met');
-                remainingGoalContainerTop.classList.add('goal-not-met');
-                remainingGoalContainerBottom.classList.remove('goal-met');
-                remainingGoalContainerBottom.classList.add('goal-not-met');
+                toggleClass(remainingGoalContainerTop, 'goal-not-met', 'goal-met');
+                toggleClass(remainingGoalContainerBottom, 'goal-not-met', 'goal-met');
             }
+            console.log(`[updateRemainingGoal] Daily Goal: ${dailyGoal.toFixed(2)}, Current Day Sold: ${currentDaySoldSales.toFixed(2)}, Remaining: ${remainingGoal.toFixed(2)}`);
 
             // Save the remaining goal and current date to local storage
             localStorage.setItem('lastDayRemainingGoal', JSON.stringify({
                 date: document.getElementById('reportDate').value,
                 remainingGoal: remainingGoal
             }));
+            console.log(`[updateRemainingGoal] Saved 'lastDayRemainingGoal' for ${document.getElementById('reportDate').value}: ${remainingGoal.toFixed(2)}`);
         }
 
         // Function to update the running totals (Discovered, Sold, Close Ratio, Insurance Claims, Total Insurance Pay, Total Customer Pay)
@@ -898,21 +925,21 @@
 
                     totalDiscovered += rowTotalDiscovered;
                     totalSold += rowTotalSold;
-                    console.log(`Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Read Discovered: ${rowTotalDiscovered.toFixed(2)}, Read Sold: ${rowTotalSold.toFixed(2)}`);
-                    console.log(`Running totals (after adding active car ${index + 1}): Discovered: ${totalDiscovered.toFixed(2)}, Sold: ${totalSold.toFixed(2)}`);
+                    console.log(`[updateRunningTotals] Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Read Discovered: ${rowTotalDiscovered.toFixed(2)}, Read Sold: ${rowTotalSold.toFixed(2)}`);
+
 
                     if (hasInsuranceCheckbox && hasInsuranceCheckbox.checked) {
                         totalInsuranceClaims++; // Increment if this active entry has an insurance portion
                         totalInsurancePay += parseFloat(insuranceSoldInput?.value) || 0; // Add insurance pay to total
-                        console.log(`Car ${index + 1} - Insurance Pay: ${insuranceSoldInput?.value || 0}. Total Insurance Pay: ${totalInsurancePay.toFixed(2)}`);
+                        console.log(`[updateRunningTotals] Car ${index + 1} - Insurance Pay: ${insuranceSoldInput?.value || 0}. Current Total Insurance Pay: ${totalInsurancePay.toFixed(2)}`);
                     }
                     // Accumulate Total Customer Pay
                     if (hasCustomerPayCheckbox && hasCustomerPayCheckbox.checked) {
                         totalCustomerPay += parseFloat(customerPaySoldInput?.value) || 0;
-                        console.log(`Car ${index + 1} - Customer Pay: ${customerPaySoldInput?.value || 0}. Total Customer Pay: ${totalCustomerPay.toFixed(2)}`);
+                        console.log(`[updateRunningTotals] Car ${index + 1} - Customer Pay: ${customerPaySoldInput?.value || 0}. Current Total Customer Pay: ${totalCustomerPay.toFixed(2)}`);
                     }
                 } else {
-                    console.log(`Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Skipped from total calculation (inactive row).`);
+                    console.log(`[updateRunningTotals] Car ${index + 1} (RO: ${ro}, Last Name: ${lastName}) - Skipped from total calculation (inactive row).`);
                 }
 
                 // Check for duplicate RO number and Last Name only for active entries
@@ -991,13 +1018,10 @@
             document.getElementById('hiddenTotalInsuranceClaims').value = totalInsuranceClaims;
             document.getElementById('hiddenPercentageOfInsuranceClaims').value = percentageOfInsuranceClaims.toFixed(2) + '%';
 
+            console.log(`[updateRunningTotals] Final totals: Discovered=${totalDiscovered.toFixed(2)}, Sold=${totalSold.toFixed(2)}, InsurancePay=${totalInsurancePay.toFixed(2)}, CustomerPay=${totalCustomerPay.toFixed(2)}`);
+
             updateRemainingGoal();
             updateCurrentDayAndWeeklyTotals(); // Ensure weekly totals are updated after all daily calculations
-            console.log(`Final totalDiscovered before display: ${totalDiscovered.toFixed(2)}`);
-            console.log(`Final totalSold before display: ${totalSold.toFixed(2)}`);
-            console.log(`Final totalInsurancePay before display: ${totalInsurancePay.toFixed(2)}`); // Log new total
-            console.log(`Final totalCustomerPay before display: ${totalCustomerPay.toFixed(2)}`); // Log new total
-            console.log('Value displayed for Total Sold Sales:', document.getElementById('totalSoldSales').innerText);
             console.log('--- updateRunningTotals finished ---');
         };
 
@@ -1018,16 +1042,11 @@
             const origCustomerPaySoldInput = originalRow.querySelector(`#carCustomerPaySold_${originalIndex + 1}`);
             const origHasInsuranceCheckbox = originalRow.querySelector(`#carHasInsurancePortion_${originalIndex + 1}`);
             const origHasCustomerPayCheckbox = originalRow.querySelector(`#carHasCustomerPayPortion_${originalIndex + 1}`);
-            // carTotalSoldInput is now always editable, no need to touch its value here directly for combining
-            // const origTotalSoldInput = originalRow.querySelector(`#carTotalSold_${originalIndex + 1}`); // Get original total sold input
 
-            // Get values from the duplicate row's fields (already safely accessed with ?.value)
+            // Get values from the duplicate row's fields
             const dupDiscovered = parseFloat(duplicateRow.querySelector(`input[name="carDiscoveredSales[]"]`)?.value) || 0;
             const dupInsuranceSold = parseFloat(duplicateRow.querySelector(`#carInsuranceSold_${duplicateIndex + 1}`)?.value) || 0;
             const dupCustomerPaySold = parseFloat(duplicateRow.querySelector(`#carCustomerPaySold_${duplicateIndex + 1}`)?.value) || 0;
-            // The dupTotalSold is also read and can be used to update the original, but as per current requirement,
-            // the total sold field will be manually updated by the user after combining, not automatically.
-            // const dupTotalSold = parseFloat(duplicateRow.querySelector(`#carTotalSold_${duplicateIndex + 1}`)?.value) || 0;
 
             // Add duplicate's discovered to original's total discovered
             if (origDiscoveredInput) {
@@ -1058,7 +1077,6 @@
                 console.log(`[Combine Entries] Original Has Customer Pay checkbox checked.`);
             }
 
-
             // Update visibility and totals for the original row based on its new state
             toggleCarPortionFields(originalIndex + 1); // This will call updateCarRowTotals and then updateRunningTotals
 
@@ -1067,7 +1085,6 @@
             reindexCarEntries(); // Reindex entries after removal
             updateRemoveButtonsVisibility('carSalesEntries');
             showMessageBox('Combined Successfully', `The new entry has been combined into the original RO ${currentDuplicateRo}. Please manually update the Total Sold for the combined entry if needed.`);
-            // updateRunningTotals will be called by toggleCarPortionFields in its flow, which is the desired outcome.
         }
 
 
@@ -1094,6 +1111,7 @@
 
             // CRITICAL: If row is not active, zero out its discovered, sold, and ratio related fields
             if (!ro && !lastName) {
+                console.log(`[updateCarRowTotals(${index})] Inactive row (no RO/Last Name). Zeroing values and hiding containers.`);
                 if (carTotalSoldInput) carTotalSoldInput.value = '0.00';
                 if (totalDiscoveredInput) totalDiscoveredInput.value = '0.00';
                 if (insuranceSoldInput) insuranceSoldInput.value = '0.00';
@@ -1110,9 +1128,6 @@
 
                 if (hasInsuranceCheckbox) hasInsuranceCheckbox.checked = false;
                 if (hasCustomerPayCheckbox) hasCustomerPayCheckbox.checked = false;
-
-                console.log(`Car ${index} is inactive (no RO/Last Name). Values zeroed and containers hidden.`);
-                console.log(`--- updateCarRowTotals(${index}) finished ---`);
                 return; // Exit early as this row won't contribute to totals if it's inactive
             }
 
@@ -1120,7 +1135,7 @@
             const totalDiscovered = parseFloat(totalDiscoveredInput?.value) || 0;
             // Get currentCarSold directly from the input, as it's now manually entered.
             const currentCarSold = parseFloat(carTotalSoldInput?.value) || 0;
-            console.log(`Car ${index} - Current Car Sold (manual): ${currentCarSold.toFixed(2)}`);
+            console.log(`[updateCarRowTotals(${index})] Car Sold (manual): ${currentCarSold.toFixed(2)}, Discovered: ${totalDiscovered.toFixed(2)}`);
 
 
             // Individual Close Ratio calculation
@@ -1128,7 +1143,7 @@
                 if (totalDiscovered === 0) {
                     individualCloseRatioInput.value = 'N/A%'; // Display N/A when total discovered is 0
                     individualCloseRatioInput.classList.remove('conversion-met', 'conversion-not-met'); // Clear colors
-                    console.log(`Car ${index} - Close Ratio: N/A% (discovered is 0)`);
+                    console.log(`[updateCarRowTotals(${index})] Close Ratio: N/A% (discovered is 0)`);
                 } else {
                     const individualConversionRate = (currentCarSold / totalDiscovered) * 100;
                     individualCloseRatioInput.value = individualConversionRate.toFixed(2) + '%';
@@ -1138,7 +1153,7 @@
                     } else {
                         individualCloseRatioInput.classList.add('conversion-not-met');
                     }
-                    console.log(`Car ${index} - Close Ratio: ${individualConversionRate.toFixed(2)}% (Sold: ${currentCarSold.toFixed(2)}, Discovered: ${totalDiscovered.toFixed(2)})`);
+                    console.log(`[updateCarRowTotals(${index})] Close Ratio: ${individualConversionRate.toFixed(2)}%`);
                 }
             }
             console.log(`--- updateCarRowTotals(${index}) finished ---`);
@@ -1154,34 +1169,31 @@
             const customerPayCheckboxContainer = document.getElementById(`carCustomerPayCheckboxContainer_${index}`);
             const customerPayContainer = document.getElementById(`carCustomerPayPortionContainer_${index}`);
 
-            // carTotalSoldInput is no longer affected by these toggles in terms of readonly or auto-calculation
-            // const carTotalSoldInput = document.getElementById(`carTotalSold_${index}`);
             const insuranceSoldInput = document.getElementById(`carInsuranceSold_${index}`);
             const customerPaySoldInput = document.getElementById(`carCustomerPaySold_${index}`);
 
 
             // Logic when "Has Insurance Portion?" is checked
             if (hasInsuranceCheckbox?.checked) {
-                console.log(`Car ${index} - Has Insurance Portion CHECKED`);
+                console.log(`[toggleCarPortionFields(${index})] Has Insurance Portion CHECKED`);
                 if (insuranceContainer) insuranceContainer.style.display = 'block';
                 if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'flex'; // Show customer pay checkbox
-                // carTotalSoldInput remains editable, no readonly attribute here
-                console.log(`Car ${index} - carTotalSoldInput remains EDITABLE.`);
+                console.log(`[toggleCarPortionFields(${index})] Total Sold Input remains EDITABLE.`);
 
                 // Logic for "Has Customer Pay Portion?" checkbox if insurance is active
                 if (hasCustomerPayCheckbox?.checked) {
-                    console.log(`Car ${index} - Has Customer Pay Portion CHECKED`);
+                    console.log(`[toggleCarPortionFields(${index})] Has Customer Pay Portion CHECKED`);
                     if (customerPayContainer) customerPayContainer.style.display = 'block';
                 } else {
-                    console.log(`Car ${index} - Has Customer Pay Portion UNCHECKED`);
+                    console.log(`[toggleCarPortionFields(${index})] Has Customer Pay Portion UNCHECKED`);
                     if (customerPayContainer) customerPayContainer.style.display = 'none';
                     if (customerPaySoldInput) {
                         customerPaySoldInput.value = '0.00'; // Clear customer pay if its checkbox is not active
-                        console.log(`Car ${index} - customerPaySoldInput cleared to 0`);
+                        console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
                     }
                 }
             } else { // Logic when "Has Insurance Portion?" is UNCHECKED
-                console.log(`Car ${index} - Has Insurance Portion UNCHECKED`);
+                console.log(`[toggleCarPortionFields(${index})] Has Insurance Portion UNCHECKED`);
                 if (insuranceContainer) insuranceContainer.style.display = 'none';
                 if (customerPayCheckboxContainer) customerPayCheckboxContainer.style.display = 'none'; // Hide customer pay checkbox
                 if (customerPayContainer) customerPayContainer.style.display = 'none';
@@ -1189,25 +1201,23 @@
                 // Uncheck customer pay checkbox if insurance is unchecked
                 if (hasCustomerPayCheckbox) {
                     hasCustomerPayCheckbox.checked = false;
-                    console.log(`Car ${index} - hasCustomerPayCheckbox UNCHECKED`);
+                    console.log(`[toggleCarPortionFields(${index})] hasCustomerPayCheckbox UNCHECKED`);
                 }
 
                 // Clear input fields when their containers are hidden
                 if (insuranceSoldInput) {
                     insuranceSoldInput.value = '0.00';
-                    console.log(`Car ${index} - insuranceSoldInput cleared to 0`);
+                    console.log(`[toggleCarPortionFields(${index})] insuranceSoldInput cleared to 0`);
                 }
                 if (customerPaySoldInput) {
                     customerPaySoldInput.value = '0.00';
-                    console.log(`Car ${index} - customerPaySoldInput cleared to 0`);
+                    console.log(`[toggleCarPortionFields(${index})] customerPaySoldInput cleared to 0`);
                 }
 
-                // carTotalSoldInput remains editable and its value is not cleared by this toggle
-                console.log(`Car ${index} - carTotalSoldInput remains EDITABLE.`);
+                console.log(`[toggleCarPortionFields(${index})] Total Sold Input remains EDITABLE.`);
             }
 
             // Ensure individual car row totals are correct before updating running totals
-            // Call updateCarRowTotals BEFORE updateRunningTotals to ensure currentCarSold is correct
             updateCarRowTotals(index);
             updateRunningTotals(); // Then update overall totals
             console.log(`--- toggleCarPortionFields(${index}) finished ---`);
@@ -1215,9 +1225,7 @@
 
         // New function to handle input on RO# and Last Name fields
         function handleCarInput(index) {
-            // This function is called on input for RO# and Last Name.
-            // It will trigger updateRunningTotals which now contains the duplicate check and confirmation logic.
-            updateRunningTotals();
+            updateRunningTotals(); // This will trigger overall recalculations
         }
 
 
@@ -1668,26 +1676,28 @@
                 updatedValue: '0.00',
                 updatedTime: null // Timestamp of when it was last updated today
             };
+            console.log('[DOMContentLoaded] Loaded priorDayUpdateState:', lastUpdateState);
 
             let shouldUpdatePriorDayTotal = false;
 
             // Determine target update time for today (8:15 AM)
             const targetUpdateTime = new Date(today);
             targetUpdateTime.setHours(8, 15, 0, 0); // Set to 8:15:00.000 AM today
+            console.log(`[DOMContentLoaded] Current time: ${today.toLocaleTimeString()}, Target update time: ${targetUpdateTime.toLocaleTimeString()}`);
 
             // Condition 1: It's a new day compared to the last update (or no previous update state)
             if (lastUpdateState.date !== todayDateString) {
-                console.log(`[Prior Day Logic] New day detected (${todayDateString} vs ${lastUpdateState.date}).`);
+                console.log(`[DOMContentLoaded] New day detected (${todayDateString} vs ${lastUpdateState.date}). Setting shouldUpdatePriorDayTotal to true.`);
                 shouldUpdatePriorDayTotal = true;
             }
             // Condition 2: It's the same day, but the current time is past 8:15 AM,
             // AND the prior day total hasn't been updated since 8:15 AM today.
             else if (today.getTime() >= targetUpdateTime.getTime() && (lastUpdateState.updatedTime === null || new Date(lastUpdateState.updatedTime).getTime() < targetUpdateTime.getTime())) {
-                console.log(`[Prior Day Logic] Same day, but past 8:15 AM and not updated since 8:15 AM today.`);
+                console.log(`[DOMContentLoaded] Same day, but past 8:15 AM and not updated since 8:15 AM today. Setting shouldUpdatePriorDayTotal to true.`);
                 shouldUpdatePriorDayTotal = true;
             } else {
                 // If neither of the above, load the value from the last stored state without recalculating
-                console.log(`[Prior Day Logic] No update needed. Loading prior day total from last update: ${lastUpdateState.updatedValue}`);
+                console.log(`[DOMContentLoaded] No update needed for prior day total. Loading value from last update: ${lastUpdateState.updatedValue}`);
                 priorDayTotalInput.value = lastUpdateState.updatedValue;
             }
 
@@ -1696,19 +1706,20 @@
                 let newPriorDayTotal = 0;
                 // Get the remaining goal from the *last* report to carry it over
                 const storedLastDayRemainingGoal = JSON.parse(localStorage.getItem('lastDayRemainingGoal'));
+                console.log('[DOMContentLoaded] Stored lastDayRemainingGoal:', storedLastDayRemainingGoal);
 
                 // If today is Monday (day 1), reset to 0
                 if (currentDayOfWeek === 1) { // Monday
                     newPriorDayTotal = 0.00;
-                    console.log(`[Prior Day Logic] Today is Monday, Prior Day Total reset to 0.00.`);
+                    console.log(`[DOMContentLoaded] Today is Monday, Prior Day Total reset to 0.00.`);
                 }
                 // If not Monday, and there's a stored remaining goal from yesterday, carry it over
                 else if (storedLastDayRemainingGoal) {
                     newPriorDayTotal = storedLastDayRemainingGoal.remainingGoal;
-                    console.log(`[Prior Day Logic] Prior day total carried over from last report: ${newPriorDayTotal.toFixed(2)}`);
+                    console.log(`[DOMContentLoaded] Prior day total carried over from last report: ${newPriorDayTotal.toFixed(2)}`);
                 } else {
                     newPriorDayTotal = 0.00; // Default if no stored data (e.g., first time using the form)
-                    console.log(`[Prior Day Logic] Prior day total initialized to default: ${newPriorDayTotal.toFixed(2)}`);
+                    console.log(`[DOMContentLoaded] Prior day total initialized to default: ${newPriorDayTotal.toFixed(2)}`);
                 }
 
                 priorDayTotalInput.value = newPriorDayTotal.toFixed(2);
@@ -1719,6 +1730,7 @@
                     updatedValue: newPriorDayTotal.toFixed(2),
                     updatedTime: today.getTime() // Store the timestamp of this specific update
                 }));
+                console.log('[DOMContentLoaded] Saved new priorDayUpdateState:', localStorage.getItem('priorDayUpdateState'));
             }
             // --- End of new logic for prior day total with 8:15 AM update and Monday reset ---
 
@@ -1727,14 +1739,11 @@
 
             // Initialize visibility for existing car entries
             document.querySelectorAll('#carSalesEntries .form-row').forEach((row, index) => {
-                // We need to call toggleCarPortionFields here to set initial visibility and readonly states.
-                // This will also trigger updateCarRowTotals and then updateRunningTotals, which is desired.
                 toggleCarPortionFields(index + 1);
             });
 
             // Initialize visibility for existing call entries (if any)
             document.querySelectorAll('#callEntries .form-row').forEach((row, index) => {
-                // This also calls updateRunningTotals()
                 toggleCallFieldsVisibility(index + 1);
             });
 
